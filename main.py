@@ -99,7 +99,7 @@ def get_whitelist():
         "SELECT SmObjId, PiqYear, PiqSession, title, held_in FROM whitelist WHERE SmObjId NOT IN(SELECT SmObjId FROM blacklist) AND PiqYear != 0 ORDER BY title ASC")
     cursor.execute(qry)
     for module in cursor:
-        for column, value in module.iteritems():
+        for column, value in module.items():
             if type(value) is bytearray:
                 module[column] = value.decode('utf-8')
         modules.append(module)
@@ -154,7 +154,7 @@ def remove_whitelist(module_id):
         cursor.execute(sel, val)
         if cursor.rowcount > 0:
             val = cursor.fetchone()
-            for column, value in val.iteritems():
+            for column, value in val.items():
                 if type(value) is bytearray:
                     val[column] = value.decode('utf-8')
         else:
@@ -193,7 +193,7 @@ def get_blacklist():
         "SELECT SmObjId, PiqYear, PiqSession, title, held_in FROM blacklist WHERE PiqYear != 0 ORDER BY title ASC")
     cursor.execute(qry)
     for module in cursor:
-        for column, value in module.iteritems():
+        for column, value in module.items():
             if type(value) is bytearray:
                 module[column] = value.decode('utf-8')
         modules.append(module)
@@ -248,7 +248,7 @@ def remove_blacklist(module_id):
         cursor.execute(sel, val)
         if cursor.rowcount > 0:
             val = cursor.fetchone()
-            for column, value in val.iteritems():
+            for column, value in val.items():
                 if type(value) is bytearray:
                     val[column] = value.decode('utf-8')
         else:
@@ -280,7 +280,7 @@ def get_searchterms():
         "SELECT id, term FROM searchterm ORDER BY term ASC")
     cursor.execute(qry)
     for row in cursor.fetchall():
-        for column, value in row.iteritems():
+        for column, value in row.items():
             if type(value) is bytearray:
                 row[column] = value.decode('utf-8')
         terms.append(row)
