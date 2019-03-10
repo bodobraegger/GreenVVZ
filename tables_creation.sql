@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `blacklist` (
     `title` TEXT
 );
 
-CREATE TABLE IF NOT EXISTS `searchterms` (
+CREATE TABLE IF NOT EXISTS `searchterm` (
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `term` TEXT
 );
