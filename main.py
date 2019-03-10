@@ -15,10 +15,10 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SECRET_KEY'] = '<secret_key>'
 db_config = {
-    'user': '<db_user>',
-    'password': '<db_password>',
+    'user': os.environ.get('DB_USER', 'test'),
+    'password': os.environ.get('DB_PASSWORD', 'testpw'),
     'host': '127.0.0.1',
-    'database': '<db_name>',
+    'database': os.environ.get('DB_NAME', 'testdb'),
 }
 
 

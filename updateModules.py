@@ -1,13 +1,14 @@
 #!/usr/bin/python
 # coding=utf8
+import os
 import mysql.connector
 import module as m
 
 db_config = {
-    'user': 'greenvvz',
-    'password': 'greenvvzpw',
+    'user': os.environ.get('DB_USER', 'test'),
+    'password': os.environ.get('DB_PASSWORD', 'testpw'),
     'host': '127.0.0.1',
-    'database': 'greenvvzdb',
+    'database': os.environ.get('DB_NAME', 'testdb'),
 }
 
 
