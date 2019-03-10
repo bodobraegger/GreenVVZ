@@ -1,4 +1,5 @@
 # coding=utf8
+import os
 import mysql.connector
 import xml.etree.ElementTree as ET
 from datetime import date
