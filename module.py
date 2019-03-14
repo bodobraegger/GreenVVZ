@@ -44,8 +44,8 @@ def current_year():
 # return: outputs the elements of the key as dictionary (SmObjId, PiqYear, PiqSession)
 def decode_key(key_string):
     regex = r"((?P<id>SmObjId=\'(\d*)\'),(?P<year>PiqYear=\'(\d*)\'),(?P<session>PiqSession=\'(\d*)\'))"
-    test_str = unicode(key_string)
-    matches = re.search(regex, test_str)
+    # test_str = unicode(key_string)
+    matches = re.search(regex, key_string)
     return {'SmObjId': matches.group(3), 'PiqYear': matches.group(5), 'PiqSession': matches.group(7)}
 
 
