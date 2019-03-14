@@ -1,5 +1,7 @@
+var baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
+var apiUrl = 'http://berggreen.ifi.uzh.ch/'
+
 $(document).ready(function () {
-    var baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
     //https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/2017/004/SM/50825256
     var root = $('#anchor-public')
     if(root.data("lang") === 'en'){
@@ -14,7 +16,7 @@ $(document).ready(function () {
 
 
     $.ajax({
-        url : 'https://api.tempestivus.ch/whitelist',
+        url : apiUrl,
         method : 'GET',
         success : function (data) {
             var table = $("<table></table>")
