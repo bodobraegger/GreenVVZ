@@ -48,7 +48,7 @@ def hello_world():
 @require_appkey
 def front():
     secret_key = app.config['SECRET_KEY']
-    return render_template('devpage.html')
+    return render_template('devpage.html', secret_key=secret_key)
 
 # Information about the API
 @app.route('/')
