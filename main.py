@@ -8,13 +8,13 @@ from functools import wraps
 import module as m
 import requests
 import updateModules
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__, static_url_path='/static')
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-app.config['SECRET_KEY'] = '<secret_key>'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'secret')
 db_config = {
     'user': os.environ.get('DB_USER', 'test'),
     'password': os.environ.get('DB_PASSWORD', 'testpw'),
@@ -42,6 +42,12 @@ def require_appkey(view_function):
 def hello_world():
     return jsonify(hell0='world'), 200
 
+# Front End Testing
+@app.route('/front')
+@cross_origin()
+@require_appkey
+def front():
+    return render_template('devpage.html')
 
 # Information about the API
 @app.route('/')
