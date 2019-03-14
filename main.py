@@ -47,6 +47,7 @@ def hello_world():
 @cross_origin()
 @require_appkey
 def front():
+    secret_key = app.config['SECRET_KEY']
     return render_template('devpage.html')
 
 # Information about the API
