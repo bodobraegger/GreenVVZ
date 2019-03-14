@@ -1,9 +1,9 @@
-var baseUrl = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
-
+var baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
+var apiUrl = 'http://berggreen.ifi.uzh.ch/'
 
 function whitelist_from_suggestions(SmObjId, PiqYear, PiqSession, held_in, title) {
     $.ajax({
-        url:'https://api.tempestivus.ch/whitelist/'+SmObjId+'?key='+$('#anchor-admin').data('api-key'),
+        url: apiUrl+'whitelist/'+SmObjId+'?key='+$('#anchor-admin').data('api-key'),
         method : 'POST',
         success : function (data) {
             delete_from_suggestions(SmObjId)
@@ -16,7 +16,7 @@ function whitelist_from_suggestions(SmObjId, PiqYear, PiqSession, held_in, title
 }
 function whitelist_from_blacklist(SmObjId, PiqYear, PiqSession, held_in, title) {
     $.ajax({
-        url:'https://api.tempestivus.ch/whitelist/'+SmObjId+'?key='+$('#anchor-admin').data('api-key'),
+        url: apiUrl+'whitelist/'+SmObjId+'?key='+$('#anchor-admin').data('api-key'),
         method : 'POST',
         success : function (data) {
             delete_from_blacklist(SmObjId)
@@ -30,7 +30,7 @@ function whitelist_from_blacklist(SmObjId, PiqYear, PiqSession, held_in, title) 
 }
 function blacklist_from_suggestions(SmObjId, PiqYear, PiqSession, held_in, title){
     $.ajax({
-        url:'https://api.tempestivus.ch/blacklist/'+SmObjId+'?key='+$('#anchor-admin').data('api-key'),
+        url: apiUrl+'blacklist/'+SmObjId+'?key='+$('#anchor-admin').data('api-key'),
         method : 'POST',
         success : function (data) {
             delete_from_suggestions(SmObjId)
@@ -43,7 +43,7 @@ function blacklist_from_suggestions(SmObjId, PiqYear, PiqSession, held_in, title
 }
 function blacklist_from_whitelist(SmObjId, PiqYear, PiqSession, held_in, title){
     $.ajax({
-        url:'https://api.tempestivus.ch/blacklist/'+SmObjId+'?key='+$('#anchor-admin').data('api-key'),
+        url: apiUrl+'blacklist/'+SmObjId+'?key='+$('#anchor-admin').data('api-key'),
         method : 'POST',
         success : function (data) {
             delete_from_whitelist(SmObjId);
@@ -57,7 +57,7 @@ function blacklist_from_whitelist(SmObjId, PiqYear, PiqSession, held_in, title){
 function save_searchterm(){
     var term = $('#searchterm_text').val()
     $.ajax({
-        url : 'https://api.tempestivus.ch/searchterm?key='+$('#anchor-admin').data('api-key'),
+        url :  apiUrl+'searchterm?key='+$('#anchor-admin').data('api-key'),
         method : 'POST',
         dataType : 'json',
         data : {'term':term},
@@ -75,7 +75,7 @@ function save_searchterm(){
 function save_module(){
     var id = $('#whitelist_text').val()
     $.ajax({
-        url : 'https://api.tempestivus.ch/whitelist/'+id+'?key='+$('#anchor-admin').data('api-key'),
+        url :  apiUrl+'whitelist/'+id+'?key='+$('#anchor-admin').data('api-key'),
         method : 'POST',
         success : function (data) {
             add_to_whitelist(data.SmObjId, data.PiqYear, data.PiqSession, data.held_in, data.title)
@@ -90,7 +90,7 @@ function save_module(){
 }
 function remove_searchterm(id){
     $.ajax({
-        url:'https://api.tempestivus.ch/searchterm/'+id+'?key='+$('#anchor-admin').data('api-key'),
+        url: apiUrl+'searchterm/'+id+'?key='+$('#anchor-admin').data('api-key'),
         method : 'DELETE',
         success : function (data) {
             delete_from_searchterms(id)
@@ -115,17 +115,17 @@ function delete_from_searchterms(id){
     term.remove()
 }
 function add_to_whitelist(SmObjId, PiqYear, PiqSession, held_in, title){
-    var url = baseUrl+PiqYear+'/'+PiqSession+'/SM/'+SmObjId
+    var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId
     var module = $('<tr id="'+SmObjId+'"><td><a target="_blank" href="'+url+'">'+title+'</a></td><td>'+convert_session_to_string(held_in)+'</td><td><button name="Verbergen" style="display: block; width: 100%" onclick="blacklist_from_whitelist('+SmObjId+', '+PiqYear+', '+PiqSession+', '+held_in+', \''+title+'\')" >Verbergen</td></tr>')
     $('#whitelist_body').append(module)
 }
 function add_to_blacklist(SmObjId, PiqYear, PiqSession, held_in, title){
-    var url = baseUrl+PiqYear+'/'+PiqSession+'/SM/'+SmObjId
+    var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId
     var module = $('<tr id="'+SmObjId+'"><td><a target="_blank" href="'+url+'">'+title+'</a></td><td>'+convert_session_to_string(held_in)+'</td><td><button style="display: block; width: 100%" name="Anzeigen" onclick="whitelist_from_blacklist('+SmObjId+', '+PiqYear+', '+PiqSession+', '+held_in+', \''+title+'\')">Anzeigen</button></td></tr>')
     $('#blacklist_body').append(module)
 }
 function add_to_suggestions(SmObjId, PiqYear, PiqSession, held_in, title){
-    var url = baseUrl+PiqYear+'/'+PiqSession+'/SM/'+SmObjId
+    var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId
     var module = $('<tr id="'+SmObjId+'"><td><a target="_blank" href="'+url+'">'+title+'</a></td><td>'+convert_session_to_string(held_in)+'</td><td><button name="Anzeigen" style="display: block; width: 100%" onclick="whitelist_from_suggestions('+SmObjId+', '+PiqYear+', '+PiqSession+', '+held_in+', \''+title+'\')">Anzeigen</button><button name="Verbergen" style="display: block; width: 100%" onclick="blacklist_from_suggestions('+SmObjId+', '+PiqYear+', '+PiqSession+', '+held_in+', \''+title+'\')">Verbergen</button></td></tr>')
     $('#suggestions_body').append(module)
 }
@@ -137,7 +137,7 @@ function add_to_searchterms(id, term){
 function populate_searchterms(){
     var searchterms = $('#searchterms_body')
     $.ajax({
-        url:'https://api.tempestivus.ch/searchterm',
+        url: apiUrl+'searchterm',
         method: 'GET',
         success: function (data) {
             searchterms.empty()
@@ -154,7 +154,7 @@ function populate_searchterms(){
 function populate_whitelist(){
     var whitelist = $('#whitelist_body')
     $.ajax({
-        url:'https://api.tempestivus.ch/whitelist',
+        url: apiUrl+'whitelist',
         method : 'GET',
         success : function (data) {
             whitelist.empty()
@@ -176,7 +176,7 @@ function populate_whitelist(){
 function populate_blacklist(){
     var blacklist = $('#blacklist_body')
     $.ajax({
-        url:'https://api.tempestivus.ch/blacklist',
+        url: apiUrl+'blacklist',
         method : 'GET',
         success : function (data) {
             blacklist.empty()
@@ -194,7 +194,7 @@ function populate_blacklist(){
 function populate_suggestions(){
     var suggestions = $('#suggestions_body')
     $.ajax({
-        url:'https://api.tempestivus.ch/search',
+        url: apiUrl+'search',
         method : 'GET',
         success : function (data) {
             suggestions.empty()
@@ -230,7 +230,7 @@ $(document).ready(function () {
 
     // update modules
     $.ajax({
-        url:'https://api.tempestivus.ch/update',
+        url: apiUrl+'update',
         method : 'GET',
         beforeSend: function () {
             $('#anchor-admin').before('<div id="loading"><h2>Module werden aktualisiert</h2><p>Bitte haben Sie Geduld, dies kann je nach Anzahl der Module bis zu einer Minute dauern</p></div>')
