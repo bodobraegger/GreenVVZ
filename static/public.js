@@ -16,9 +16,10 @@ $(document).ready(function () {
 
 
     $.ajax({
-        url : apiUrl,
+        url : apiUrl+"/whitelist",
         method : 'GET',
         success : function (data) {
+            console.log(data)
             var table = $("<table></table>")
             table.append('<thead><th colspan="2"><strong>'+langTitle+'</strong></th></thead>')
             var body = $('<tbody></tbody>')
