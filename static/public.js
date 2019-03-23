@@ -1,5 +1,5 @@
 var baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
-var apiUrl = 'http://berggreen.ifi.uzh.ch/'
+var apiUrl = 'http://greenvvz.ifi.uzh.ch/'
 
 $(document).ready(function () {
     //https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/2017/004/SM/50825256

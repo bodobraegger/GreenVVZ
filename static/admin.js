@@ -1,5 +1,5 @@
 var baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
-var apiUrl = 'http://berggreen.ifi.uzh.ch/'
+var apiUrl = 'http://greenvvz.ifi.uzh.ch/'
 
 function whitelist_from_suggestions(SmObjId, PiqYear, PiqSession, held_in, title) {
     $.ajax({
