@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from datetime import date
 from functools import wraps
 
-import module as m
+import models
 import requests
 import updateModules
 from flask import Flask, jsonify, request, abort, render_template
@@ -48,7 +48,33 @@ def hello_world():
 @require_appkey
 def front():
     secret_key = app.config['SECRET_KEY']
-    return render_template('devpage.html', secret_key=secret_key)
+    return render_template('front_test.html', secret_key=secret_key)
+
+# Front End Dev Page
+@app.route('/front_dev')
+@cross_origin()
+@require_appkey
+def front_dev():
+    modules = []
+    try:
+        cnx = mysql.connector.connect(**db_config)
+        cursor = cnx.cursor(dictionary=True)
+        qry = (
+            "SELECT SmObjId, PiqYear, PiqSession, title, held_in FROM whitelist WHERE SmObjId NOT IN(SELECT SmObjId FROM blacklist) AND PiqYear != 0 ORDER BY title ASC")
+        cursor.execute(qry)
+        for module in cursor:
+            for column, value in module.items():
+                if type(value) is bytearray:
+                    module[column] = value.decode('utf-8')
+            modules.append(module)
+        cnx.close()
+    except mysql.connector.errors.InterfaceError as e:
+        print(e, "\n!!!only works on server!!!")
+    
+    secret_key = app.config['SECRET_KEY']
+    return render_template('front_dev.html', modules=modules, secret_key=secret_key)
+
+
 
 # Information about the API
 @app.route('/')
@@ -122,7 +148,7 @@ def add_whitelist(module_id):
     cnx = mysql.connector.connect(**db_config)
     qry = "INSERT IGNORE INTO whitelist (SmObjId, PiqYear, PiqSession, title, held_in) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(held_in)s)"
     qry2 = "DELETE FROM blacklist WHERE SmObjId = %(SmObjId)s"
-    module = m.Module(module_id)
+    module = models.Module(module_id)
     module.update()
     val = module.get_module()
     if val:
@@ -215,7 +241,7 @@ def add_blacklist(module_id):
     cnx = mysql.connector.connect(**db_config)
     qry = "INSERT IGNORE INTO blacklist (SmObjId, PiqYear, PiqSession, title, held_in) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(held_in)s)"
     qry2 = "DELETE FROM whitelist WHERE SmObjId = %(SmObjId)s"
-    module = m.Module(module_id)
+    module = models.Module(module_id)
     module.update()
     val = module.get_module()
     if val:
