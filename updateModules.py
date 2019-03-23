@@ -2,7 +2,7 @@
 # coding=utf8
 import os
 import mysql.connector
-import module as m
+import models
 
 db_config = {
     'user': os.environ.get('DB_USER', 'test'),
@@ -23,7 +23,7 @@ def update_whitelist():
     cursor.execute(qry)
     for row in cursor:
         cursor2 = cnx.cursor()
-        mod = m.Module(row[0])
+        mod = models.Module(row[0])
         if mod.update():
             qry2 = "UPDATE whitelist SET PiqYear=%(PiqYear)s, PiqSession=%(PiqSession)s, held_in=%(held_in)s, title=%(title)s WHERE SmObjId=%(SmObjId)s;"
             val = {'SmObjId': mod.SmObjId,
@@ -55,7 +55,7 @@ def update_blacklist():
     cursor.execute(qry)
     for row in cursor:
         cursor2 = cnx.cursor()
-        mod = m.Module(row[0])
+        mod = models.Module(row[0])
         if mod.update():
             qry2 = "UPDATE blacklist SET PiqYear=%(PiqYear)s, PiqSession=%(PiqSession)s, held_in=%(held_in)s, title=%(title)s WHERE SmObjId=%(SmObjId)s;"
             val = {'SmObjId': mod.SmObjId,
