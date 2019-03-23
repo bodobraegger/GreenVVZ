@@ -238,10 +238,10 @@ $(document).ready(function () {
         success : function (data) {
             var root = $('#anchor-admin')
             // prepare lists
-            var whitelist = $('<h3>Angezeigte Elemente (Whitelist)</h3><div style="padding: 0"><table><thead><td>Name der Lehrveranstaltung</td><td>Semster</td><td>Verbergen</td></thead><tbody id="whitelist_body"></tbody></table></div>')
-            var searchterms = $('<h3>Suchbegriffe</h3><div style="padding: 0"><table><thead><td>Begriff</td><td>Entfernen</td></thead><tbody id="searchterms_body"></tbody></table></div>')
-            var suggestions = $('<h3>Vorschläge basierend auf Suchbegriffen</h3><div style="padding: 0"><table><thead><td>Name der Lehrveranstaltung</td><td>Semster</td><td>Anzeigen/Verbergen</td></thead><tbody id="suggestions_body"></tbody></table></div>')
-            var blacklist = $('<h3>Verborgene Elemente (Blacklist)</h3><div style="padding: 0"><table><thead><td>Name der Lehrveranstaltung</td><td>Semster</td><td>Anzeigen</td></thead><tbody id="blacklist_body"></tbody></table></div>')
+            var whitelist =     $('<h3>Angezeigte Elemente (Whitelist)</h3><div style="padding: 0"><table><thead><td>Name der Lehrveranstaltung</td><td>Semster</td><td>Verbergen</td></thead><tbody id="whitelist_body"></tbody></table></div>')
+            var searchterms =   $('<h3>Suchbegriffe</h3><div style="padding: 0"><table><thead><td>Begriff</td><td>Entfernen</td></thead><tbody id="searchterms_body"></tbody></table></div>')
+            var suggestions =   $('<h3>Vorschläge basierend auf Suchbegriffen</h3><div style="padding: 0"><table><thead><td>Name der Lehrveranstaltung</td><td>Semster</td><td>Anzeigen/Verbergen</td></thead><tbody id="suggestions_body"></tbody></table></div>')
+            var blacklist =     $('<h3>Verborgene Elemente (Blacklist)</h3><div style="padding: 0"><table><thead><td>Name der Lehrveranstaltung</td><td>Semster</td><td>Anzeigen</td></thead><tbody id="blacklist_body"></tbody></table></div>')
             root.append(whitelist,searchterms,suggestions,blacklist)
             // populate searchterms
             populate_searchterms()
