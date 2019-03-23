@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}
+{% endblock %}
+{% block content %}
+    <div class="flight-container" style="overflow: auto; max-height: 80vh">
+        <div class="table-responsive">
+            <table class="table" id="flights">
+                <thead>
+                    <tr>
+                        <th scope="col">title</</th>
+                        <th scope="col">SmObjId</th>
+                        <th scope="col">held_in</th>
+                        <th scope="col">PiqSession</th>
+                        <th scope="col">PiqYear</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for m in modules %}
+                    <tr id={{ m.id }}>
+                        <th scope="row">{{ m.title }}</th>
+                        <td>            {{ m.SmObjId }} </td>
+                        <td>            {{ m.held_in }} </td>
+                        <td>            {{ m.PiqSession }} </td>
+                        <td>            {{ m.PiqYear }} </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+
+<html>
+    <head>
+        <link rel="stylesheet" href="static/jquery-ui.min.css">
+        <script type="text/javascript" src="static/external/jquery/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="static/jquery-ui.min.js"></script>
+
+        <script type="text/javascript" src="static/admin.js"></script>
+        <script type="text/javascript" src="static/public.js"></script>
+    </head>
+    <body>
+        <div id="anchor-admin" data-api-key="secret" class="ui-accordion ui-widget ui-helper-reset" role="tablist"></div>
+            <hr>
+        <br>
+        <br>
+        <p>
+            Above is the admin interface, below the public interface.
+        </p>
+        <br>
+            <hr>
+        <div id="anchor-public"></div>
+
+
+        <hr>
+        <div id="anchor-admin-2" data-api-key="secret" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
+            <h3>Angezeigte Elemente (Whitelist)</h3>
+            <div style="padding: 0">
+                <table>
+                    <thead>
+                        <td>Name der Lehrveranstaltung</td>
+                        <td>Semster</td>
+                        <td>Verbergen</td>
+                    </thead>
+                    <tbody id="whitelist_body">
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Suchbegriffe</h3><div style="padding: 0">
+            <table>
+                <thead>
+                    <td>Begriff</td>
+                    <td>Entfernen</td>
+                </thead>
+                <tbody id="searchterms_body">
+                </tbody>
+            </table>
+            </div>
+
+            <h3>Vorschläge basierend auf Suchbegriffen</h3>
+            <div style="padding: 0">
+                <table>
+                    <thead>
+                        <td>Name der Lehrveranstaltung</td>
+                        <td>Semster</td>
+                        <td>Anzeigen/Verbergen</td>
+                    </thead>
+                    <tbody id="suggestions_body">
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Verborgene Elemente (Blacklist)</h3>
+            <div style="padding: 0">
+                <table>
+                    <thead>
+                        <td>Name der Lehrveranstaltung</td>
+                        <td>Semster</td>
+                        <td>Anzeigen</td>
+                    </thead>
+                    <tbody id="blacklist_body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+    </body>
+</html>
