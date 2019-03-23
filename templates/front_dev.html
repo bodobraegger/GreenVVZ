@@ -1,6 +1,4 @@
-{% extends 'base.html' %}
-{% block title %}
-{% endblock %}
+{# {% extends 'base.html' %}
 {% block content %}
     <div class="flight-container" style="overflow: auto; max-height: 80vh">
         <div class="table-responsive">
@@ -28,7 +26,7 @@
             </table>
         </div>
     </div>
-{% endblock %}
+{% endblock %} #}
 
 
 <html>
@@ -64,6 +62,26 @@
                         <td>Verbergen</td>
                     </thead>
                     <tbody id="whitelist_body">
+                        {% for m in whitelist %}
+                            <tr id={{ m.SmObjId }}>
+                                <th scope="row">{{ m.title }}</th>
+                                {# <td>            {{ m.SmObjId }} </td> #}
+                                <td> <!-- {{ m.held_in }} -->
+                                    {% if m.held_in == 3 %}
+                                        HS
+                                    {% elif m.held_in == 4 %}
+                                        FS
+                                    {% elif m.held_in == 999 %}
+                                        HS & FS
+                                    {% else %}
+                                        undefiniert
+                                    {% endif %}
+                                </td>
+                                {# <td>            {{ m.PiqSession }} </td> #}
+                                {# <td>            {{ m.PiqYear }} </td> #}
+                                <td><button name="Verbergen" style="display: block; width: 100%" onclick="blacklist_from_whitelist">Verbergen</button></td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -101,6 +119,27 @@
                         <td>Anzeigen</td>
                     </thead>
                     <tbody id="blacklist_body">
+                        {% for m in blacklist %}
+                            <tr id={{ m.SmObjId }}>
+                                <th scope="row">{{ m.title }}</th>
+                                {# <td>            {{ m.SmObjId }} </td> #}
+                                <td> <!-- {{ m.held_in }} -->
+                                    {% if m.held_in == 3 %}
+                                        HS
+                                    {% elif m.held_in == 4 %}
+                                        FS
+                                    {% elif m.held_in == 999 %}
+                                        HS & FS
+                                    {% else %}
+                                        undefiniert
+                                    {% endif %}
+                                </td>
+                                {# <td>            {{ m.PiqSession }} </td> #}
+                                {# <td>            {{ m.PiqYear }} </td> #}
+                                <td><button name="Verbergen" style="display: block; width: 100%" onclick="blacklist_from_whitelist">Verbergen</button></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
                     </tbody>
                 </table>
             </div>

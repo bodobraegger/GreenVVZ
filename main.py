@@ -55,24 +55,17 @@ def front():
 @cross_origin()
 @require_appkey
 def front_dev():
-    modules = []
+    whitelist = []
+    blacklist = []
+    secret_key = app.config['SECRET_KEY']
+
     try:
-        cnx = mysql.connector.connect(**db_config)
-        cursor = cnx.cursor(dictionary=True)
-        qry = (
-            "SELECT SmObjId, PiqYear, PiqSession, title, held_in FROM whitelist WHERE SmObjId NOT IN(SELECT SmObjId FROM blacklist) AND PiqYear != 0 ORDER BY title ASC")
-        cursor.execute(qry)
-        for module in cursor:
-            for column, value in module.items():
-                if type(value) is bytearray:
-                    module[column] = value.decode('utf-8')
-            modules.append(module)
-        cnx.close()
+        whitelist = get_modules("whitelist")
+        blacklist = get_modules("blacklist")
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
-    
-    secret_key = app.config['SECRET_KEY']
-    return render_template('front_dev.html', modules=modules, secret_key=secret_key)
+        
+    return render_template('front_dev.html', whitelist=whitelist, blacklist=blacklist, secret_key=secret_key)
 
 
 
@@ -459,3 +452,18 @@ def current_year():
 
 if __name__ == "__main__":
     app.run()
+
+def get_modules(name):
+    modules = []
+    cnx = mysql.connector.connect(**db_config)
+    cursor = cnx.cursor(dictionary=True)
+    qry = (
+        "SELECT SmObjId, PiqYear, PiqSession, title, held_in FROM "+name+" WHERE PiqYear != 0 ORDER BY title ASC")
+    cursor.execute(qry)
+    for module in cursor:
+        for column, value in module.items():
+            if type(value) is bytearray:
+                module[column] = value.decode('utf-8')
+        modules.append(module)
+    cnx.close()
+    return modules
