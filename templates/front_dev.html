@@ -121,7 +121,7 @@
                     <tbody id="blacklist_body">
                         {% for m in blacklist %}
                             <tr id={{ m.SmObjId }}>
-                                <th scope="row">{{ m.title }}</th>
+                                <td><a target=_"blank" href="">{{ m.title }}</a></th>
                                 {# <td>            {{ m.SmObjId }} </td> #}
                                 <td> <!-- {{ m.held_in }} -->
                                     {% if m.held_in == 3 %}
