@@ -55,6 +55,7 @@ def front():
 @cross_origin()
 @require_appkey
 def front_dev():
+    baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
     whitelist = []
     blacklist = []
     secret_key = app.config['SECRET_KEY']
@@ -64,8 +65,17 @@ def front_dev():
         blacklist = get_modules("blacklist")
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
-        
-    return render_template('front_dev.html', whitelist=whitelist, blacklist=blacklist, secret_key=secret_key)
+        test = {
+            'PiqSession': 3,
+            'PiqYear': 2018,
+            'SmObjId': 50904112,
+            'held_in': 3,
+            'title': "ayy",
+        }
+        whitelist.append(test)
+        blacklist.append(test)
+
+    return render_template('front_dev.html', whitelist=whitelist, blacklist=blacklist, baseUrlVvzUzh=baseUrlVvzUzh, secret_key=secret_key)
 
 
 
