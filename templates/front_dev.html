@@ -74,7 +74,7 @@
                         </tr>
                         {% for m in whitelist %}
                             <tr id={{ m.SmObjId }}>
-                                <td><a target=_"blank" href="">{{ m.title }}</a></th>
+                                <td><a target=_"blank" href="">{{ m.held_in }}</a></th>
                                 {# <td>            {{ m.SmObjId }} </td> #}
                                 <td> <!-- {{ m.held_in }} -->
                                     {% if m.held_in == 3 %}
@@ -89,7 +89,7 @@
                                 </td>
                                 {# <td>            {{ m.PiqSession }} </td> #}
                                 {# <td>            {{ m.PiqYear }} </td> #}
-                                <td><button name="Verbergen" onclick="blacklist_from_whitelist">Verbergen</button></td>
+                                <td><button name="Verbergen" onclick="blacklist_from_whitelist({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.held_in }}, {{ m.held_in }}, '{{ m.title }}')">Verbergen</button></td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -156,7 +156,7 @@
                                 </td>
                                 {# <td>            {{ m.PiqSession }} </td> #}
                                 {# <td>            {{ m.PiqYear }} </td> #}
-                                <td><button name="Verbergen" onclick="blacklist_from_whitelist">Verbergen</button></td>
+                                <td><button name="Anzeigen" onclick="whitelist_from_blacklist({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.held_in }}, {{ m.held_in }}, '{{ m.title }}')">Anzeigen</button></td>
                             </tr>
                         {% endfor %}
                     </tbody>
