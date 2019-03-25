@@ -453,6 +453,7 @@ def current_year():
 if __name__ == "__main__":
     app.run()
 
+# Get modules from either the black or white list database, for in template use.
 def get_modules(name):
     modules = []
     cnx = mysql.connector.connect(**db_config)
