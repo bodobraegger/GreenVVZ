@@ -62,6 +62,10 @@
                         <td>Verbergen</td>
                     </thead>
                     <tbody id="whitelist_body">
+                        <tr>
+                            <td><input type="text" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%"></td>
+                            <td colspan="2"><button name="submit_whitelist" style="display: block; width: 100%" type="button" onclick="save_module()">Modul hinzufügen</button></td>
+                        </tr>
                         {% for m in whitelist %}
                             <tr id={{ m.SmObjId }}>
                                 <td><a target=_"blank" href="">{{ m.title }}</a></th>
@@ -93,6 +97,16 @@
                     <td>Entfernen</td>
                 </thead>
                 <tbody id="searchterms_body">
+                    <tr>
+                        <td><input type="text" id="searchterm_text" spellcheck="true" placeholder="Suchbegriff für Titel, Beschrieb oder Kürzel" style="width: 90%"></td>
+                        <td><button name="submit_searchterm" style="display: block; width: 100%" type="button" onclick="save_searchterm()">Suchbegriff speichern</button></td>
+                    </tr>
+                    {% for t in searchterms %}
+                        <tr id={{ t.id }}>
+                            <td>{{ t.term }}</td>
+                            <td><button style="display: block; width: 100%" onclick="remove_searchterm({{ t.id }})">Entfernen</button></td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
             </div>
