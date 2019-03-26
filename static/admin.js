@@ -2,8 +2,9 @@ var baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/d
 var apiUrl = 'http://greenvvz.ifi.uzh.ch/'
 
 function whitelist_from_suggestions(SmObjId, PiqYear, PiqSession, held_in, title) {
+    var secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data('api-key')
     $.ajax({
-        url: apiUrl+'whitelist/'+SmObjId+'?key='+$('#anchor-admin').data('api-key'),
+        url: apiUrl+'whitelist/'+SmObjId+'?key='+secret_key,
         method : 'POST',
         success : function (data) {
             delete_from_suggestions(SmObjId)
@@ -16,7 +17,7 @@ function whitelist_from_suggestions(SmObjId, PiqYear, PiqSession, held_in, title
 }
 function whitelist_from_blacklist(SmObjId, PiqYear, PiqSession, held_in, title) {
     $.ajax({
-        url: apiUrl+'whitelist/'+SmObjId+'?key='+$('#anchor-admin').data('api-key'),
+        url: apiUrl+'whitelist/'+SmObjId+'?key='+secret_key,
         method : 'POST',
         success : function (data) {
             delete_from_blacklist(SmObjId)
@@ -30,7 +31,7 @@ function whitelist_from_blacklist(SmObjId, PiqYear, PiqSession, held_in, title) 
 }
 function blacklist_from_suggestions(SmObjId, PiqYear, PiqSession, held_in, title){
     $.ajax({
-        url: apiUrl+'blacklist/'+SmObjId+'?key='+$('#anchor-admin').data('api-key'),
+        url: apiUrl+'blacklist/'+SmObjId+'?key='+secret_key,
         method : 'POST',
         success : function (data) {
             delete_from_suggestions(SmObjId)
@@ -43,7 +44,7 @@ function blacklist_from_suggestions(SmObjId, PiqYear, PiqSession, held_in, title
 }
 function blacklist_from_whitelist(SmObjId, PiqYear, PiqSession, held_in, title){
     $.ajax({
-        url: apiUrl+'blacklist/'+SmObjId+'?key='+$('#anchor-admin').data('api-key'),
+        url: apiUrl+'blacklist/'+SmObjId+'?key='+secret_key,
         method : 'POST',
         success : function (data) {
             delete_from_whitelist(SmObjId);
@@ -57,7 +58,7 @@ function blacklist_from_whitelist(SmObjId, PiqYear, PiqSession, held_in, title){
 function save_searchterm(){
     var term = $('#searchterm_text').val()
     $.ajax({
-        url :  apiUrl+'searchterm?key='+$('#anchor-admin').data('api-key'),
+        url :  apiUrl+'searchterm?key='+secret_key,
         method : 'POST',
         dataType : 'json',
         data : {'term':term},
@@ -75,7 +76,7 @@ function save_searchterm(){
 function save_module(){
     var id = $('#whitelist_text').val()
     $.ajax({
-        url :  apiUrl+'whitelist/'+id+'?key='+$('#anchor-admin').data('api-key'),
+        url :  apiUrl+'whitelist/'+id+'?key='+secret_key,
         method : 'POST',
         success : function (data) {
             add_to_whitelist(data.SmObjId, data.PiqYear, data.PiqSession, data.held_in, data.title)
@@ -90,7 +91,7 @@ function save_module(){
 }
 function remove_searchterm(id){
     $.ajax({
-        url: apiUrl+'searchterm/'+id+'?key='+$('#anchor-admin').data('api-key'),
+        url: apiUrl+'searchterm/'+id+'?key='+secret_key,
         method : 'DELETE',
         success : function (data) {
             delete_from_searchterms(id)
