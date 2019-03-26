@@ -311,7 +311,7 @@ def remove_blacklist(module_id):
 # get all search terms
 @app.route('/searchterm', methods=['GET'])
 @cross_origin()
-def get_searchterms():
+def get_searchterms(jsonified=True):
     terms = []
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
@@ -323,7 +323,9 @@ def get_searchterms():
             if type(value) is bytearray:
                 row[column] = value.decode('utf-8')
         terms.append(row)
-    return jsonify(terms)
+    if jsonified:
+        return jsonify(terms)
+    return terms
 
 
 # add search term
