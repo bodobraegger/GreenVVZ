@@ -3,9 +3,6 @@
         <link rel="stylesheet" href="static/jquery-ui.min.css">
         <script type="text/javascript" src="static/external/jquery/jquery-3.3.1.min.js"></script>
         <script type="text/javascript" src="static/jquery-ui.min.js"></script>
-
-        <script type="text/javascript" src="static/admin.js"></script>
-        <script type="text/javascript" src="static/public.js"></script>
         <style>
             button {
                 display: block; 
@@ -14,8 +11,8 @@
         </style>
     </head>
     <body>
-        <!-- <div id="anchor-admin" data-api-key="secret" class="ui-accordion ui-widget ui-helper-reset" role="tablist"></div> -->
-        <div id="anchor-admin-2" data-api-key="secret" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
+        <!-- <div id="anchor-admin" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist"></div> -->
+        <div id="anchor-admin-2" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
             <h3>Angezeigte Elemente (Whitelist)</h3>
             <div style="padding: 0">
                 <table>
@@ -137,5 +134,8 @@
         <br>
         <div id="anchor-public"></div>
         <hr>
+    
+        <script type="text/javascript" src="static/admin.js"></script>
+        <script type="text/javascript" src="static/public.js"></script>
     </body>
 </html>
