@@ -4,12 +4,11 @@ import mysql.connector
 import xml.etree.ElementTree as ET
 from datetime import date
 from functools import wraps
-import json
 
 import models
 import requests
 import updateModules
-from flask import Flask, jsonify, request, abort, render_template
+from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__, static_url_path='/static')
