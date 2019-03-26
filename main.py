@@ -58,6 +58,7 @@ def front_dev():
     baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
     whitelist = []
     blacklist = []
+    searchterms = []
     secret_key = app.config['SECRET_KEY']
 
     try:
@@ -75,6 +76,7 @@ def front_dev():
         }
         whitelist.append(test)
         blacklist.append(test)
+        searchterms.append({"id": 1, "term": "wut"})
 
     return render_template('front_dev.html', whitelist=whitelist, blacklist=blacklist, searchterms=searchterms, baseUrlVvzUzh=baseUrlVvzUzh, secret_key=secret_key)
 
