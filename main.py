@@ -4,6 +4,7 @@ import mysql.connector
 import xml.etree.ElementTree as ET
 from datetime import date
 from functools import wraps
+import json
 
 import models
 import requests
@@ -64,7 +65,7 @@ def front_dev():
     try:
         whitelist = get_modules("whitelist")
         blacklist = get_modules("blacklist")
-        searchterms = get_searchterms(jsonified=False)
+        searchterms = json.loads(get_searchterms())
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
@@ -311,7 +312,7 @@ def remove_blacklist(module_id):
 # get all search terms
 @app.route('/searchterm', methods=['GET'])
 @cross_origin()
-def get_searchterms(jsonified=True):
+def get_searchterms():
     terms = []
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
@@ -323,9 +324,7 @@ def get_searchterms(jsonified=True):
             if type(value) is bytearray:
                 row[column] = value.decode('utf-8')
         terms.append(row)
-    if jsonified:
-        return jsonify(terms)
-    return terms
+    return jsonify(terms)
 
 
 # add search term
