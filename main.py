@@ -63,6 +63,7 @@ def front_dev():
     try:
         whitelist = get_modules("whitelist")
         blacklist = get_modules("blacklist")
+        searchters = get_searchterms()
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
