@@ -13,112 +13,114 @@
     </head>
     <body>
         <!-- <div id="anchor-admin" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist"></div> -->
-        <div id="anchor-admin-2" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
-            <h3>Angezeigte Elemente (Whitelist)</h3>
-            <div style="padding: 0">
+        <div class="mod mod-text skin-text-basics"> <!-- add this outer div to match UZH styling -->
+            <div id="anchor-admin-2" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
+                <h3>Angezeigte Elemente (Whitelist)</h3>
+                <div style="padding: 0">
+                    <table>
+                        <thead>
+                            <td>Name der Lehrveranstaltung</td>
+                            <td>Semster</td>
+                            <td>Verbergen</td>
+                        </thead>
+                        <tbody id="whitelist_body">
+                            <tr>
+                                <td><input type="text" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%"></td>
+                                <td colspan="2"><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
+                            </tr>
+                            {% for m in whitelist %}
+                                <tr id={{ m.SmObjId }}>
+                                    <td><a target=_"blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
+                                    {# <td>            {{ m.SmObjId }} </td> #}
+                                    <td> <!-- {{ m.held_in }} -->
+                                        {% if m.held_in == 3 %}
+                                            HS
+                                        {% elif m.held_in == 4 %}
+                                            FS
+                                        {% elif m.held_in == 999 %}
+                                            HS & FS
+                                        {% else %}
+                                            undefiniert
+                                        {% endif %}
+                                    </td>
+                                    {# <td>            {{ m.PiqSession }} </td> #}
+                                    {# <td>            {{ m.PiqYear }} </td> #}
+                                    <td><button name="Verbergen" onclick="blacklist_from_whitelist({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.PiqSession }}, {{ m.held_in }}, '{{ m.title }}')">Verbergen</button></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Suchbegriffe</h3><div style="padding: 0">
                 <table>
                     <thead>
-                        <td>Name der Lehrveranstaltung</td>
-                        <td>Semster</td>
-                        <td>Verbergen</td>
+                        <td>Begriff</td>
+                        <td>Entfernen</td>
                     </thead>
-                    <tbody id="whitelist_body">
+                    <tbody id="searchterms_body">
                         <tr>
-                            <td><input type="text" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%"></td>
-                            <td colspan="2"><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
+                            <td><input type="text" id="searchterm_text" spellcheck="true" placeholder="Suchbegriff für Titel, Beschrieb oder Kürzel" style="width: 90%"></td>
+                            <td><button name="submit_searchterm" type="button" onclick="save_searchterm()">Suchbegriff speichern</button></td>
                         </tr>
-                        {% for m in whitelist %}
-                            <tr id={{ m.SmObjId }}>
-                                <td><a target=_"blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
-                                {# <td>            {{ m.SmObjId }} </td> #}
-                                <td> <!-- {{ m.held_in }} -->
-                                    {% if m.held_in == 3 %}
-                                        HS
-                                    {% elif m.held_in == 4 %}
-                                        FS
-                                    {% elif m.held_in == 999 %}
-                                        HS & FS
-                                    {% else %}
-                                        undefiniert
-                                    {% endif %}
-                                </td>
-                                {# <td>            {{ m.PiqSession }} </td> #}
-                                {# <td>            {{ m.PiqYear }} </td> #}
-                                <td><button name="Verbergen" onclick="blacklist_from_whitelist({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.PiqSession }}, {{ m.held_in }}, '{{ m.title }}')">Verbergen</button></td>
+                        {% for t in searchterms %}
+                            <tr id={{ t.id }}>
+                                <td>{{ t.term }}</td>
+                                <td><button onclick="remove_searchterm({{ t.id }})">Entfernen</button></td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-            </div>
+                </div>
 
-            <h3>Suchbegriffe</h3><div style="padding: 0">
-            <table>
-                <thead>
-                    <td>Begriff</td>
-                    <td>Entfernen</td>
-                </thead>
-                <tbody id="searchterms_body">
-                    <tr>
-                        <td><input type="text" id="searchterm_text" spellcheck="true" placeholder="Suchbegriff für Titel, Beschrieb oder Kürzel" style="width: 90%"></td>
-                        <td><button name="submit_searchterm" type="button" onclick="save_searchterm()">Suchbegriff speichern</button></td>
-                    </tr>
-                    {% for t in searchterms %}
-                        <tr id={{ t.id }}>
-                            <td>{{ t.term }}</td>
-                            <td><button onclick="remove_searchterm({{ t.id }})">Entfernen</button></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            </div>
+                <h3>Vorschläge basierend auf Suchbegriffen</h3>
+                <div style="padding: 0">
+                    <table>
+                        <thead>
+                            <td>Name der Lehrveranstaltung</td>
+                            <td>Semster</td>
+                            <td>Anzeigen/Verbergen</td>
+                        </thead>
+                        <tbody id="suggestions_body">
+                        </tbody>
+                    </table>
+                </div>
 
-            <h3>Vorschläge basierend auf Suchbegriffen</h3>
-            <div style="padding: 0">
-                <table>
-                    <thead>
-                        <td>Name der Lehrveranstaltung</td>
-                        <td>Semster</td>
-                        <td>Anzeigen/Verbergen</td>
-                    </thead>
-                    <tbody id="suggestions_body">
-                    </tbody>
-                </table>
+                <h3>Verborgene Elemente (Blacklist)</h3>
+                <div style="padding: 0">
+                    <table>
+                        <thead>
+                            <td>Name der Lehrveranstaltung</td>
+                            <td>Semster</td>
+                            <td>Anzeigen</td>
+                        </thead>
+                        <tbody id="blacklist_body">
+                            {% for m in blacklist %}
+                                <tr id={{ m.SmObjId }}>
+                                    <td><a target=_"blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
+                                    {# <td>            {{ m.SmObjId }} </td> #}
+                                    <td> <!-- {{ m.held_in }} -->
+                                        {% if m.held_in == 3 %}
+                                            HS
+                                        {% elif m.held_in == 4 %}
+                                            FS
+                                        {% elif m.held_in == 999 %}
+                                            HS & FS
+                                        {% else %}
+                                            undefiniert
+                                        {% endif %}
+                                    </td>
+                                    {# <td>            {{ m.PiqSession }} </td> #}
+                                    {# <td>            {{ m.PiqYear }} </td> #}
+                                    <td><button name="Anzeigen" onclick="whitelist_from_blacklist({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.held_in }}, {{ m.held_in }}, '{{ m.title }}')">Anzeigen</button></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-
-            <h3>Verborgene Elemente (Blacklist)</h3>
-            <div style="padding: 0">
-                <table>
-                    <thead>
-                        <td>Name der Lehrveranstaltung</td>
-                        <td>Semster</td>
-                        <td>Anzeigen</td>
-                    </thead>
-                    <tbody id="blacklist_body">
-                        {% for m in blacklist %}
-                            <tr id={{ m.SmObjId }}>
-                                <td><a target=_"blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
-                                {# <td>            {{ m.SmObjId }} </td> #}
-                                <td> <!-- {{ m.held_in }} -->
-                                    {% if m.held_in == 3 %}
-                                        HS
-                                    {% elif m.held_in == 4 %}
-                                        FS
-                                    {% elif m.held_in == 999 %}
-                                        HS & FS
-                                    {% else %}
-                                        undefiniert
-                                    {% endif %}
-                                </td>
-                                {# <td>            {{ m.PiqSession }} </td> #}
-                                {# <td>            {{ m.PiqYear }} </td> #}
-                                <td><button name="Anzeigen" onclick="whitelist_from_blacklist({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.held_in }}, {{ m.held_in }}, '{{ m.title }}')">Anzeigen</button></td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        </div> <!-- END outer div to match UZH styling -->
 
         <br>
         <br>       
