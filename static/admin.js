@@ -59,7 +59,7 @@ function blacklist_from_whitelist(SmObjId, PiqYear, PiqSession, held_in, title){
 function save_searchterm(){
     var term = $('#searchterm_text').val()
     $.ajax({
-        url :  apiUrl+'searchterm?key='+secret_key,
+        url :  apiUrl+'searchterms?key='+secret_key,
         method : 'POST',
         dataType : 'json',
         data : {'term':term},
@@ -92,7 +92,7 @@ function save_module(){
 }
 function remove_searchterm(id){
     $.ajax({
-        url: apiUrl+'searchterm/'+id+'?key='+secret_key,
+        url: apiUrl+'searchterms/'+id+'?key='+secret_key,
         method : 'DELETE',
         success : function (data) {
             delete_from_searchterms(id)
@@ -139,7 +139,7 @@ function add_to_searchterms(id, term){
 function populate_searchterms(){
     var searchterms = $('#searchterms_body')
     $.ajax({
-        url: apiUrl+'searchterm',
+        url: apiUrl+'searchterms',
         method: 'GET',
         success: function (data) {
             searchterms.empty()

@@ -309,14 +309,14 @@ def remove_blacklist(module_id):
 
 
 # get all search terms
-@app.route('/searchterm', methods=['GET'])
+@app.route('/searchterms', methods=['GET'])
 @cross_origin()
 def get_searchterms():
     terms = []
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
     qry = (
-        "SELECT id, term FROM searchterm ORDER BY term ASC")
+        "SELECT id, term FROM searchterms ORDER BY term ASC")
     cursor.execute(qry)
     for row in cursor.fetchall():
         for column, value in row.items():
@@ -327,7 +327,7 @@ def get_searchterms():
 
 
 # add search term
-@app.route('/searchterm', methods=['POST'])
+@app.route('/searchterms', methods=['POST'])
 @cross_origin()
 @require_appkey
 def add_searchterm():
@@ -336,7 +336,7 @@ def add_searchterm():
     data = request.form
     term = data['term']
     # term  =  'test'
-    qry = "INSERT INTO searchterm (term) VALUES (%(term)s)"
+    qry = "INSERT INTO searchterms (term) VALUES (%(term)s)"
     try:
         cursor.execute(qry, data)
         id = cursor.lastrowid
@@ -349,13 +349,13 @@ def add_searchterm():
 
 
 # remove search term
-@app.route('/searchterm/<int:id>', methods=['DELETE'])
+@app.route('/searchterms/<int:id>', methods=['DELETE'])
 @cross_origin()
 @require_appkey
 def remove_searchterm(id):
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor()
-    qry = "DELETE FROM searchterm WHERE id= %(id)s"
+    qry = "DELETE FROM searchterms WHERE id= %(id)s"
     try:
         cursor.execute(qry, {'id': id})
         cnx.commit()
@@ -375,7 +375,7 @@ def search():
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
     qry = (
-        "SELECT term FROM searchterm")
+        "SELECT term FROM searchterms")
     cursor.execute(qry)
     for row in cursor:
         terms.append(row['term'])
