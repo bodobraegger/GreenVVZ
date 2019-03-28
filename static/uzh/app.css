@@ -11998,7 +11998,7 @@ body {
 .skin-text-basics a[href^="#"] {
   padding-left: 13px;
   padding-right: 2px;
-  background: transparent url(uzh/assets/img/sprite/icon/arrow-right.png) 0 0 no-repeat;
+  background: transparent url(assets/img/sprite/icon/arrow-right.png) 0 0 no-repeat;
 }
 .skin-text-basics a[href*="/dam/"],
 .skin-text-basics a.download {
