@@ -18,5 +18,5 @@ CREATE TABLE IF NOT EXISTS `blacklist` (
 -- should be searchterms
 CREATE TABLE IF NOT EXISTS `searchterms` (
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `term` TEXT NOT NULL CHECK (`term` <> '')
+    `term` TEXT NOT NULL CHECK (`term` <> N'') -- Ignored in MariaDB version < 10.2.1, we are on 10.1.37 :(
 );
