@@ -226,3 +226,7 @@ function convert_session_to_string(session){
     }
 
 }
+
+$(document).ready(function () {
+    $('#anchor-admin-2').accordion({collapsible:true,heightStyle:'content'})
+});

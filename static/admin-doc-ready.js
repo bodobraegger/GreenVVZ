@@ -1,5 +1,4 @@
 $(document).ready(function () {
-    $('#anchor-admin-2').accordion({collapsible:true,heightStyle:'content'})
     // update modules
     $.ajax({
         url: apiUrl+'update',
