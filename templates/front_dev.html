@@ -85,6 +85,25 @@
                             <td>Anzeigen/Verbergen</td>
                         </thead>
                         <tbody id="suggestions_body">
+                        {% for m in found_modules %}
+                            <tr id={{m.SmObjId}}>
+                                <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
+                                <td> <!-- held in: {{ m.held_in }} -->
+                                    {% if m.held_in == 3 %}
+                                        HS
+                                    {% elif m.held_in == 4 %}
+                                        FS
+                                    {% elif m.held_in == 999 %}
+                                        HS & FS
+                                    {% else %}
+                                        undefiniert
+                                    {% endif %}
+                                </td>
+                                <td><button name="Anzeigen" onclick="whitelist_from_suggestions({{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, {{m.held_in}}, {{m.title}})">Anzeigen</button>
+                                    <button name="Verbergen" style="display: block; width: 100%" onclick="blacklist_from_suggestions({{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, {{m.held_in}}, {{m.title}})">Verbergen</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -141,7 +160,8 @@
         <div id="anchor-public" class="mod mod-text skin-text-basics"></div>
         <hr>
     
-        <script type="text/javascript" src="static/admin.js"></script>
-        <script type="text/javascript" src="static/public.js"></script>
+        <!---->
+        <script type="text/javascript" src="static/admin.js" async></script> 
+        <script type="text/javascript" src="static/public.js" async></script>
     </body>
 </html>
