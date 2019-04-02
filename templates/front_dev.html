@@ -88,12 +88,12 @@
                         {% for m in found_modules %}
                             <tr id={{ m.SmObjId }}>
                                 <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
-                                <td> <!-- held in: {{ m.held_in }} -->
-                                    {% if m.held_in == 3 %}
+                                <td> <!-- held in / PiqSession: {{ m.PiqSession }} -->
+                                    {% if m.PiqSession == 3 %}
                                         HS
-                                    {% elif m.held_in == 4 %}
+                                    {% elif m.PiqSession == 4 %}
                                         FS
-                                    {% elif m.held_in == 999 %}
+                                    {% elif m.PiqSession == 999 %}
                                         HS & FS
                                     {% else %}
                                         undefiniert
@@ -119,7 +119,7 @@
                         <tbody id="blacklist_body">
                             {% for m in blacklist %}
                                 <tr id={{ m.SmObjId }}>
-                                    <td><a target=_"blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
+                                    <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     {# <td>            {{ m.SmObjId }} </td> #}
                                     <td> <!-- {{ m.held_in }} -->
                                         {% if m.held_in == 3 %}
