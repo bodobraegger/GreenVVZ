@@ -143,25 +143,28 @@
                 </div>
             </div>
         </div> <!-- END outer div to match UZH styling -->
-
-        <br>
-        <br>       
-        <hr>
-        <br>
-        <br>
-        <p>
-            Above is the admin interface, below the public interface.
-        </p>
-        <br>
-        <br>
-        <hr>
-        <br>
-        <br>
-        <div id="anchor-public" class="mod mod-text skin-text-basics"></div>
-        <hr>
+        <script type="text/javascript" src="static/admin.js"></script> 
     
-        <!---->
-        <script type="text/javascript" src="static/admin.js" async></script> 
-        <script type="text/javascript" src="static/public.js" async></script>
+        {% if config['ENV'] == 'development' %}
+        <!-- if config['ENV'] == 'development': doc ready function and public view -->
+            <br>
+            <br>       
+            <hr>
+            <br>
+            <br>
+            <p>
+                Above is the admin interface, below the public interface.
+            </p>
+            <br>
+            <br>
+            <hr>
+            <br>
+            <br>
+            <div id="anchor-public" class="mod mod-text skin-text-basics"></div>
+            <hr>
+            <script type="text/javascript" src="static/admin-doc-ready.js"></script> 
+            <script type="text/javascript" src="static/public.js" async></script>
+        <!-- END if config['ENV'] == 'development': doc ready function and public view -->
+        {% endif %}
     </body>
 </html>
