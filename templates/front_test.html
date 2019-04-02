@@ -12,7 +12,7 @@
     <body>
         <div id="anchor-admin" data-api-key="{{secret_key}}"></div>
         <script type="text/javascript" src="static/admin.js"></script>
-        
+        <script type="text/javascript" src="static/admin-doc-ready.js"></script>
         <br>
             <hr>
         <br>
@@ -22,8 +22,11 @@
         <br>
             <hr>
         
-        <div id="anchor-public"></div>
-        <script type="text/javascript" src="static/public.js"></script>
+        
+        {% if config['ENV'] == 'development' %}
+            <div id="anchor-public" class="mod mod-text skin-text-basics"></div>
+            <script type="text/javascript" src="static/public.js"></script>
+        {% endif %}
 
     </body>
 </html>
