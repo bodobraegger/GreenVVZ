@@ -8,6 +8,7 @@ from functools import wraps
 import models
 import requests
 import updateModules
+import helpers
 from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
 
@@ -67,6 +68,7 @@ def front_dev():
         blacklist = get_modules("blacklist")
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
+        # found_modules = helpers.OrderedSet(json.loads(search().get_data())) - helpers.OrderedSet(whitelist) - helpers.OrderedSet(blacklist)
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
