@@ -408,13 +408,14 @@ def search():
     white_u_blacklist = []
     cursor = cnx.cursor()
     qry = (
-        "SELECT SmObjId FROM whitelist UNION SELECT SmObjId FROM blacklist")
+        "SELECT SmObjId FROM whitelist UNION ALL SELECT SmObjId FROM blacklist")
     cursor.execute(qry)
     for row in cursor:
         white_u_blacklist.append(row[0])
 
     for mod in modules:
         if int(mod.get('SmObjId')) in white_u_blacklist:
+            print("REMOVED: ", mod)
             modules.remove(mod)
     cursor.close()
     
