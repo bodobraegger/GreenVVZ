@@ -411,11 +411,11 @@ def search():
         "SELECT SmObjId FROM whitelist UNION SELECT SmObjId FROM blacklist")
     cursor.execute(qry)
     for row in cursor:
-        white_u_blacklist.append(str(row[0]))
+        white_u_blacklist.append(row[0])
 
     print(modules)
     for mod in modules:
-        if mod['SmObjId'] in white_u_blacklist:
+        if int(mod['SmObjId']) in white_u_blacklist:
             modules.pop(mod)
     cursor.close()
     print(white_u_blacklist)
