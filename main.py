@@ -401,8 +401,8 @@ def search():
                         'title': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmStext').text
                     })
 
-    # remove duplicates
-    modules = [dict(t) for t in set([tuple(d.items()) for d in modules])]
+    # remove duplicates TODO: FIND BETTER WAY TO REMOVE DUPLICATES AND KEEP ORDER
+    modules = list(set(modules))
 
     # remove elements that are on whitelist unified with blacklist
     white_u_blacklist = []
