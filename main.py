@@ -413,14 +413,18 @@ def search():
     for row in cursor:
         white_u_blacklist.append(row[0])
 
+    print("\n\n\nBEFORE\n\n\n")
     print(modules)
+    print("\n\n\nMIDDLE\n\n\n")
     for mod in modules:
-        print(mod['SmObjId'])
-        if mod['SmObjId'] in white_u_blacklist:
+        mod_id = mod['SmObjId']
+        if int(mod_id) in white_u_blacklist:
             modules.pop(mod)
     cursor.close()
     print(white_u_blacklist)
+    print("\n\n\nREMOVE\n\n\n")
     print(modules)
+    print("\n\n\nAFTER\n\n\n")
     return jsonify(modules)
 
 
