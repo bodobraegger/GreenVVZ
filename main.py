@@ -5,8 +5,9 @@ import xml.etree.ElementTree as ET
 from datetime import date
 from functools import wraps
 
-import models
 import requests
+import models
+import helpers
 import updateModules
 from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
@@ -401,8 +402,8 @@ def search():
                         'title': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmStext').text
                     })
 
-    # remove duplicates TODO: FIND BETTER WAY TO REMOVE DUPLICATES AND KEEP ORDER
-    modules = list(set(modules))
+    # remove duplicates 
+    modules = list(helpers.OrderedSet(modules))
 
     # remove elements that are on whitelist unified with blacklist
     white_u_blacklist = []
