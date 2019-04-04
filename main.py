@@ -4,10 +4,11 @@ import mysql.connector
 import xml.etree.ElementTree as ET
 from datetime import date
 from functools import wraps
+from collections import OrderedDict
 
 import requests
 import models
-import helpers
+# import helpers TODO: Consider deleting this
 import updateModules
 from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
@@ -403,7 +404,7 @@ def search():
                     })
 
     # remove duplicates 
-    modules = list(helpers.OrderedSet(modules))
+    modules = list(OrderedDict.fromkeys(modules))
 
     # remove elements that are on whitelist unified with blacklist
     white_u_blacklist = []
