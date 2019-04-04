@@ -404,7 +404,7 @@ def search():
                     })
 
     # remove duplicates 
-    modules = list(OrderedDict.fromkeys(modules))
+    modules = list(OrderedDict.fromkeys(modules).items())
 
     # remove elements that are on whitelist unified with blacklist
     white_u_blacklist = []
