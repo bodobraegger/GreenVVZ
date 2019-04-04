@@ -415,8 +415,8 @@ def search():
 
     print(modules)
     for mod in modules:
+        print(mod['SmObjId'])
         if mod['SmObjId'] in white_u_blacklist:
-            print(mod['SmObjId'])
             modules.pop(mod)
     cursor.close()
     print(white_u_blacklist)
