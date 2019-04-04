@@ -404,34 +404,22 @@ def search():
     # remove duplicates
     modules = [dict(t) for t in set([tuple(d.items()) for d in modules])]
 
-    # remove elements that are on blacklist
-    blacklist = []
+    # remove elements that are on whitelist unified with blacklist
+    white_u_blacklist = []
     cursor = cnx.cursor()
     qry = (
-        "SELECT SmObjId FROM blacklist")
+        "SELECT SmObjId FROM whitelist UNION blacklist")
     cursor.execute(qry)
     for row in cursor:
-        blacklist.append(row[0])
+        white_u_blacklist.append(row[0])
 
+    print(modules)
     for mod in modules:
-        if mod['SmObjId'] in blacklist:
+        if mod['SmObjId'] in white_u_blacklist:
             modules.pop(mod)
     cursor.close()
-
-    # remove elements that are already on whitelist
-    whitelist = []
-    cursor = cnx.cursor()
-    qry = (
-        "SELECT SmObjId FROM whitelist WHERE SmObjId NOT IN(SELECT SmObjId FROM blacklist) AND PiqYear != 0 ORDER BY title ASC")
-    cursor.execute(qry)
-    for row in cursor:
-        whitelist.append(row[0])
-
-    for mod in modules:
-        if mod['SmObjId'] in whitelist:
-            modules.pop(mod)
-    cursor.close()
-
+    print(white_u_blacklist)
+    print(modules)
     return jsonify(modules)
 
 
