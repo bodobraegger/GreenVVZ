@@ -418,7 +418,7 @@ def search():
     print("\n\n\nMIDDLE\n\n\n")
     for mod in modules:
         if int(mod.get('SmObjId')) in white_u_blacklist:
-            modules.pop(mod)
+            modules.remove(mod)
     cursor.close()
     print(white_u_blacklist)
     print("\n\n\nREMOVE\n\n\n")
