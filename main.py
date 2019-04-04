@@ -417,8 +417,9 @@ def search():
     print(modules)
     print("\n\n\nMIDDLE\n\n\n")
     for mod in modules:
-        mod_id = mod['SmObjId']
-        if int(mod_id) in white_u_blacklist:
+        mod_id = mod.get('SmObjId')
+        print(type(mod_id)
+        if mod_id in white_u_blacklist:
             modules.pop(mod)
     cursor.close()
     print(white_u_blacklist)
