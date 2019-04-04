@@ -408,7 +408,7 @@ def search():
     white_u_blacklist = []
     cursor = cnx.cursor()
     qry = (
-        "SELECT SmObjId FROM whitelist UNION blacklist")
+        "SELECT SmObjId FROM whitelist UNION SELECT SmObjId blacklist")
     cursor.execute(qry)
     for row in cursor:
         white_u_blacklist.append(row[0])
