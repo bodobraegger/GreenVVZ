@@ -211,15 +211,15 @@ function populate_suggestions(){
     })
 }
 
-function convert_session_to_string(session){
+function convert_session_to_string(session, year){
     if (session == 3){
-        return 'HS'
+        return `HS ${year % 100}`
     }
     if (session == 4){
-        return 'FS'
+        return `FS ${year % 100}`
     }
     if (session == 999){
-        return 'HS & FS'
+        return `HS & FS ${year % 100}`
     }
     else{
         return 'undefiniert'
