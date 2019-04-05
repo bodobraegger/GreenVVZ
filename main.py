@@ -410,9 +410,7 @@ def search():
     # remove duplicates
     #modules = [dict(t) for t in set([tuple(sorted(d.items())) for d in modules])]
     modules = list({frozenset(item.items()):item for item in modules}.values())
-    print('\n\n\nAFTER UNIQUE\n\n\n')
-    for e in modules:
-        print(e)
+
     # remove elements that are on whitelist unified with blacklist
     white_u_blacklist = []
     cursor = cnx.cursor()
@@ -436,7 +434,7 @@ def search():
             #     modules.remove(mod)
     cursor.close()
     
-    print('\n\n\nAFTER UNIQUE\n\n\n')
+    print('\n\n\nAFTER REMOVAL\n\n\n')
     for e in modules:
         print(e)
 
