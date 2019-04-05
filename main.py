@@ -403,14 +403,14 @@ def search():
                         'title': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmStext').text
                     })
 
-    print('\n\n\nBEFORE\n\n\n')
+    print('\n\n\nBEFORE UNIQUE\n\n\n')
     for e in modules:
-        print(e, "\n")
+        print(e)
     
     # remove duplicates
     #modules = [dict(t) for t in set([tuple(sorted(d.items())) for d in modules])]
     modules = list({frozenset(item.items()):item for item in modules}.values())
-    print('\n\n\nAFTER\n\n\n')
+    print('\n\n\nAFTER UNIQUE\n\n\n')
     for e in modules:
         print(e)
     # remove elements that are on whitelist unified with blacklist
@@ -422,6 +422,10 @@ def search():
     for row in cursor:
         white_u_blacklist.append(row[0])
 
+    print('\n\n\nBEFORE REMOVAL\n\n\n')
+    for e in modules:
+        print(e)
+
     for mod in modules:
         if int(mod.get('SmObjId')) in white_u_blacklist:
             modules.remove(mod)
@@ -432,6 +436,10 @@ def search():
             #     modules.remove(mod)
     cursor.close()
     
+    print('\n\n\nAFTER UNIQUE\n\n\n')
+    for e in modules:
+        print(e)
+
     return jsonify(modules)
 
 
