@@ -90,11 +90,11 @@
                                 <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                 <td> <!-- held in / PiqSession: {{ m.PiqSession }} -->
                                     {% if m.PiqSession == "003" %}
-                                        HS
+                                        HS {{"%s" | format(m.PiqYear % 100)}}
                                     {% elif m.PiqSession == "004" %}
-                                        FS
+                                        FS {{"%s" | format(m.PiqYear % 100)}}
                                     {% elif m.PiqSession == "999" %}
-                                        HS & FS
+                                        HS & FS {{"%s" | format(m.PiqYear % 100)}}
                                     {% else %}
                                         undefiniert
                                     {% endif %}

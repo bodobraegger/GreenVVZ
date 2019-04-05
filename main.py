@@ -72,7 +72,7 @@ def front_dev():
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
-            'PiqSession': 3,
+            'PiqSession': '003',
             'PiqYear': 2018,
             'SmObjId': 50904112,
             'held_in': 3,
