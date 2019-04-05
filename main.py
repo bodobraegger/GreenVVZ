@@ -408,11 +408,11 @@ def search():
         print(e, "\n")
     
     # remove duplicates
-    modules = [dict(t) for t in set([tuple(sorted(d.items())) for d in modules])]
-
+    #modules = [dict(t) for t in set([tuple(sorted(d.items())) for d in modules])]
+    modules = {frozenset(item.items()):item for item in modules}.values()
     print('\n\n\nAFTER\n\n\n')
     for e in modules:
-        print(e, "\n")
+        print(e)
     # remove elements that are on whitelist unified with blacklist
     white_u_blacklist = []
     cursor = cnx.cursor()
