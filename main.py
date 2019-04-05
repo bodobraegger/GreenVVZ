@@ -420,8 +420,8 @@ def search():
             # modules = [m for m in modules if m != mod]
             # modules.remove(mod)
             while mod in modules:
+                print('REMOVED', mod)
                 modules.remove(mod)
-            print('REMOVED', mod)
     cursor.close()
     
     return jsonify(modules)
