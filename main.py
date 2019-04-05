@@ -417,9 +417,11 @@ def search():
 
     for mod in modules:
         if int(mod.get('SmObjId')) in white_u_blacklist:
-            print('REMOVED', mod)
-            modules = [m for m in modules if m != mod]
+            # modules = [m for m in modules if m != mod]
             # modules.remove(mod)
+            while mod in modules:
+                modules.remove(mod)
+            print('REMOVED', mod)
     cursor.close()
     
     return jsonify(modules)
