@@ -403,9 +403,16 @@ def search():
                         'title': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmStext').text
                     })
 
+    print('\n\n\nBEFORE\n\n\n')
+    for e in modules:
+        print(e, "\n")
+    
     # remove duplicates
     modules = [dict(t) for t in set([tuple(sorted(d.items())) for d in modules])]
 
+    print('\n\n\nAFTER\n\n\n')
+    for e in modules:
+        print(e, "\n")
     # remove elements that are on whitelist unified with blacklist
     white_u_blacklist = []
     cursor = cnx.cursor()
