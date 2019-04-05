@@ -404,7 +404,7 @@ def search():
                     })
 
     # remove duplicates
-    modules = [dict(t) for t in set([tuple(d.items()) for d in modules])]
+    modules = [dict(t) for t in set([tuple(sorted(d.items())) for d in modules])]
 
     # remove elements that are on whitelist unified with blacklist
     white_u_blacklist = []
@@ -419,6 +419,7 @@ def search():
         if int(mod.get('SmObjId')) in white_u_blacklist:
             # modules = [m for m in modules if m != mod]
             # modules.remove(mod)
+            print('To remove:', mod)
             while mod in modules:
                 print('REMOVED', mod)
                 modules.remove(mod)
