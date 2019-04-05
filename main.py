@@ -396,10 +396,10 @@ def search():
             for entry in root.findall('{http://www.w3.org/2005/Atom}entry'):
                 for a in entry.findall('{http://www.w3.org/2005/Atom}content'):
                     modules.append({
-                        'SmObjId': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}Objid').text,
-                        'PiqYear': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqYear').text,
-                        'PiqSession': a[0].find(
-                            '{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqSession').text,
+                        'SmObjId': int(a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}Objid').text),
+                        'PiqYear': int(a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqYear').text),
+                        'PiqSession': int(a[0].find(
+                            '{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqSession').text),
                         'title': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmStext').text
                     })
 
