@@ -128,7 +128,7 @@ function add_to_blacklist(SmObjId, PiqYear, PiqSession, held_in, title){
 }
 function add_to_suggestions(SmObjId, PiqYear, PiqSession, held_in, title){
     var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId
-    var module = $('<tr id="'+SmObjId+'"><td><a target="_blank" href="'+url+'">'+title+'</a></td><td>'+convert_session_to_string(held_in)+'</td><td><button name="Anzeigen" style="display: block; width: 100%" onclick="whitelist_from_suggestions('+SmObjId+', '+PiqYear+', '+PiqSession+', '+held_in+', \''+title+'\')">Anzeigen</button><button name="Verbergen" style="display: block; width: 100%" onclick="blacklist_from_suggestions('+SmObjId+', '+PiqYear+', '+PiqSession+', '+held_in+', \''+title+'\')">Verbergen</button></td></tr>')
+    var module = $('<tr id="'+SmObjId+'"><td><a target="_blank" href="'+url+'">'+title+'</a></td><td>'+convert_session_to_string(held_in, PiqSession)+'</td><td><button name="Anzeigen" style="display: block; width: 100%" onclick="whitelist_from_suggestions('+SmObjId+', '+PiqYear+', '+PiqSession+', '+held_in+', \''+title+'\')">Anzeigen</button><button name="Verbergen" style="display: block; width: 100%" onclick="blacklist_from_suggestions('+SmObjId+', '+PiqYear+', '+PiqSession+', '+held_in+', \''+title+'\')">Verbergen</button></td></tr>')
     $('#suggestions_body').append(module)
 }
 function add_to_searchterms(id, term){
@@ -213,13 +213,13 @@ function populate_suggestions(){
 
 function convert_session_to_string(session, year){
     if (session == 3){
-        return `HS ${year % 100}`
+        return `HS ${year % 100 || ''}`
     }
     if (session == 4){
-        return `FS ${year % 100}`
+        return `FS ${year % 100 || ''}`
     }
     if (session == 999){
-        return `HS & FS ${year % 100}`
+        return `HS & FS ${year % 100 || ''}`
     }
     else{
         return 'undefiniert'
