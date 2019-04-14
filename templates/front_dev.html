@@ -1,5 +1,6 @@
 <html>
     <head>
+        <link rel="stylesheet" href="static/filter.css">
         <link rel="stylesheet" href="static/uzh/app.css">
         <link rel="stylesheet" href="static/jquery-ui.min.css">
         <script type="text/javascript" src="static/external/jquery/jquery-3.3.1.min.js"></script>
@@ -15,8 +16,34 @@
         </style>
     </head>
     <body>
+        {# <div>
+            <input type="radio" id="blue" name="color" />
+            <label for="blue">BLUE</label>
+            <input type="radio" id="red" name="color"/>
+            <label for="red">RED</label>
+            <input type="radio" id="green" name="color"/>
+            <label for="green">GREEN</label>
+            <input type="radio" id="reset" name="color"/>
+            <label for="reset">RESET</label>
+
+            <div class="tile blue">1</div>
+            <div class="tile red">2</div>
+            <div class="tile blue">3</div>
+            <div class="tile green">4</div>
+            <div class="tile blue">5</div>
+        </div> #}
+        </div>
         <!-- <div id="anchor-admin" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist"></div> -->
         <div class="mod mod-text skin-text-basics"> <!-- add this outer div to match UZH styling -->
+            <input type="checkbox" id="{{date.today().year-1}} 4" name="semester" checked/>
+            <label for="{{'%s' | format(date.today().year-1)}} 4">FS {{'%s' | format((date.today().year-1) % 100)}} </label>
+            <input type="checkbox" id="{{date.today().year-1}} 3" name="semester" checked/>
+            <label for="{{'%s' | format(date.today().year-1)}} 3">HS {{'%s' | format((date.today().year-1) % 100)}} </label>
+
+            <input type="checkbox" id="{{date.today().year}} 4" name="semester" checked/>
+            <label for="{{'%s' | format(date.today().year)}} 4">FS {{'%s' | format(date.today().year % 100)}} </label>
+            <input type="checkbox" id="{{date.today().year}} 3" name="semester" checked/>
+            <label for="{{'%s' | format(date.today().year)}} 3">HS {{'%s' | format(date.today().year % 100)}} </label>
             <div id="anchor-admin-2" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
                 <h3>Angezeigte Elemente (Whitelist)</h3>
                 <div style="padding: 0">
@@ -32,7 +59,7 @@
                                 <td colspan="2"><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
                             </tr>
                             {% for m in whitelist %}
-                                <tr id={{ m.SmObjId }}>
+                                <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}} class="shown"'>
                                     <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     {# <td>            {{ m.SmObjId }} </td> #}
                                     <td> <!-- {{ m.held_in }} -->
@@ -86,7 +113,7 @@
                         </thead>
                         <tbody id="suggestions_body">
                         {% for m in found_modules %}
-                            <tr id={{ m.SmObjId }}>
+                            <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqSession}} {{m.PiqYear}}' class="shown">
                                 <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                 <td> <!-- held in / PiqSession: {{ m.PiqSession }} -->
                                     {% if m.PiqSession == 3 %}
@@ -118,7 +145,7 @@
                         </thead>
                         <tbody id="blacklist_body">
                             {% for m in blacklist %}
-                                <tr id={{ m.SmObjId }}>
+                                <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown"'>
                                     <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     {# <td>            {{ m.SmObjId }} </td> #}
                                     <td> <!-- {{ m.held_in }} -->
@@ -166,5 +193,17 @@
             <script type="text/javascript" src="static/public.js" async></script>
         <!-- END if config['ENV'] == 'development': doc ready function and public view -->
         {% endif %}
+        <script type="text/javascript">
+        $('input[name="semester"]').change(function() {
+            var modules_to_filter = new $();
+            $(`input[name="semester"]:not(:checked)`).each(function() {
+                modules_to_filter=modules_to_filter.add($(`[data-semester*="${$(this).get(0).id}"]`))
+            })
+            // console.log(modules_to_filter.length)
+            $('[data-semester]').removeClass('hidden')
+            $(modules_to_filter).addClass('hidden')
+           return;
+        });
+        </script>
     </body>
 </html>
