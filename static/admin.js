@@ -118,21 +118,21 @@ function delete_from_searchterms(id){
 }
 function add_to_whitelist(SmObjId, PiqYear, PiqSession, held_in, title){
     var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId
-    var module = $('<tr id="'+SmObjId+'"><td><a target="_blank" href="'+url+'">'+title+'</a></td><td>'+convert_session_to_string(held_in)+'</td><td><button name="Verbergen" style="display: block; width: 100%" onclick="blacklist_from_whitelist('+SmObjId+', '+PiqYear+', '+PiqSession+', '+held_in+', \''+title+'\')" >Verbergen</td></tr>')
+    var module = $(`<tr data-semester="${PiqSession} ${PiqYear}" id="${SmObjId}"><td><a target="_blank" href="${url}">${title}</a></td><td>${convert_session_to_string(held_in)}</td><td><button name="Verbergen" onclick="whitelist_from_blacklist(${SmObjId}, ${PiqYear}, ${PiqSession}, ${held_in}, ${title})">Verbergen</button></td></tr>`)
     $('#whitelist_body').append(module)
 }
 function add_to_blacklist(SmObjId, PiqYear, PiqSession, held_in, title){
-    var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId
-    var module = $('<tr id="'+SmObjId+'"><td><a target="_blank" href="'+url+'">'+title+'</a></td><td>'+convert_session_to_string(held_in)+'</td><td><button style="display: block; width: 100%" name="Anzeigen" onclick="whitelist_from_blacklist('+SmObjId+', '+PiqYear+', '+PiqSession+', '+held_in+', \''+title+'\')">Anzeigen</button></td></tr>')
+    var url = baseUrlVvzUzh+`${PiqYear}/${PiqSession}/SM/${SmObjId}`
+    var module = $(`<tr data-semester="${PiqSession} ${PiqYear}" id="${SmObjId}"><td><a target="_blank" href="${url}">${title}</a></td><td>${convert_session_to_string(held_in)}</td><td><button name="Anzeigen" onclick="whitelist_from_blacklist(${SmObjId}, ${PiqYear}, ${PiqSession}, ${held_in}, ${title})">Anzeigen</button></td></tr>`)
     $('#blacklist_body').append(module)
 }
 function add_to_suggestions(SmObjId, PiqYear, PiqSession, held_in, title){
     var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId
-    var module = $('<tr id="'+SmObjId+'"><td><a target="_blank" href="'+url+'">'+title+'</a></td><td>'+convert_session_to_string(held_in, PiqYear)+'</td><td><button name="Anzeigen" style="display: block; width: 100%" onclick="whitelist_from_suggestions('+SmObjId+', '+PiqYear+', '+PiqSession+', '+held_in+', \''+title+'\')">Anzeigen</button><button name="Verbergen" style="display: block; width: 100%" onclick="blacklist_from_suggestions('+SmObjId+', '+PiqYear+', '+PiqSession+', '+held_in+', \''+title+'\')">Verbergen</button></td></tr>')
+    var module = $(`<tr data-semester="${PiqSession} ${PiqYear}" id="${SmObjId}"><td><a target="_blank" href="${url}">${title}</a></td><td>${convert_session_to_string(held_in)}</td><td><button name="Anzeigen" onclick="whitelist_from_blacklist(${SmObjId}, ${PiqYear}, ${PiqSession}, ${held_in}, ${title})">Anzeigen</button><button name="Verbergen" onclick="whitelist_from_blacklist(${SmObjId}, ${PiqYear}, ${PiqSession}, ${held_in}, ${title})">Verbergen</button></td></tr>`)
     $('#suggestions_body').append(module)
 }
 function add_to_searchterms(id, term){
-    var searchterm = $('<tr id="'+id+'"><td>'+term+'</td><td><button style="display: block; width: 100%" onclick="remove_searchterm('+id+')">Entfernen</button></td></tr>')
+    var searchterm = $('<tr id="'+id+'"><td>'+term+'</td><td><button onclick="remove_searchterm('+id+')">Entfernen</button></td></tr>')
     $('#searchterms_body').append(searchterm)
 }
 
