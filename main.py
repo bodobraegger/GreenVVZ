@@ -83,7 +83,15 @@ def front_dev():
         found_modules.append(test)
         searchterms.append({"id": 1, "term": "wut"})
 
-    return render_template('front_dev.html', whitelist=whitelist, blacklist=blacklist, searchterms=searchterms, baseUrlVvzUzh=baseUrlVvzUzh, secret_key=secret_key, found_modules=found_modules)
+    return render_template('front_dev.html', **{
+        'whitelist': whitelist,
+        'blacklist': blacklist,
+        'searchterms': searchterms,
+        'baseUrlVvzUzh': baseUrlVvzUzh,
+        'secret_key': secret_key,
+        'found_modules': found_modules,
+        'date':date
+    })
 
 
 
