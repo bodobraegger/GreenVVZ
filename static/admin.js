@@ -211,7 +211,7 @@ function populate_suggestions(){
         success : function (data) {
             suggestions.empty()
             for (var row in data) {
-                add_to_suggestions(data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].PiqSession, data[row].title, data[row].get('in_whitelist'), data[row].get('in_blacklist'))
+                add_to_suggestions(data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].PiqSession, data[row].title, data[row].in_whitelist, data[row].in_blacklist)
             }
         },
         error : function (err) {
