@@ -93,6 +93,47 @@ def front_dev():
         'date':date
     })
 
+@app.route('/public')
+@cross_origin()
+@require_appkey
+def public():
+    baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
+    whitelist = []
+    blacklist = []
+    searchterms = []
+    found_modules= []
+    secret_key = app.config['SECRET_KEY']
+
+    try:
+        whitelist = get_modules("whitelist")
+        blacklist = get_modules("blacklist")
+        searchterms = json.loads(get_searchterms().get_data())
+        found_modules = json.loads(search().get_data())
+        # found_modules = helpers.OrderedSet(json.loads(search().get_data())) - helpers.OrderedSet(whitelist) - helpers.OrderedSet(blacklist)
+    except mysql.connector.errors.InterfaceError as e:
+        print(e, "\n!!!only works on server!!!")
+        test = {
+            'PiqSession': '003',
+            'PiqYear': 2018,
+            'SmObjId': 50904112,
+            'held_in': 3,
+            'title': "ayy",
+        }
+        whitelist.append(test)
+        blacklist.append(test)
+        found_modules.append(test)
+        searchterms.append({"id": 1, "term": "wut"})
+
+    return render_template('public.html', **{
+        'whitelist': whitelist,
+        'blacklist': blacklist,
+        'searchterms': searchterms,
+        'baseUrlVvzUzh': baseUrlVvzUzh,
+        'secret_key': secret_key,
+        'found_modules': found_modules,
+        'date':date
+    })
+
 
 
 # Information about the API
