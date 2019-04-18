@@ -93,8 +93,18 @@
                                             undefiniert
                                         {% endif %}
                                     </td>
-                                <td><button name="Anzeigen" onclick="whitelist_from_suggestions({{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, {{m.PiqSession}}, {{m.title}})">Anzeigen</button>
-                                    <button name="Verbergen" onclick="blacklist_from_suggestions({{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, {{m.PiqSession}}, {{m.title}})">Verbergen</button>
+                                <td><button name="Anzeigen" 
+                                    onclick="whitelist_from_suggestions({{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, {{m.PiqSession}}, {{m.title}})"
+                                    {% if m.in_whitelist==1 %}
+                                    disabled
+                                    {% endif %}
+                                >Anzeigen</button>
+                                <button name="Verbergen" 
+                                    onclick="blacklist_from_suggestions({{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, {{m.PiqSession}}, {{m.title}})"
+                                    {% if m.in_blacklist==1 %}
+                                    disabled
+                                    {% endif %}
+                                >Verbergen</button>
                                 </td>
                             </tr>
                         {% endfor %}

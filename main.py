@@ -461,31 +461,42 @@ def search():
     modules = list({frozenset(item.items()):item for item in modules}.values())
 
     # remove elements that are on whitelist unified with blacklist
-    white_u_blacklist = []
+    ids_whitelist = []
     cursor = cnx.cursor()
-    qry = (
-        "SELECT SmObjId FROM whitelist UNION SELECT SmObjId FROM blacklist")
-    cursor.execute(qry)
+    cursor.execute("SELECT SmObjId FROM whitelist")
     for row in cursor:
-        white_u_blacklist.append(row[0])
+        ids_whitelist.append(row[0])
 
-    print('\n\n\nBEFORE REMOVAL\n\n\n')
-    for e in modules:
-        print(e)
+    ids_blacklist = []
+    cursor = cnx.cursor()
+    cursor.execute("SELECT SmObjId FROM blacklist")
+    for row in cursor:
+        ids_blacklist.append(row[0])
+    cursor.close()
+    ids_white_u_blacklist = list(set(ids_whitelist + ids_blacklist))
+
+    # print('\n\n\nBEFORE REMOVAL\n\n\n')
+    # for e in modules:
+    #     print(e)
+
+    # for mod in modules:
+    #     if int(mod.get('SmObjId')) in ids_white_u_blacklist:
+    #         modules.remove(mod)
+    #         # modules = [m for m in modules if m != mod]
+    #         # print('To remove:', mod)
+    #         # while mod in modules:
+    #         #     print('REMOVED', mod)
+    #         #     modules.remove(mod)
+    
+    # print('\n\n\nAFTER REMOVAL\n\n\n')
+    # for e in modules:
+    #     print(e)
 
     for mod in modules:
-        if int(mod.get('SmObjId')) in white_u_blacklist:
-            modules.remove(mod)
-            # modules = [m for m in modules if m != mod]
-            # print('To remove:', mod)
-            # while mod in modules:
-            #     print('REMOVED', mod)
-            #     modules.remove(mod)
-    cursor.close()
-    
-    print('\n\n\nAFTER REMOVAL\n\n\n')
-    for e in modules:
-        print(e)
+        if int(mod.get('SmObjId')) in ids_whitelist:
+            mod['in_whitelist'] = 1
+        if int(mod.get('SmObjId')) in ids_blacklist:
+            mod['in_blacklist'] = 1
 
     return jsonify(modules)
 
