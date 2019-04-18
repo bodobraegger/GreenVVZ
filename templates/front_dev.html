@@ -8,26 +8,9 @@
         <script type="text/javascript" src="static/additional/iframeResizer.contentWindow.min.js"></script>
     </head>
     <body>
-        {# <div>
-            <input type="radio" id="blue" name="color" />
-            <label for="blue">BLUE</label>
-            <input type="radio" id="red" name="color"/>
-            <label for="red">RED</label>
-            <input type="radio" id="green" name="color"/>
-            <label for="green">GREEN</label>
-            <input type="radio" id="reset" name="color"/>
-            <label for="reset">RESET</label>
-
-            <div class="tile blue">1</div>
-            <div class="tile red">2</div>
-            <div class="tile blue">3</div>
-            <div class="tile green">4</div>
-            <div class="tile blue">5</div>
-        </div> #}
-        </div>
-        <!-- <div id="anchor-admin" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist"></div> -->
+        {% include 'includes/filter-selectors.html' %}
         <div class="mod mod-text skin-text-basics"> <!-- add this outer div to match UZH styling -->
-                {% include 'includes/filter-selectors.html' %}
+            <div id="anchor-admin-2" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
                 <h3>Angezeigte Elemente (Whitelist)</h3>
                 <div style="padding: 0">
                     <table>
@@ -47,11 +30,11 @@
                                     {# <td>            {{ m.SmObjId }} </td> #}
                                     <td> <!-- {{ m.held_in }} / held_in -->
                                         {% if m.held_in == 3 %}
-                                            HS {{'%s' | format(m.PiqYear % 100)}}
+                                            <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% elif m.held_in == 4 %}
-                                            FS {{'%s' | format(m.PiqYear % 100)}}
+                                            <span class="semester">FS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% elif m.held_in == 999 %}
-                                            HS & FS {{'%s' | format(m.PiqYear % 100)}}
+                                            <span class="semester">HS & FS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% else %}
                                             undefiniert
                                         {% endif %}
@@ -65,7 +48,8 @@
                     </table>
                 </div>
 
-                <h3>Suchbegriffe</h3><div style="padding: 0">
+                <h3>Suchbegriffe</h3>
+                <div style="padding: 0">
                 <table>
                     <thead>
                         <td>Begriff</td>
@@ -100,11 +84,11 @@
                                 <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     <td> <!-- {{ m.PiqSession }} / PiqSession -->
                                         {% if m.PiqSession == 3 %}
-                                            HS {{'%s' | format(m.PiqYear % 100)}}
+                                            <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% elif m.PiqSession == 4 %}
-                                            FS {{'%s' | format(m.PiqYear % 100)}}
+                                            <span class="semester">FS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% elif m.PiqSession == 999 %}
-                                            HS & FS {{'%s' | format(m.PiqYear % 100)}}
+                                            <span class="semester">HS & FS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% else %}
                                             undefiniert
                                         {% endif %}
@@ -133,11 +117,11 @@
                                     {# <td>            {{ m.SmObjId }} </td> #}
                                     <td> <!-- {{ m.held_in }} / held_in -->
                                         {% if m.held_in == 3 %}
-                                            HS {{'%s' | format(m.PiqYear % 100)}}
+                                            <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% elif m.held_in == 4 %}
-                                            FS {{'%s' | format(m.PiqYear % 100)}}
+                                            <span class="semester">FS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% elif m.held_in == 999 %}
-                                            HS & FS {{'%s' | format(m.PiqYear % 100)}}
+                                            <span class="semester">HS & FS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% else %}
                                             undefiniert
                                         {% endif %}

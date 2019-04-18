@@ -216,13 +216,13 @@ function populate_suggestions(){
 
 function convert_session_to_string(session, year){
     if (session == 3){
-        return `HS ${year % 100 || ''}`
+        return `<span class="semester">HS </span>${year % 100 || ''}`
     }
     if (session == 4){
-        return `FS ${year % 100 || ''}`
+        return `<span class="semester">FS </span>${year % 100 || ''}`
     }
     if (session == 999){
-        return `HS & FS ${year % 100 || ''}`
+        return `<span class="semester">HS & FS </span>${year % 100 || ''}`
     }
     else{
         return 'undefiniert'
