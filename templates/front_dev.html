@@ -80,7 +80,7 @@
                         </thead>
                         <tbody id="suggestions_body">
                         {% for m in found_modules %}
-                            <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqSession}} {{m.PiqYear}}' class="shown">
+                            <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown">
                                 <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     <td> <!-- {{ m.PiqSession }} / PiqSession -->
                                         {% if m.PiqSession == 3 %}
