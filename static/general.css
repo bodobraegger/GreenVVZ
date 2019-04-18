@@ -1,0 +1,11 @@
+button {
+    display: block; 
+    width: 100%
+}
+td {
+    font-size: 80%;
+}
+span.semester {
+    display: inline-block;
+    width: 4.5em;
+}
