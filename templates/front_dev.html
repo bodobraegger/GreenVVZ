@@ -6,6 +6,7 @@
         <script type="text/javascript" src="static/external/jquery/jquery-3.3.1.min.js"></script>
         <script type="text/javascript" src="static/jquery-ui.min.js"></script>
         <script type="text/javascript" src="static/additional/iframeResizer.contentWindow.min.js"></script>
+        <script type="text/javascript" src="static/additional/sorttable.js"></script>
     </head>
     <body>
         {% include 'includes/filter-selectors.html' %}
@@ -13,7 +14,7 @@
             <div id="anchor-admin-2" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
                 <h3>Angezeigte Elemente (Whitelist)</h3>
                 <div style="padding: 0">
-                    <table>
+                    <table class="sortable">
                         <thead>
                             <td>Name der Lehrveranstaltung</td>
                             <td class="semester">Semster</td>
@@ -50,7 +51,7 @@
 
                 <h3>Suchbegriffe</h3>
                 <div style="padding: 0">
-                <table>
+                <table class="sortable">
                     <thead>
                         <td>Begriff</td>
                         <td>Entfernen</td>
@@ -72,7 +73,7 @@
 
                 <h3>Vorschläge basierend auf Suchbegriffen</h3>
                 <div style="padding: 0">
-                    <table>
+                    <table class="sortable">
                         <thead>
                             <td>Name der Lehrveranstaltung</td>
                             <td class="semester">Semster</td>
@@ -114,7 +115,7 @@
 
                 <h3>Verborgene Elemente (Blacklist)</h3>
                 <div style="padding: 0">
-                    <table>
+                    <table class="sortable">
                         <thead>
                             <td>Name der Lehrveranstaltung</td>
                             <td class="semester">Semster</td>
