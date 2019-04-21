@@ -103,6 +103,21 @@ function delete_searchterm(id){
         }
     })
 }
+function delete_blacklisted_module(id){
+    $.ajax({
+        url: apiUrl+'blacklist/'+id+'?key='+secret_key,
+        method : 'DELETE',
+        success : function (data) {
+            remove_from_blacklist(id)
+            populate_blacklist()
+        },
+        error : function (err) {
+            console.log(err);
+            alert('Das Modul konnte nicht gelöscht werden.');
+        }
+    })
+}
+
 function remove_from_whitelist(id){
     $('#whitelist_body').find('#'+id).remove()
 }
@@ -126,18 +141,19 @@ function add_to_whitelist(SmObjId, PiqYear, PiqSession, held_in, title){
     $('#whitelist_body').append(module)
 }
 function add_to_blacklist(SmObjId, PiqYear, PiqSession, held_in, title){
-    var module = $(`${write_tr_prefix_for_list(SmObjId, PiqYear, PiqSession, held_in, title)}<button name="Anzeigen" onclick="whitelist_from_blacklist('${SmObjId}', '${PiqYear}', '${PiqSession}', '${held_in}', '${title}')">Anzeigen</button></td></tr>`)
+    var anzeigen_button = `<button name="Anzeigen" onclick="whitelist_from_blacklist('${SmObjId}', '${PiqYear}', '${PiqSession}', '${held_in}', '${title}')">Anzeigen</button>`
+    var delete_button = `<button name="Löschen" onclick="delete_blacklisted_module('${SmObjId}')">Löschen</button>`
+    var module = $(`${write_tr_prefix_for_list(SmObjId, PiqYear, PiqSession, held_in, title)}
+        ${anzeigen_button}${delete_button}</td></tr>`)
     $('#blacklist_body').append(module)
 }
 function add_to_suggestions(SmObjId, PiqYear, PiqSession, held_in, title, in_whitelist, in_blacklist){
     var anzeigen_button=`<button name="Anzeigen" onclick="whitelist_from_blacklist('${SmObjId}', '${PiqYear}', '${PiqSession}', '${held_in}', '${title}')"
-    ${in_whitelist ? 'disabled' : ''}>Anzeigen</button>`
+        ${in_whitelist ? 'disabled' : ''}>Anzeigen</button>`
     var verbergen_button=`<button name="Verbergen" onclick="whitelist_from_blacklist('${SmObjId}', '${PiqYear}', '${PiqSession}', '${held_in}', '${title}')"
-    ${in_blacklist ? 'disabled' : ''}>Verbergen</button>`
+        ${in_blacklist ? 'disabled' : ''}>Verbergen</button>`
     var module = $(`${write_tr_prefix_for_list(SmObjId, PiqYear, PiqSession, held_in, title)}
-    ${anzeigen_button}
-    ${verbergen_button}
-    </td></tr>`);
+        ${anzeigen_button}${verbergen_button}</td></tr>`);
     $('#suggestions_body').append(module)
 }
 

@@ -139,7 +139,10 @@
                                     </td>
                                     {# <td>            {{ m.PiqSession }} </td> #}
                                     {# <td>            {{ m.PiqYear }} </td> #}
-                                    <td><button name="Anzeigen" onclick="whitelist_from_blacklist({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.held_in }}, {{ m.held_in }}, '{{ m.title }}')">Anzeigen</button></td>
+                                    <td>
+                                        <button name="Anzeigen" onclick="whitelist_from_blacklist({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.held_in }}, {{ m.held_in }}, '{{ m.title }}')">Anzeigen</button>
+                                        <button name="Löschen" onclick="delete_blacklisted_module({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.held_in }}, {{ m.held_in }}, '{{ m.title }}')">Löschen</button>
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
