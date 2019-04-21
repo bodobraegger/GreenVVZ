@@ -8,7 +8,7 @@ function whitelist_from_suggestions(SmObjId, PiqYear, PiqSession, held_in, title
         url: apiUrl+'whitelist/'+SmObjId+'?key='+secret_key,
         method : 'POST',
         success : function (data) {
-            delete_from_suggestions(SmObjId)
+            remove_from_suggestions(SmObjId)
             populate_whitelist()
         },
         error : function (err) {
@@ -21,7 +21,7 @@ function whitelist_from_blacklist(SmObjId, PiqYear, PiqSession, held_in, title) 
         url: apiUrl+'whitelist/'+SmObjId+'?key='+secret_key,
         method : 'POST',
         success : function (data) {
-            delete_from_blacklist(SmObjId)
+            remove_from_blacklist(SmObjId)
             populate_whitelist()
         },
         error : function (err) {
@@ -35,7 +35,7 @@ function blacklist_from_suggestions(SmObjId, PiqYear, PiqSession, held_in, title
         url: apiUrl+'blacklist/'+SmObjId+'?key='+secret_key,
         method : 'POST',
         success : function (data) {
-            delete_from_suggestions(SmObjId)
+            remove_from_suggestions(SmObjId)
             populate_blacklist()
         },
         error : function (err) {
@@ -48,7 +48,7 @@ function blacklist_from_whitelist(SmObjId, PiqYear, PiqSession, held_in, title){
         url: apiUrl+'blacklist/'+SmObjId+'?key='+secret_key,
         method : 'POST',
         success : function (data) {
-            delete_from_whitelist(SmObjId);
+            remove_from_whitelist(SmObjId);
             populate_blacklist();
         },
         error : function (err) {
@@ -90,12 +90,12 @@ function save_module(){
 
     })
 }
-function remove_searchterm(id){
+function delete_searchterm(id){
     $.ajax({
         url: apiUrl+'searchterms/'+id+'?key='+secret_key,
         method : 'DELETE',
         success : function (data) {
-            delete_from_searchterms(id)
+            remove_from_searchterms(id)
             populate_suggestions()
         },
         error : function (err) {
@@ -103,16 +103,16 @@ function remove_searchterm(id){
         }
     })
 }
-function delete_from_whitelist(id){
+function remove_from_whitelist(id){
     $('#whitelist_body').find('#'+id).remove()
 }
-function delete_from_blacklist(id){
+function remove_from_blacklist(id){
     $('#blacklist_body').find('#'+id).remove()
 }
-function delete_from_suggestions(id){
+function remove_from_suggestions(id){
     $('#suggestions_body').find('#'+id).remove()
 }
-function delete_from_searchterms(id){
+function remove_from_searchterms(id){
     var term = $('#searchterms_body').find('#'+id)
     term.remove()
 }
@@ -142,7 +142,7 @@ function add_to_suggestions(SmObjId, PiqYear, PiqSession, held_in, title, in_whi
 }
 
 function add_to_searchterms(id, term){
-    var searchterm = $('<tr id="'+id+'"><td>'+term+'</td><td><button onclick="remove_searchterm('+id+')">Entfernen</button></td></tr>')
+    var searchterm = $('<tr id="'+id+'"><td>'+term+'</td><td><button onclick="delete_searchterm('+id+')">Entfernen</button></td></tr>')
     $('#searchterms_body').append(searchterm)
 }
 
