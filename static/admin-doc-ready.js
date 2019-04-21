@@ -4,7 +4,7 @@ $(document).ready(function () {
         url: apiUrl+'update',
         method : 'GET',
         beforeSend: function () {
-            $(":input").prop("disabled", true);
+            // $(":input").prop("disabled", true);
             $('#anchor-admin').before('<div id="loading"><h2>Module werden aktualisiert</h2><p>Bitte haben Sie Geduld, dies kann je nach Anzahl der Module bis zu einer Minute dauern</p></div>')
         },
         success : function (data) {
