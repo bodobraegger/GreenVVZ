@@ -16,7 +16,7 @@
         $('input[name="semester"]').change(function() {
             var modules_to_filter = new $();
             $(`input[name="semester"]:not(:checked)`).each(function() {
-                modules_to_filter=modules_to_filter.add($(`[data-semester*="${$(this).get(0).id}"]`))
+                modules_to_filter=modules_to_filter.add($(`[data-semester*="${$(this).get(0).id}"]`)).add($(`[data-semester*="${$(this).get(0).id} 999"]`))
             })
             // console.log(modules_to_filter.length)
             $('[data-semester]').removeClass('hidden')
