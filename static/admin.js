@@ -229,6 +229,7 @@ function populate_suggestions(){
             for (var row in data) {
                 add_to_suggestions(data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].PiqSession, data[row].title, data[row].in_whitelist, data[row].in_blacklist)
             }
+            $('#suggestions_title_th').trigger("click")
         },
         error : function (err) {
             console.log('Suchvorschläge konnten nicht abgerufen werden: '+err)
