@@ -1,23 +1,35 @@
 <!-- FILTER SELECTOR INCLUDE -->
 <div id="filter_selectors_wrapper">
     <div id="filter_selectors">
-        <input type="checkbox" id="{{date.today().year-1}} 4" name="semester" checked/>
+        <input type="checkbox" data-semester="{{date.today().year-1}} 4" id="{{date.today().year-1}} 4" name="semester" checked/>
         <label for="{{'%s' | format(date.today().year-1)}} 4">FS {{'%s' | format((date.today().year-1) % 100)}} </label>
-        <input type="checkbox" id="{{date.today().year-1}} 3" name="semester" checked/>
+        <input type="checkbox" data-semester="{{date.today().year-1}} 3" id="{{date.today().year-1}} 3" name="semester" checked/>
         <label for="{{'%s' | format(date.today().year-1)}} 3">HS {{'%s' | format((date.today().year-1) % 100)}} </label>
-        <input type="checkbox" id="{{date.today().year}} 4" name="semester" checked/>
+        <input type="checkbox" data-semester="{{date.today().year}} 4" id="{{date.today().year}} 4" name="semester" checked/>
         <label for="{{'%s' | format(date.today().year)}} 4">FS {{'%s' | format(date.today().year % 100)}} </label>
-        <input type="checkbox" id="{{date.today().year}} 3" name="semester" checked/>
+        <input type="checkbox" data-semester="{{date.today().year}} 3" id="{{date.today().year}} 3" name="semester" checked/>
         <label for="{{'%s' | format(date.today().year)}} 3">HS {{'%s' | format(date.today().year % 100)}} </label>
     </div>
     <!--hwat-->
 
     <script type="text/javascript">
         $('input[name="semester"]').change(function() {
-            var modules_to_filter = new $();
+            var modules_to_filter = new $(); 
+            var year_semesters = {};
             $(`input[name="semester"]:not(:checked)`).each(function() {
-                modules_to_filter=modules_to_filter.add($(`[data-semester*="${$(this).get(0).id}"]`)).add($(`[data-semester*="${$(this).get(0).id} 999"]`))
+                modules_to_filter=modules_to_filter.add($(`[data-semester*="${$(this).get(0).id}"]`).not(`[data-semester*="999"]`))
+                var year = $(this).get(0).id.split(' ')[0]
+                var semester = $(this).get(0).id.split(' ')[1]
+                if(!(year in year_semesters)) {
+                    year_semesters[year] = new Set();
+                }
+                year_semesters[year].add(semester);
             })
+            $.each(year_semesters, (value, index) => {
+                if(year_semesters[value].size == 2){
+                    modules_to_filter=modules_to_filter.add($(`[data-semester*="${value}"]`));
+                }
+            });
             // console.log(modules_to_filter.length)
             $('[data-semester]').removeClass('hidden')
             $(modules_to_filter).addClass('hidden')
