@@ -1,29 +1,23 @@
 <html>
     <head>
+        <link rel="stylesheet" href="static/general.css">
         <link rel="stylesheet" href="static/uzh/app.css">
         <link rel="stylesheet" href="static/jquery-ui.min.css">
         <script type="text/javascript" src="static/external/jquery/jquery-3.3.1.min.js"></script>
         <script type="text/javascript" src="static/jquery-ui.min.js"></script>
-        <style>
-            button {
-                display: block; 
-                width: 100%
-            }
-            td {
-                font-size: 80%;
-            }
-        </style>
+        <script type="text/javascript" src="static/additional/iframeResizer.contentWindow.min.js"></script>
+        <script type="text/javascript" src="static/additional/sorttable.js"></script>
     </head>
     <body>
-        <!-- <div id="anchor-admin" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist"></div> -->
+        {% include 'includes/filter-selectors.html' %}
         <div class="mod mod-text skin-text-basics"> <!-- add this outer div to match UZH styling -->
             <div id="anchor-admin-2" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
                 <h3>Angezeigte Elemente (Whitelist)</h3>
                 <div style="padding: 0">
-                    <table>
+                    <table> <!--class="sortable"-->
                         <thead>
                             <td>Name der Lehrveranstaltung</td>
-                            <td>Semster</td>
+                            <td class="semester">Semster</td>
                             <td>Verbergen</td>
                         </thead>
                         <tbody id="whitelist_body">
@@ -32,16 +26,16 @@
                                 <td colspan="2"><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
                             </tr>
                             {% for m in whitelist %}
-                                <tr id={{ m.SmObjId }}>
+                                <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}} class="shown"'>
                                     <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     {# <td>            {{ m.SmObjId }} </td> #}
-                                    <td> <!-- {{ m.held_in }} -->
+                                    <td> <!-- {{ m.held_in }} / held_in -->
                                         {% if m.held_in == 3 %}
-                                            HS
+                                            <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% elif m.held_in == 4 %}
-                                            FS
+                                            <span class="semester">FS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% elif m.held_in == 999 %}
-                                            HS & FS
+                                            <span class="semester">HS & FS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% else %}
                                             undefiniert
                                         {% endif %}
@@ -55,8 +49,9 @@
                     </table>
                 </div>
 
-                <h3>Suchbegriffe</h3><div style="padding: 0">
-                <table>
+                <h3>Suchbegriffe</h3>
+                <div style="padding: 0">
+                <table> <!--class="sortable"-->
                     <thead>
                         <td>Begriff</td>
                         <td>Entfernen</td>
@@ -78,29 +73,39 @@
 
                 <h3>Vorschläge basierend auf Suchbegriffen</h3>
                 <div style="padding: 0">
-                    <table>
+                    <table class="sortable">
                         <thead>
-                            <td>Name der Lehrveranstaltung</td>
-                            <td>Semster</td>
+                            <td id="suggestions_title_th">Name der Lehrveranstaltung</td>
+                            <td class="semester">Semster</td>
                             <td>Anzeigen/Verbergen</td>
                         </thead>
                         <tbody id="suggestions_body">
                         {% for m in found_modules %}
-                            <tr id={{ m.SmObjId }}>
+                            <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown">
                                 <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
-                                <td> <!-- held in / PiqSession: {{ m.PiqSession }} -->
-                                    {% if m.PiqSession == "003" %}
-                                        HS
-                                    {% elif m.PiqSession == "004" %}
-                                        FS
-                                    {% elif m.PiqSession == "999" %}
-                                        HS & FS
-                                    {% else %}
-                                        undefiniert
+                                    <td> <!-- {{ m.PiqSession }} / PiqSession -->
+                                        {% if m.PiqSession == 3 %}
+                                            <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
+                                        {% elif m.PiqSession == 4 %}
+                                            <span class="semester">FS </span>{{'%s' | format(m.PiqYear % 100)}}
+                                        {% elif m.PiqSession == 999 %}
+                                            <span class="semester">HS & FS </span>{{'%s' | format(m.PiqYear % 100)}}
+                                        {% else %}
+                                            undefiniert
+                                        {% endif %}
+                                    </td>
+                                <td><button name="Anzeigen" 
+                                    onclick="whitelist_from_suggestions({{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, {{m.PiqSession}}, {{m.title}})"
+                                    {% if m.in_whitelist==1 %}
+                                    disabled
                                     {% endif %}
-                                </td>
-                                <td><button name="Anzeigen" onclick="whitelist_from_suggestions({{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, {{m.PiqSession}}, {{m.title}})">Anzeigen</button>
-                                    <button name="Verbergen" onclick="blacklist_from_suggestions({{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, {{m.PiqSession}}, {{m.title}})">Verbergen</button>
+                                >Anzeigen</button>
+                                <button name="Verbergen" 
+                                    onclick="blacklist_from_suggestions({{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, {{m.PiqSession}}, {{m.title}})"
+                                    {% if m.in_blacklist==1 %}
+                                    disabled
+                                    {% endif %}
+                                >Verbergen</button>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -110,31 +115,34 @@
 
                 <h3>Verborgene Elemente (Blacklist)</h3>
                 <div style="padding: 0">
-                    <table>
+                    <table> <!--class="sortable"-->
                         <thead>
                             <td>Name der Lehrveranstaltung</td>
-                            <td>Semster</td>
+                            <td class="semester">Semster</td>
                             <td>Anzeigen</td>
                         </thead>
                         <tbody id="blacklist_body">
                             {% for m in blacklist %}
-                                <tr id={{ m.SmObjId }}>
+                                <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown"'>
                                     <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     {# <td>            {{ m.SmObjId }} </td> #}
-                                    <td> <!-- {{ m.held_in }} -->
+                                    <td> <!-- {{ m.held_in }} / held_in -->
                                         {% if m.held_in == 3 %}
-                                            HS
+                                            <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% elif m.held_in == 4 %}
-                                            FS
+                                            <span class="semester">FS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% elif m.held_in == 999 %}
-                                            HS & FS
+                                            <span class="semester">HS & FS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% else %}
                                             undefiniert
                                         {% endif %}
                                     </td>
                                     {# <td>            {{ m.PiqSession }} </td> #}
                                     {# <td>            {{ m.PiqYear }} </td> #}
-                                    <td><button name="Anzeigen" onclick="whitelist_from_blacklist({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.held_in }}, {{ m.held_in }}, '{{ m.title }}')">Anzeigen</button></td>
+                                    <td>
+                                        <button name="Anzeigen" onclick="whitelist_from_blacklist({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.held_in }}, {{ m.held_in }}, '{{ m.title }}')">Anzeigen</button>
+                                        <button name="Löschen" onclick="delete_blacklisted_module({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.held_in }}, {{ m.held_in }}, '{{ m.title }}')">Löschen</button>
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>

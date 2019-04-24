@@ -8,6 +8,7 @@ from functools import wraps
 import models
 import requests
 import updateModules
+import helpers
 from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
 
@@ -67,10 +68,11 @@ def front_dev():
         blacklist = get_modules("blacklist")
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
+        # found_modules = helpers.OrderedSet(json.loads(search().get_data())) - helpers.OrderedSet(whitelist) - helpers.OrderedSet(blacklist)
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
-            'PiqSession': 3,
+            'PiqSession': '003',
             'PiqYear': 2018,
             'SmObjId': 50904112,
             'held_in': 3,
@@ -81,7 +83,56 @@ def front_dev():
         found_modules.append(test)
         searchterms.append({"id": 1, "term": "wut"})
 
-    return render_template('front_dev.html', whitelist=whitelist, blacklist=blacklist, searchterms=searchterms, baseUrlVvzUzh=baseUrlVvzUzh, secret_key=secret_key, found_modules=found_modules)
+    return render_template('front_dev.html', **{
+        'whitelist': whitelist,
+        'blacklist': blacklist,
+        'searchterms': searchterms,
+        'baseUrlVvzUzh': baseUrlVvzUzh,
+        'secret_key': secret_key,
+        'found_modules': found_modules,
+        'date':date
+    })
+
+@app.route('/public')
+@cross_origin()
+@require_appkey
+def public():
+    baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
+    whitelist = []
+    blacklist = []
+    searchterms = []
+    found_modules= []
+    secret_key = app.config['SECRET_KEY']
+
+    try:
+        whitelist = get_modules("whitelist")
+        blacklist = get_modules("blacklist")
+        searchterms = json.loads(get_searchterms().get_data())
+        found_modules = json.loads(search().get_data())
+        # found_modules = helpers.OrderedSet(json.loads(search().get_data())) - helpers.OrderedSet(whitelist) - helpers.OrderedSet(blacklist)
+    except mysql.connector.errors.InterfaceError as e:
+        print(e, "\n!!!only works on server!!!")
+        test = {
+            'PiqSession': '003',
+            'PiqYear': 2018,
+            'SmObjId': 50904112,
+            'held_in': 3,
+            'title': "ayy",
+        }
+        whitelist.append(test)
+        blacklist.append(test)
+        found_modules.append(test)
+        searchterms.append({"id": 1, "term": "wut"})
+
+    return render_template('public.html', **{
+        'whitelist': whitelist,
+        'blacklist': blacklist,
+        'searchterms': searchterms,
+        'baseUrlVvzUzh': baseUrlVvzUzh,
+        'secret_key': secret_key,
+        'found_modules': found_modules,
+        'date':date
+    })
 
 
 
@@ -437,32 +488,59 @@ def search():
             for entry in root.findall('{http://www.w3.org/2005/Atom}entry'):
                 for a in entry.findall('{http://www.w3.org/2005/Atom}content'):
                     modules.append({
-                        'SmObjId': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}Objid').text,
-                        'PiqYear': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqYear').text,
-                        'PiqSession': a[0].find(
-                            '{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqSession').text,
+                        'SmObjId': int(a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}Objid').text),
+                        'PiqYear': int(a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqYear').text),
+                        'PiqSession': int(a[0].find(
+                            '{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqSession').text),
                         'title': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmStext').text
                     })
 
+    print('\n\n\nBEFORE UNIQUE\n\n\n')
+    for e in modules:
+        print(e)
+    
     # remove duplicates
-    modules = [dict(t) for t in set([tuple(d.items()) for d in modules])]
+    #modules = [dict(t) for t in set([tuple(sorted(d.items())) for d in modules])]
+    modules = list({frozenset(item.items()):item for item in modules}.values())
 
     # remove elements that are on whitelist unified with blacklist
-    white_u_blacklist = []
+    ids_whitelist = []
     cursor = cnx.cursor()
-    qry = (
-        "SELECT SmObjId FROM whitelist UNION SELECT SmObjId FROM blacklist")
-    cursor.execute(qry)
+    cursor.execute("SELECT SmObjId FROM whitelist")
     for row in cursor:
-        white_u_blacklist.append(row[0])
+        ids_whitelist.append(row[0])
+
+    ids_blacklist = []
+    cursor = cnx.cursor()
+    cursor.execute("SELECT SmObjId FROM blacklist")
+    for row in cursor:
+        ids_blacklist.append(row[0])
+    cursor.close()
+    ids_white_u_blacklist = list(set(ids_whitelist + ids_blacklist))
+
+    # print('\n\n\nBEFORE REMOVAL\n\n\n')
+    # for e in modules:
+    #     print(e)
+
+    # for mod in modules:
+    #     if int(mod.get('SmObjId')) in ids_white_u_blacklist:
+    #         modules.remove(mod)
+    #         # modules = [m for m in modules if m != mod]
+    #         # print('To remove:', mod)
+    #         # while mod in modules:
+    #         #     print('REMOVED', mod)
+    #         #     modules.remove(mod)
+    
+    # print('\n\n\nAFTER REMOVAL\n\n\n')
+    # for e in modules:
+    #     print(e)
 
     for mod in modules:
-        if int(mod.get('SmObjId')) in white_u_blacklist:
-            print('REMOVED', mod)
-            modules = [m for m in modules if m != mod]
-            # modules.remove(mod)
-    cursor.close()
-    
+        if int(mod.get('SmObjId')) in ids_whitelist:
+            mod['in_whitelist'] = 1
+        if int(mod.get('SmObjId')) in ids_blacklist:
+            mod['in_blacklist'] = 1
+
     return jsonify(modules)
 
 
