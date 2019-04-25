@@ -543,6 +543,98 @@ def search():
 
     return jsonify(modules)
 
+@app.route('/search_upwards', methods=['GET'])
+@cross_origin()
+def search_upwards():
+    # get searchterms
+    terms = []
+    try:
+        cnx = mysql.connector.connect(**db_config)
+        cursor = cnx.cursor(dictionary=True)
+        cursor.execute("SELECT term FROM searchterms")
+        for row in cursor:
+            terms.append(row['term'])
+    except Exception as e:
+        print('not possible in dev', e)
+        terms.append('101a/b')
+
+    # get results for all searchterms
+    courses = []
+    modules = []
+    URI_prefix = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/"
+    for session in [next_session(), current_session(), previous_session()]:
+        for searchterm in terms:
+            rURI = URI_prefix+"ESearchSet?$skip=0&$top=20&$orderby=EStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages".format(
+                searchterm, session['year'], session['session'])
+            courses_search = requests.get(rURI)
+            r = requests.get(rURI)
+            root = ET.fromstring(r.content)
+            for entry in root.findall('{http://www.w3.org/2005/Atom}entry'):
+                for a in entry.findall('{http://www.w3.org/2005/Atom}content'):
+                    courses.append({
+                        'EObjId': int(a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}Objid').text),
+                        'EText': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}EStext').text,
+                        'PiqYear': int(a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqYear').text),
+                        'PiqSession': int(a[0].find(
+                            '{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqSession').text),
+                    })
+        # remove duplicates
+        #courses = [dict(t) for t in set([tuple(sorted(d.items())) for d in courses])]
+        # courses = list({frozenset(item.items()):item for item in courses}.values())
+        for course in courses:
+            course['Modules'] = []
+            rURI = URI_prefix+"EDetailsSet(EObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links".format(
+                course.get('EObjId'), session['year'], session['session'])
+            course_details = requests.get(rURI)
+            course_details_root = ET.fromstring(course_details.content)
+            # # ET.dump(course_details_root)
+            # course_details_root_modules = course_details_root.find("{http://www.w3.org/2005/Atom}link[@title='Modules']")
+            # print()
+            # for e in course_details_root_modules.findall(".//{http://www.w3.org/2005/Atom}entry"):
+            #     print(e)
+            #     for ee in course_details_root.findall("{http://www.w3.org/2005/Atom}link[@title='Modules'].//{http://www.w3.org/2005/Atom}content/*"):
+            #         print(ee)
+            #         for eee in ee.findall('*'):
+            #             print(eee)
+            #         # for eee in ee.findall('*'):
+            #     #         print(eee)
+            # print()
+            # select all contents of entry elements in the link element titled 'Modules'
+            for entry in course_details_root.findall("{http://www.w3.org/2005/Atom}link[@title='Modules'].//{http://www.w3.org/2005/Atom}entry"):
+                for datapoints in entry.findall('{http://www.w3.org/2005/Atom}content/*'):
+                    course['Modules'].append({
+                        'SmObjId': int(datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmObjId').text),
+                        'SmText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmText').text,
+                        'PiqYear': int(datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqYear').text),
+                        'PiqSession': int(datapoints.find(
+                            '{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqSession').text),
+                    })
+
+            for module in course['Modules']:
+                module['Partof'] = []
+                # SmDetailsSet(SmObjId='50934872',PiqYear='2018',PiqSession='004')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods
+                rURI = URI_prefix+"SmDetailsSet(SmObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods".format(
+                    module.get('SmObjId'), session['year'], session['session'])
+                module_details = requests.get(rURI)
+                module_details_root = ET.fromstring(module_details.content)
+                for entry in module_details_root.findall("{http://www.w3.org/2005/Atom}link[@title='Partof'].//{http://www.w3.org/2005/Atom}entry"):
+                    for datapoints in entry.findall('{http://www.w3.org/2005/Atom}content/*'):
+                        module['Partof'].append({
+                            'ScObjid': int(datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}ScObjid').text),
+                            'ScText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}ScText').text,
+                            'OText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}OText').text,
+                            'CgHighObjid': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighObjid').text,
+                            'CgHighText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighText').text,
+                            'CgHighCategory': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighCategory').text,
+                            'CgHighObjid': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighObjid').text,
+                            'CgLowObjid': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowObjid').text,
+                            'CgLowText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowText').text,
+                            'CgLowCategory': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowCategory').text,
+                        })
+            print(course)
+
+    return jsonify(courses)
+
 
 def current_session():
     if date.today() < date(date.today().year, 2, 1):
