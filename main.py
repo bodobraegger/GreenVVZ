@@ -5,6 +5,9 @@ import xml.etree.ElementTree as ET
 from datetime import date
 from functools import wraps
 import requests
+import time
+# from multiprocessing.pool import ThreadPool
+from concurrent.futures import ThreadPoolExecutor
 
 from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
@@ -559,11 +562,12 @@ def search():
 # loop = asyncio.get_event_loop()
 # loop.run_until_complete(main())
 
+URI_prefix = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/"
 
-def find_modules_for_course(course, URI_prefix, session):
+def find_modules_for_course(course):
     course['Modules'] = []
     rURI = URI_prefix+"EDetailsSet(EObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links".format(
-        course.get('EObjId'), session['year'], session['session'])
+        course.get('EObjId'), course.get('PiqYear'), course.get('PiqSession'))
     # async with aiohttp.ClientSession() as session:
     #     r = await fetch_content(session, rURI)
     r = requests.get(rURI)
@@ -590,12 +594,13 @@ def find_modules_for_course(course, URI_prefix, session):
                 'PiqSession': int(datapoints.find(
                     '{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqSession').text),
             })
+    return course
 
-def find_studyprograms_for_module(module, URI_prefix, session):
+def find_studyprograms_for_module(module):
     module['Partof'] = []
     # SmDetailsSet(SmObjId='50934872',PiqYear='2018',PiqSession='004')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods
     rURI = URI_prefix+"SmDetailsSet(SmObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods".format(
-        module.get('SmObjId'), session['year'], session['session'])
+        module.get('SmObjId'), module.get('PiqYear'), module.get('PiqSession'))
     # async with aiohttp.ClientSession() as session:
     #     r = await fetch_content(session, rURI)
     r = requests.get(rURI)
@@ -614,11 +619,18 @@ def find_studyprograms_for_module(module, URI_prefix, session):
                 'CgLowText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowText').text,
                 'CgLowCategory': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowCategory').text,
             })
+    return module
+
+
+def wrap_execute_for_modules_in_course(course):
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        return executor.map(find_studyprograms_for_module, course['Modules'])
+    # return ThreadPool(len(course['Modules'])).imap_unordered(find_studyprograms_for_module, course['Modules'])
 
 @app.route('/search_upwards', methods=['GET'])
 @cross_origin()
 def search_upwards():
-
+    start_time = time.perf_counter()
     # get searchterms
     terms = []
     try:
@@ -634,7 +646,6 @@ def search_upwards():
     # get results for all searchterms
     courses = []
     modules = []
-    URI_prefix = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/"
     for session in [next_session(), current_session(), previous_session()]:
         for searchterm in terms:
             rURI = URI_prefix+"ESearchSet?$skip=0&$top=20&$orderby=EStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages".format(
@@ -653,13 +664,22 @@ def search_upwards():
         # remove duplicates
         #courses = [dict(t) for t in set([tuple(sorted(d.items())) for d in courses])]
         # courses = list({frozenset(item.items()):item for item in courses}.values())
-        for course in courses:
-            find_modules_for_course(course, URI_prefix, session)
-            
-            for module in course['Modules']:
-                find_studyprograms_for_module(module, URI_prefix, session)
-            print(course)
+        
+        # takes about 6 seconds for the two dev terms
+        with ThreadPoolExecutor(max_workers=len(courses)) as executor:
+            x = executor.map(find_modules_for_course, courses)
+            y = executor.map(wrap_execute_for_modules_in_course, courses)
 
+        # takes >20 seconds for the two dev terms.        
+        # for course in courses:
+        #     find_modules_for_course(course)
+            
+        #     for module in course['Modules']:
+        #         find_studyprograms_for_module(module)
+            # print(course)
+
+    elapsed_time = time.perf_counter() - start_time
+    print("elapsed", elapsed_time)
     return jsonify(courses)
 
 
