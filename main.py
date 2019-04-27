@@ -549,7 +549,6 @@ def find_studyprograms_for_module(module):
                 'CgHighObjid': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighObjid').text,
                 'CgHighText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighText').text,
                 'CgHighCategory': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighCategory').text,
-                'CgHighObjid': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighObjid').text,
                 'CgLowObjid': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowObjid').text,
                 'CgLowText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowText').text,
                 'CgLowCategory': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowCategory').text,
@@ -585,7 +584,6 @@ def search_upwards():
 
     # get results for all searchterms
     courses = []
-    modules = []
     for session in [helpers.next_session(), helpers.current_session(), helpers.previous_session()]:
         for searchterm in terms:
             rURI = models.Globals.URI_prefix+"ESearchSet?$skip=0&$top=20&$orderby=EStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages".format(
@@ -607,8 +605,8 @@ def search_upwards():
         
         # takes about 6 seconds for the two dev terms
         with ThreadPoolExecutor(max_workers=len(courses)) as executor:
-            x = executor.map(find_modules_for_course, courses)
-            y = executor.map(wrap_execute_for_modules_in_course, courses)
+            executor.map(find_modules_for_course, courses)
+            executor.map(wrap_execute_for_modules_in_course, courses)
 
         # takes >20 seconds for the two dev terms.        
         # for course in courses:

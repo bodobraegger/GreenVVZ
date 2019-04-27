@@ -1,5 +1,6 @@
 import collections
 from datetime import date
+import re
 
 # returns a dictionary containing the values 'year' and 'session' as of today
 def current_session():

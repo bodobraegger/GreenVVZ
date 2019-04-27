@@ -1,7 +1,6 @@
 # coding=utf8
 import requests
 import xml.etree.ElementTree as ET
-import re
 
 import helpers
 
@@ -29,7 +28,7 @@ class Module:
 
             root = ET.fromstring(r.content)
 
-            key = decode_key(root.find('{http://www.w3.org/2005/Atom}title').text)
+            key = helpers.decode_key(root.find('{http://www.w3.org/2005/Atom}title').text)
             title = root.find('{http://www.w3.org/2005/Atom}content')[0].find(
                 '{http://schemas.microsoft.com/ado/2007/08/dataservices}SmText').text
 
@@ -41,6 +40,7 @@ class Module:
             else:
                 return key
         except AttributeError as err:
+            print(err)
             return None
 
     # get most recent module from odata-api, and set class-variables
