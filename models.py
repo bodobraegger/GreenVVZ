@@ -2,52 +2,11 @@
 import requests
 import xml.etree.ElementTree as ET
 import re
-from datetime import date
 
+import helpers
 
-# returns a dictionary containing the values 'year' and 'session' as of today
-def current_session():
-    if date.today() < date(date.today().year, 2, 1):
-        return {'year': current_year() - 1, 'session': '003'}
-    elif date.today() < date(date.today().year, 8, 1):
-        return {'year': current_year() - 1, 'session': '004'}
-    else:
-        return {'year': current_year(), 'session': '003'}
-
-
-# returns a dictionary containing the values 'year' and 'session' of the upcoming semester
-def next_session():
-    if date.today() < date(date.today().year, 2, 1):
-        return {'year': current_year() - 1, 'session': '004'}
-    elif date.today() < date(date.today().year, 8, 1):
-        return {'year': current_year(), 'session': '003'}
-    else:
-        return {'year': current_year(), 'session': '004'}
-
-
-# returns a dictionary containing the values 'year' and 'session' of the previous semester
-def previous_session():
-    if date.today() < date(date.today().year, 2, 1):
-        return {'year': current_year() - 2, 'session': '004'}
-    elif date.today() < date(date.today().year, 8, 1):
-        return {'year': current_year() - 1, 'session': '003'}
-    else:
-        return {'year': current_year() - 1, 'session': '004'}
-
-
-# returns current year as int
-def current_year():
-    return date.today().year
-
-
-# input: A string in the form "SmDetailsSet(SmObjId='00000000',PiqYear='0000',PiqSession='000')"
-# return: outputs the elements of the key as dictionary (SmObjId, PiqYear, PiqSession)
-def decode_key(key_string):
-    regex = r"((?P<id>SmObjId=\'(\d*)\'),(?P<year>PiqYear=\'(\d*)\'),(?P<session>PiqSession=\'(\d*)\'))"
-    # test_str = unicode(key_string)
-    matches = re.search(regex, key_string)
-    return {'SmObjId': matches.group(3), 'PiqYear': matches.group(5), 'PiqSession': matches.group(7)}
-
+class Globals():
+    URI_prefix = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/"
 
 class Module:
     # constructor
@@ -87,9 +46,9 @@ class Module:
     # get most recent module from odata-api, and set class-variables
     # return false if not available
     def update(self):
-        previous = self.module_exists(previous_session()['year'], previous_session()['session'])
-        current = self.module_exists(current_session()['year'], current_session()['session'])
-        next = self.module_exists(next_session()['year'], next_session()['session'])
+        previous = self.module_exists(helpers.previous_session()['year'], helpers.previous_session()['session'])
+        current = self.module_exists(helpers.current_session()['year'], helpers.current_session()['session'])
+        next = self.module_exists(helpers.next_session()['year'], helpers.next_session()['session'])
 
         if previous:
             self.set_module(previous)
