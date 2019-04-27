@@ -4,13 +4,17 @@ import mysql.connector
 import xml.etree.ElementTree as ET
 from datetime import date
 from functools import wraps
-
-import models
 import requests
-import updateModules
-import helpers
+import time
+# from multiprocessing.pool import ThreadPool
+from concurrent.futures import ThreadPoolExecutor
+
 from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
+
+import models
+import updateModules
+import helpers
 
 app = Flask(__name__, static_url_path='/static')
 cors = CORS(app)
@@ -64,8 +68,8 @@ def front_dev():
     secret_key = app.config['SECRET_KEY']
 
     try:
-        whitelist = get_modules("whitelist")
-        blacklist = get_modules("blacklist")
+        whitelist = json.loads(get_whitelist().get_data())
+        blacklist = json.loads(get_blacklist().get_data())
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
         # found_modules = helpers.OrderedSet(json.loads(search().get_data())) - helpers.OrderedSet(whitelist) - helpers.OrderedSet(blacklist)
@@ -105,8 +109,8 @@ def public():
     secret_key = app.config['SECRET_KEY']
 
     try:
-        whitelist = get_modules("whitelist")
-        blacklist = get_modules("blacklist")
+        whitelist = json.loads(get_whitelist().get_data())
+        blacklist = json.loads(get_blacklist().get_data())
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
         # found_modules = helpers.OrderedSet(json.loads(search().get_data())) - helpers.OrderedSet(whitelist) - helpers.OrderedSet(blacklist)
@@ -436,52 +440,10 @@ def search():
 
     # get results for all searchterms
     modules = []
-    for session in [next_session(), current_session(), previous_session()]:
+    for session in [helpers.next_session(), helpers.current_session(), helpers.previous_session()]:
         for searchterm in terms:
             rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmSearchSet?$skip=0&$top=20&$orderby=SmStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages".format(
                 searchterm, session['year'], session['session'])
-            # for a search of courses instead of modules ESearchSet (vs SmSerachSet):
-            # prefix= https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/
-        # ESearchSet?$skip=0&$top=20&$orderby=EStext%20asc&$filter=substringof(%27i%20wer%27,Seark)%20and%20PiqYear%20eq%20%272018%27%20and%20PiqSession%20eq%20%27004%27&$expand=Persons&$inlinecount=allpages
-            # /Persons:
-            # PSearchSet?$skip=0&$top=20&$orderby=LastName%20asc&$filter=PiqYear%20eq%20%272018%27%20and%20PiqSession%20eq%20%27004%27&$inlinecount=allpages 
-            # 
-            # clicking on course (detail page, containing info about containing modules, persons, rooms etc.): 
-        # EDetailsSet(EObjId='50934874',PiqYear='2018',PiqSession='004')?$expand=Rooms%2cPersons%2cSchedule%2cSchedule%2fRooms%2cSchedule%2fPersons%2cModules%2cLinks
-            # CANNOT CALL INDIVIDUALLY?, because not implemented
-                # /Rooms, GListSet
-                # /Links, WebLinkSet
-                # /Modules, Module! SmListSet !!!!!!
-                    # SmListSet(ObligCore4Cg='',SmObjId='50934872',PiqYear='2018',PiqSession='004')
-                    # ?$expand=Modules
-                # /Schedule, EScheduleSet
-                # /Persons, PListSet
-            # 
-            # from there, following a link to a containing module:
-            # clicking on module (detail page, containing Partof information of Sc (studienprogramme)):
-        # SmDetailsSet(SmObjId='50934872',PiqYear='2018',PiqSession='004')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods
-            # /OfferPeriods
-            # /Partof, Studienprogramme!
-            # /Responsible
-            # /Organizations
-            # /Events
-            #
-            # clicking on details for first studienprogramm:
-        # CgDetailsSet(CgObjId='50437275',PiqYear='2018',PiqSession='004')?$expand=Organizations%2cHead%2cCoordination%2cScs%2cCgs 
-            # /Cgs, seemingly empty?
-            # /Organizations
-            # /Head
-            # /Coordination
-            # /Scs, Studiengänge!
-            # just finding containing studienprogramms:
-            # CgSearchSet?$skip=0&$top=20&$orderby=CgStext%20asc&$filter=PiqYear%20eq%20%272018%27%20and%20PiqSession%20eq%20%27004%27&$inlinecount=allpages
-            # from there, following a link to a studienprogramm:
-
-            # when clicking on details, odd GET (not sure if necessary): 
-            # DetailPageConfigSet?$filter=OType%20eq%20%27E%27%20and%20ObjectId%20eq%20%2750934874%27
-            # again, odd GET:
-            # DetailPageConfigSet?$filter=OType%20eq%20%27SM%27%20and%20ObjectId%20eq%20%2750934872%27
-            # 
 
             r = requests.get(rURI)
             root = ET.fromstring(r.content)
@@ -543,53 +505,123 @@ def search():
 
     return jsonify(modules)
 
+"""
+Request detail page for course object, add Module subobjects(dicts) as list to given course object 
+"""
+def find_modules_for_course(course):
+    course['Modules'] = []
+    rURI = models.Globals.URI_prefix+"EDetailsSet(EObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links".format(
+        course.get('EObjId'), course.get('PiqYear'), course.get('PiqSession'))
 
-def current_session():
-    if date.today() < date(date.today().year, 2, 1):
-        return {'year': current_year() - 1, 'session': '003'}
-    elif date.today() < date(date.today().year, 8, 1):
-        return {'year': current_year() - 1, 'session': '004'}
-    else:
-        return {'year': current_year(), 'session': '003'}
+    r = requests.get(rURI)
+    root = ET.fromstring(r.content)
 
+    # select all contents of entry elements in the link element titled 'Modules'
+    for entry in root.findall("{http://www.w3.org/2005/Atom}link[@title='Modules'].//{http://www.w3.org/2005/Atom}entry"):
+        for datapoints in entry.findall('{http://www.w3.org/2005/Atom}content/*'):
+            course['Modules'].append({
+                'SmObjId': int(datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmObjId').text),
+                'SmText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmText').text,
+                'PiqYear': int(datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqYear').text),
+                'PiqSession': int(datapoints.find(
+                    '{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqSession').text),
+            })
+    return course
 
-def next_session():
-    if date.today() < date(date.today().year, 2, 1):
-        return {'year': current_year() - 1, 'session': '004'}
-    elif date.today() < date(date.today().year, 8, 1):
-        return {'year': current_year(), 'session': '003'}
-    else:
-        return {'year': current_year(), 'session': '004'}
+"""
+Request detail page for module object, add Studyprogrm subobjects(dicts) as list to given module obj
+"""
+def find_studyprograms_for_module(module):
+    module['Partof'] = []
+    # SmDetailsSet(SmObjId='50934872',PiqYear='2018',PiqSession='004')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods
+    rURI = models.Globals.URI_prefix+"SmDetailsSet(SmObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods".format(
+        module.get('SmObjId'), module.get('PiqYear'), module.get('PiqSession'))
+    # async with aiohttp.ClientSession() as session:
+    #     r = await fetch_content(session, rURI)
+    r = requests.get(rURI)
+    root = ET.fromstring(r.content)
+    for entry in root.findall("{http://www.w3.org/2005/Atom}link[@title='Partof'].//{http://www.w3.org/2005/Atom}entry"):
+        for datapoints in entry.findall('{http://www.w3.org/2005/Atom}content/*'):
+            module['Partof'].append({
+                'ScObjid': int(datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}ScObjid').text),
+                'ScText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}ScText').text,
+                'OText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}OText').text,
+                'CgHighObjid': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighObjid').text,
+                'CgHighText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighText').text,
+                'CgHighCategory': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighCategory').text,
+                'CgLowObjid': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowObjid').text,
+                'CgLowText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowText').text,
+                'CgLowCategory': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowCategory').text,
+            })
+    return module
 
+"""
+Wrapper function to be able to parallelize finding studyprograms for modules
+"""
+def wrap_execute_for_modules_in_course(course):
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        return executor.map(find_studyprograms_for_module, course['Modules'])
+    # return ThreadPool(len(course['Modules'])).imap_unordered(find_studyprograms_for_module, course['Modules'])
 
-def previous_session():
-    if date.today() < date(date.today().year, 2, 1):
-        return {'year': current_year() - 2, 'session': '004'}
-    elif date.today() < date(date.today().year, 8, 1):
-        return {'year': current_year() - 1, 'session': '003'}
-    else:
-        return {'year': current_year() - 1, 'session': '004'}
+"""
+Find course matches, then find containing modules, containing study programs
+"""
+@app.route('/search_upwards', methods=['GET'])
+@cross_origin()
+def search_upwards():
+    start_time = time.perf_counter()
+    # get searchterms
+    terms = []
+    try:
+        cnx = mysql.connector.connect(**db_config)
+        cursor = cnx.cursor(dictionary=True)
+        cursor.execute("SELECT term FROM searchterms")
+        for row in cursor:
+            terms.append(row['term'])
+    except Exception as e:
+        print('not possible in dev', e)
+        terms+=['Nachhaltigkeit', 'Sustainability']
 
+    # get results for all searchterms
+    courses = []
+    for session in [helpers.next_session(), helpers.current_session(), helpers.previous_session()]:
+        for searchterm in terms:
+            rURI = models.Globals.URI_prefix+"ESearchSet?$skip=0&$top=20&$orderby=EStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages".format(
+                searchterm, session['year'], session['session'])
+            r = requests.get(rURI)
+            root = ET.fromstring(r.content)
+            for entry in root.findall('{http://www.w3.org/2005/Atom}entry'):
+                for a in entry.findall('{http://www.w3.org/2005/Atom}content'):
+                    courses.append({
+                        'EObjId': int(a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}Objid').text),
+                        'EText': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}EStext').text,
+                        'PiqYear': int(a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqYear').text),
+                        'PiqSession': int(a[0].find(
+                            '{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqSession').text),
+                    })
+        # remove duplicates
+        #courses = [dict(t) for t in set([tuple(sorted(d.items())) for d in courses])]
+        # courses = list({frozenset(item.items()):item for item in courses}.values())
+        
+        # takes about 6 seconds for the two dev terms
+        with ThreadPoolExecutor(max_workers=len(courses)) as executor:
+            executor.map(find_modules_for_course, courses)
+            executor.map(wrap_execute_for_modules_in_course, courses)
 
-def current_year():
-    return date.today().year
+        # takes >20 seconds for the two dev terms.        
+        # for course in courses:
+        #     find_modules_for_course(course)
+            
+        #     for module in course['Modules']:
+        #         find_studyprograms_for_module(module)
+            # print(course)
+
+    elapsed_time = time.perf_counter() - start_time
+    print("elapsed", elapsed_time)
+    return jsonify(courses)
 
 
 if __name__ == "__main__":
     app.run()
 
 # Get modules from either the black or white list database, for in template use.
-def get_modules(name):
-    modules = []
-    cnx = mysql.connector.connect(**db_config)
-    cursor = cnx.cursor(dictionary=True)
-    qry = (
-        "SELECT SmObjId, PiqYear, PiqSession, title, held_in FROM "+name+" WHERE PiqYear != 0 ORDER BY title ASC")
-    cursor.execute(qry)
-    for module in cursor:
-        for column, value in module.items():
-            if type(value) is bytearray:
-                module[column] = value.decode('utf-8')
-        modules.append(module)
-    cnx.close()
-    return modules
