@@ -68,8 +68,8 @@ def front_dev():
     secret_key = app.config['SECRET_KEY']
 
     try:
-        whitelist = json.loads(get_whitelist())
-        blacklist = json.loads(get_blacklist())
+        whitelist = json.loads(get_whitelist().get_data())
+        blacklist = json.loads(get_blacklist().get_data())
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
         # found_modules = helpers.OrderedSet(json.loads(search().get_data())) - helpers.OrderedSet(whitelist) - helpers.OrderedSet(blacklist)
@@ -109,8 +109,8 @@ def public():
     secret_key = app.config['SECRET_KEY']
 
     try:
-        whitelist = json.loads(get_whitelist())
-        blacklist = json.loads(get_blacklist())
+        whitelist = json.loads(get_whitelist().get_data())
+        blacklist = json.loads(get_blacklist().get_data())
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
         # found_modules = helpers.OrderedSet(json.loads(search().get_data())) - helpers.OrderedSet(whitelist) - helpers.OrderedSet(blacklist)
