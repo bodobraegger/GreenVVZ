@@ -428,13 +428,12 @@ def remove_searchterm(id):
 @app.route('/search', methods=['GET'])
 @cross_origin()
 def search():
+    start_time = time.perf_counter()
     # get searchterms
     terms = []
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
-    qry = (
-        "SELECT term FROM searchterms")
-    cursor.execute(qry)
+    cursor.execute("SELECT term FROM searchterms")
     for row in cursor:
         terms.append(row['term'])
 
@@ -457,13 +456,15 @@ def search():
                         'title': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmStext').text
                     })
 
-    print('\n\n\nBEFORE UNIQUE\n\n\n')
-    for e in modules:
-        print(e)
+    # print('\n\n\nBEFORE UNIQUE\n\n\n')
+    # for e in modules:
+    #     print(e)
     
     # remove duplicates
     #modules = [dict(t) for t in set([tuple(sorted(d.items())) for d in modules])]
     modules = list({frozenset(item.items()):item for item in modules}.values())
+    elapsed_time = time.perf_counter() - start_time
+    print("elapsed: getting modules", elapsed_time)
 
     # remove elements that are on whitelist unified with blacklist
     ids_whitelist = []
@@ -617,7 +618,7 @@ def search_upwards():
             # print(course)
 
     elapsed_time = time.perf_counter() - start_time
-    print("elapsed", elapsed_time)
+    print("elapsed: getting courses->modules->studyprograms", elapsed_time)
     return jsonify(courses)
 
 
