@@ -26,7 +26,7 @@
                                 <td colspan="2"><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
                             </tr>
                             {% for m in whitelist %}
-                                <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}} class="shown"'>
+                                <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}} {{m.held_in}}' class="shown">
                                     <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     {# <td>            {{ m.SmObjId }} </td> #}
                                     <td> <!-- {{ m.held_in }} / held_in -->
@@ -81,7 +81,7 @@
                         </thead>
                         <tbody id="suggestions_body">
                         {% for m in found_modules %}
-                            <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown">
+                            <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}} {{m.held_in}}' class="shown">
                                 <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     <td> <!-- {{ m.PiqSession }} / PiqSession -->
                                         {% if m.PiqSession == 3 %}
@@ -123,7 +123,7 @@
                         </thead>
                         <tbody id="blacklist_body">
                             {% for m in blacklist %}
-                                <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown"'>
+                                <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}} {{m.held_in}}' class="shown">
                                     <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     {# <td>            {{ m.SmObjId }} </td> #}
                                     <td> <!-- {{ m.held_in }} / held_in -->
