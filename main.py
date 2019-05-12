@@ -195,7 +195,7 @@ def get_modules(whitelisted):
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
     qry = (
-        "SELECT * FROM modules WHERE whitelisted == {whitelisted} ORDER BY title ASC".format(whitelisted=whitelisted))
+        "SELECT * FROM modules WHERE whitelisted = {whitelisted} ORDER BY title ASC".format(whitelisted=whitelisted))
     cursor.execute(qry)
     for module in cursor:
         for column, value in module.items():
@@ -207,7 +207,9 @@ def get_modules(whitelisted):
 
 def add_module(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted):
     cnx = mysql.connector.connect(**db_config)
-    qry = "INSERT INTO modules VALUES ({SmObjId}, {PiqYear}, {PiqSession}, {title}, {whitelisted}) ON DUPLICATE KEY UPDATE whitelisted={whitelisted}".format(
+    qry = "INSERT INTO modules VALUES (SmObjId, PiqYear, PiqSession, title, whitelisted) \
+    ({SmObjId}, {PiqYear}, {PiqSession}, {title}, {whitelisted}) \
+    ON DUPLICATE KEY UPDATE whitelisted={whitelisted}".format(
         SmObjId=SmObjId, PiqYear=PiqYear, PiqSession=PiqSession, title=title, whitelisted=whitelisted)
     module = models.Module(module_id)
     module.update()
@@ -284,7 +286,7 @@ def remove_blacklist(module_id):
     # read module from blacklist
     try:
         val = {'SmObjId': module_id}
-        sel = "SELECT * FROM modules WHERE SmObjId = %(SmObjId)s AND whitelisted == 0"
+        sel = "SELECT * FROM modules WHERE SmObjId = %(SmObjId)s AND whitelisted = 0"
         cursor = cnx.cursor(dictionary=True, buffered=True)
         cursor.execute(sel, val)
         if cursor.rowcount > 0:
@@ -299,7 +301,7 @@ def remove_blacklist(module_id):
 
     # remove module from whitelist
     try:
-        qry = "DELETE FROM modules WHERE SmObjId = %(SmObjId)s AND whitelisted == 0"
+        qry = "DELETE FROM modules WHERE SmObjId = %(SmObjId)s AND whitelisted = 0"
         cursor.execute(qry, val)
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 500
