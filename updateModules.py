@@ -13,59 +13,26 @@ db_config = {
 
 
 def update_db():
-    return update_whitelist() and update_blacklist()
+    return update_modules() # and update_blacklist()
 
 
-def update_whitelist():
+def update_modules():
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(buffered=True)
-    qry = ("SELECT SmObjId FROM whitelist")
+    qry = ("SELECT SmObjId FROM modules")
     cursor.execute(qry)
     for row in cursor:
         cursor2 = cnx.cursor()
         mod = models.Module(row[0])
         if mod.update():
-            qry2 = "UPDATE whitelist SET PiqYear=%(PiqYear)s, PiqSession=%(PiqSession)s, held_in=%(held_in)s, title=%(title)s WHERE SmObjId=%(SmObjId)s;"
+            qry2 = "UPDATE modules SET PiqYear=%(PiqYear)s, PiqSession=%(PiqSession)s, held_in=%(held_in)s, title=%(title)s WHERE SmObjId=%(SmObjId)s;"
             val = {'SmObjId': mod.SmObjId,
                    'PiqYear': mod.PiqYear,
                    'PiqSession': mod.PiqSession,
-                   'held_in': mod.held_in,
                    'title': mod.title
                    }
         else:
-            qry2 = "DELETE FROM whitelist WHERE SmObjId=%(SmObjId)s"
-            val = {'SmObjId': mod.SmObjId}
-
-        try:
-            cursor2.execute(qry2, val)
-        except mysql.connector.Error as err:
-            print("Error: {}".format(err))
-            return False
-        cursor2.close()
-
-    cnx.commit()
-    cnx.close()
-    return True
-
-
-def update_blacklist():
-    cnx = mysql.connector.connect(**db_config)
-    cursor = cnx.cursor(buffered=True)
-    qry = ("SELECT SmObjId FROM blacklist")
-    cursor.execute(qry)
-    for row in cursor:
-        cursor2 = cnx.cursor()
-        mod = models.Module(row[0])
-        if mod.update():
-            qry2 = "UPDATE blacklist SET PiqYear=%(PiqYear)s, PiqSession=%(PiqSession)s, held_in=%(held_in)s, title=%(title)s WHERE SmObjId=%(SmObjId)s;"
-            val = {'SmObjId': mod.SmObjId,
-                   'PiqYear': mod.PiqYear,
-                   'PiqSession': mod.PiqSession,
-                   'held_in': mod.held_in,
-                   'title': mod.title
-                   }
-        else:
-            qry2 = "DELETE FROM blacklist WHERE SmObjId=%(SmObjId)s"
+            qry2 = "DELETE FROM modules WHERE SmObjId=%(SmObjId)s"
             val = {'SmObjId': mod.SmObjId}
 
         try:

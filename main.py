@@ -454,8 +454,6 @@ def check_which_saved(modules):
 
         for mod in modules:
             if int(mod.get('SmObjId')) in list(ids_whitelisted.keys()):
-                print(list(ids_whitelisted.keys()))
-                print(int(mod.get('SmObjId')))
                 mod['whitelisted'] = ids_whitelisted[int(mod.get('SmObjId'))]
         
 
