@@ -1,7 +1,6 @@
 # coding=utf8
 import os
 import mysql.connector
-import xml.etree.ElementTree as ET
 from datetime import date
 from functools import wraps
 import requests
@@ -441,20 +440,17 @@ def search():
     modules = []
     for session in [helpers.next_session(), helpers.current_session(), helpers.previous_session()]:
         for searchterm in terms:
-            rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmSearchSet?$skip=0&$top=20&$orderby=SmStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages".format(
+            rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmSearchSet?$skip=0&$top=20&$orderby=SmStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages&$format=json".format(
                 searchterm, session['year'], session['session'])
 
             r = requests.get(rURI)
-            root = ET.fromstring(r.content)
-            for entry in root.findall('{http://www.w3.org/2005/Atom}entry'):
-                for a in entry.findall('{http://www.w3.org/2005/Atom}content'):
-                    modules.append({
-                        'SmObjId': int(a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}Objid').text),
-                        'PiqYear': int(a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqYear').text),
-                        'PiqSession': int(a[0].find(
-                            '{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqSession').text),
-                        'title': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmStext').text
-                    })
+            for module in r.json()['d']['results']:
+                modules.append({
+                    'SmObjId':    module['SmObjId'],
+                    'title':      module['SmText'],
+                    'PiqYear':    module['PiqYear'],
+                    'PiqSession': module['PiqSession'],
+                })
 
     # print('\n\n\nBEFORE UNIQUE\n\n\n')
     # for e in modules:
@@ -511,22 +507,20 @@ Request detail page for course object, add Module subobjects(dicts) as list to g
 """
 def find_modules_for_course(course):
     course['Modules'] = []
-    rURI = models.Globals.URI_prefix+"EDetailsSet(EObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links".format(
+    rURI = models.Globals.URI_prefix+"EDetailsSet(EObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links&$format=json".format(
         course.get('EObjId'), course.get('PiqYear'), course.get('PiqSession'))
 
     r = requests.get(rURI)
-    root = ET.fromstring(r.content)
 
-    # select all contents of entry elements in the link element titled 'Modules'
-    for entry in root.findall("{http://www.w3.org/2005/Atom}link[@title='Modules'].//{http://www.w3.org/2005/Atom}entry"):
-        for datapoints in entry.findall('{http://www.w3.org/2005/Atom}content/*'):
-            course['Modules'].append({
-                'SmObjId': int(datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmObjId').text),
-                'SmText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}SmText').text,
-                'PiqYear': int(datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqYear').text),
-                'PiqSession': int(datapoints.find(
-                    '{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqSession').text),
-            })
+    # select each result of the 'Modules' subelement
+    for module in r.json()['d']['Modules']['results']:
+        course['Modules'].append({
+            'SmObjId':    module['SmObjId'],
+            'title':      module['SmText'],
+            'PiqYear':    module['PiqYear'],
+            'PiqSession': module['PiqSession'],
+        })
+    course['Modules'] = list({frozenset(item.items()) : item for item in course['Modules']}.values())
     return course
 
 """
@@ -535,25 +529,34 @@ Request detail page for module object, add Studyprogrm subobjects(dicts) as list
 def find_studyprograms_for_module(module):
     module['Partof'] = []
     # SmDetailsSet(SmObjId='50934872',PiqYear='2018',PiqSession='004')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods
-    rURI = models.Globals.URI_prefix+"SmDetailsSet(SmObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods".format(
+    rURI = models.Globals.URI_prefix+"SmDetailsSet(SmObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods&$format=json".format(
         module.get('SmObjId'), module.get('PiqYear'), module.get('PiqSession'))
     # async with aiohttp.ClientSession() as session:
     #     r = await fetch_content(session, rURI)
     r = requests.get(rURI)
-    root = ET.fromstring(r.content)
-    for entry in root.findall("{http://www.w3.org/2005/Atom}link[@title='Partof'].//{http://www.w3.org/2005/Atom}entry"):
-        for datapoints in entry.findall('{http://www.w3.org/2005/Atom}content/*'):
-            module['Partof'].append({
-                'ScObjid': int(datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}ScObjid').text),
-                'ScText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}ScText').text,
-                'OText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}OText').text,
-                'CgHighObjid': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighObjid').text,
-                'CgHighText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighText').text,
-                'CgHighCategory': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgHighCategory').text,
-                'CgLowObjid': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowObjid').text,
-                'CgLowText': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowText').text,
-                'CgLowCategory': datapoints.find('{http://schemas.microsoft.com/ado/2007/08/dataservices}CgLowCategory').text,
-            })
+
+    for studyprogram in r.json()['d']['Partof']['results']:
+        module['Partof'].append({
+            'ScObjId':    studyprogram['ScObjid'],
+            'ScText':     studyprogram['ScText'],
+            # CgCategorySort: "25"
+            # CgHighCategory: "Teaching Subject"
+            # CgHighObjid: "50724643"
+            # CgHighText: "Allgemeine Ausbildung (1UF)"
+            # CgLowCategory: "Area"
+            # CgLowObjid: "50724651"
+            # CgLowText: "Fachdidaktik"
+            # Corestep: true
+            # OObjid: "50000007"
+            # OText: "00\nFaculty of Arts and Social Sciences"
+            # Oblig: false
+            # PiqSession: "000"
+            # PiqYear: "0000"
+            # ScObjid: "50720073"
+            # ScText: "Teaching Diploma for Upper Secondary Education (1 TS)"
+            # SmObjId: "50911009"
+        })
+    module['Partof'] = list({frozenset(item.items()) : item for item in module['Partof']}.values())
     return module
 
 """
@@ -587,22 +590,19 @@ def search_upwards():
     courses = []
     for session in [helpers.next_session(), helpers.current_session(), helpers.previous_session()]:
         for searchterm in terms:
-            rURI = models.Globals.URI_prefix+"ESearchSet?$skip=0&$top=20&$orderby=EStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages".format(
+            rURI = models.Globals.URI_prefix+"ESearchSet?$skip=0&$top=20&$orderby=EStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages&$format=json".format(
                 searchterm, session['year'], session['session'])
             r = requests.get(rURI)
-            root = ET.fromstring(r.content)
-            for entry in root.findall('{http://www.w3.org/2005/Atom}entry'):
-                for a in entry.findall('{http://www.w3.org/2005/Atom}content'):
-                    courses.append({
-                        'EObjId': int(a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}Objid').text),
-                        'EText': a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}EStext').text,
-                        'PiqYear': int(a[0].find('{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqYear').text),
-                        'PiqSession': int(a[0].find(
-                            '{http://schemas.microsoft.com/ado/2007/08/dataservices}PiqSession').text),
-                    })
+            for course in r.json()['d']['results']:
+                courses.append({
+                    'EObjId':     course['Objid'],
+                    'EStext':     course['EStext'],
+                    'PiqYear':    course['PiqYear'],
+                    'PiqSession': course['PiqSession'],
+                })
         # remove duplicates
-        #courses = [dict(t) for t in set([tuple(sorted(d.items())) for d in courses])]
-        # courses = list({frozenset(item.items()):item for item in courses}.values())
+        # courses = list({frozenset(item.items()) : item for item in courses}.values())
+
         
         # takes about 6 seconds for the two dev terms
         with ThreadPoolExecutor(max_workers=len(courses)) as executor:
