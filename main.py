@@ -377,12 +377,16 @@ def search():
     start_time = time.perf_counter()
     # get searchterms
     terms = []
-    cnx = mysql.connector.connect(**db_config)
-    cursor = cnx.cursor(dictionary=True)
-    cursor.execute("SELECT term FROM searchterms")
-    for row in cursor:
-        terms.append(row['term'])
-    cursor.close()
+    try:
+        cnx = mysql.connector.connect(**db_config)
+        cursor = cnx.cursor(dictionary=True)
+        cursor.execute("SELECT term FROM searchterms")
+        for row in cursor:
+            terms.append(row['term'])
+        cursor.close()
+    except Exception as e:
+        print('not possible in dev', e)
+        terms+=['Nachhaltigkeit', 'Sustainability']
 
     # get results for all searchterms
     modules = []
@@ -392,10 +396,11 @@ def search():
                 searchterm, session['year'], session['session'])
 
             r = requests.get(rURI)
+            print(rURI)
             for module in r.json()['d']['results']:
                 modules.append({
-                    'SmObjId':    module['SmObjId'],
-                    'title':      module['SmText'],
+                    'SmObjId':    module['Objid'],
+                    'title':      module['SmStext'],
                     'PiqYear':    module['PiqYear'],
                     'PiqSession': module['PiqSession'],
                 })
@@ -406,9 +411,11 @@ def search():
     
     # remove duplicates
     #modules = [dict(t) for t in set([tuple(sorted(d.items())) for d in modules])]
+    modules += json.loads(search_upwards().get_data())
     modules = list({frozenset(item.items()):item for item in modules}.values())
     elapsed_time = time.perf_counter() - start_time
     print("elapsed: getting modules", elapsed_time)
+
 
     # flag elements that are on whitelist unified with blacklist
     modules = check_which_saved(modules)
