@@ -396,7 +396,7 @@ def search():
                 searchterm, session['year'], session['session'])
 
             r = requests.get(rURI)
-            print(rURI)
+
             for module in r.json()['d']['results']:
                 modules.append({
                     'SmObjId':    module['Objid'],
@@ -431,7 +431,7 @@ def check_which_saved(modules):
         cursor = cnx.cursor(dictionary=True)
         cursor.execute("SELECT SmObjId, whitelisted FROM modules")
         for row in cursor:
-            ids_whitelisted[row[0]]=row[1]
+            ids_whitelisted[row['SmObjId']]=row['whitelisted']
         cursor.close()
 
 
@@ -454,7 +454,10 @@ def check_which_saved(modules):
 
         for mod in modules:
             if int(mod.get('SmObjId')) in list(ids_whitelisted.keys()):
-                mod['whitelited'] = ids_whitelisted[int(mod.get('SmObjId'))]
+                print(list(ids_whitelisted.keys()))
+                print(int(mod.get('SmObjId')))
+                mod['whitelisted'] = ids_whitelisted[int(mod.get('SmObjId'))]
+        
 
     except mysql.connector.errors.InterfaceError as e:
         print(e)
