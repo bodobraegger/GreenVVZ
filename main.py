@@ -188,11 +188,14 @@ def update():
 @app.route('/whitelist', methods=['GET'])
 @cross_origin()
 def get_whitelist():
+    return get_modules(whitelisted=1)
+
+def get_modules(whitelisted):
     modules = []
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
     qry = (
-        "SELECT SmObjId, PiqYear, PiqSession, title, held_in FROM whitelist WHERE SmObjId NOT IN(SELECT SmObjId FROM blacklist) AND PiqYear != 0 ORDER BY title ASC")
+        "SELECT * FROM modules WHERE whitelisted == {whitelisted} ORDER BY title ASC".format(whitelisted=whitelisted))
     cursor.execute(qry)
     for module in cursor:
         for column, value in module.items():
@@ -202,26 +205,14 @@ def get_whitelist():
     cnx.close()
     return jsonify(modules)
 
-
-# add module to whitelist and remove it from blacklist
-@app.route('/whitelist/<int:module_id>', methods=['POST'])
-@cross_origin()
-@require_appkey
-def add_whitelist(module_id):
+def add_module(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted):
     cnx = mysql.connector.connect(**db_config)
-    qry = "INSERT IGNORE INTO whitelist (SmObjId, PiqYear, PiqSession, title, held_in) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(held_in)s)"
-    qry2 = "DELETE FROM blacklist WHERE SmObjId = %(SmObjId)s"
+    qry = "INSERT INTO modules VALUES ({SmObjId}, {PiqYear}, {PiqSession}, {title}, {whitelisted}) ON DUPLICATE KEY UPDATE whitelisted={whitelisted}".format(
+        SmObjId=SmObjId, PiqYear=PiqYear, PiqSession=PiqSession, title=title, whitelisted=whitelisted)
     module = models.Module(module_id)
     module.update()
     val = module.get_module()
     if val:
-        try:
-            cursor = cnx.cursor()
-            cursor.execute(qry2, val)
-            cnx.commit()
-            cursor.close()
-        except mysql.connector.Error as err:
-            pass
         try:
             cursor = cnx.cursor()
             cursor.execute(qry, val)
@@ -234,66 +225,45 @@ def add_whitelist(module_id):
     else:
         return 'No module found', 404
 
+# add module to whitelist and remove it from blacklist
+@app.route('/whitelist/<int:module_id>', methods=['POST'])
+@cross_origin()
+@require_appkey
+def add_whitelist(module_id):
+    return add_module(module_id, "%(SmObjId)s", "%(PiqYear)s", "%(PiqSession)s", "%(title)s", whitelisted=1)
+
 
 # remove module from whitelist and add to blacklist
 @app.route('/whitelist/<int:module_id>', methods=['DELETE'])
 @cross_origin()
 @require_appkey
 def remove_whitelist(module_id):
+    return flag_module(module_id, whitelisted=0)
+
+def flag_module(module_id, whitelisted):
     cnx = mysql.connector.connect(**db_config)
-
-    # read module from whitelist
-    try:
-        val = {'SmObjId': module_id}
-        sel = "SELECT * FROM whitelist WHERE SmObjId = %(SmObjId)s"
-        cursor = cnx.cursor(dictionary=True, buffered=True)
-        cursor.execute(sel, val)
-        if cursor.rowcount > 0:
-            val = cursor.fetchone()
-            for column, value in val.items():
-                if type(value) is bytearray:
-                    val[column] = value.decode('utf-8')
-        else:
-            return 'There is no module to delete', 404
-    except mysql.connector.Error as err:
-        return "Error: {}".format(err), 500
-
+    cursor = cnx.cursor(dictionary=True, buffered=True)
     # remove module from whitelist
     try:
-        qry = "DELETE FROM whitelist WHERE SmObjId = %(SmObjId)s"
-        cursor.execute(qry, val)
-    except mysql.connector.Error as err:
-        return "Error: {}".format(err), 500
-
-    # add module to blacklist
-    try:
-        qry = "INSERT IGNORE INTO blacklist (SmObjId, PiqYear, PiqSession, title, held_in) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(held_in)s)"
-        cursor.execute(qry, val)
+        qry = "UPDATE modules SET whitelisted = {whitelisted} WHERE SmObjId = {module_id}".format(whitelisted=whitelisted, module_id=module_id)
+        cursor.execute(qry)
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 500
 
     cnx.commit()
     cursor.close()
     cnx.close()
-    return 'Deleted and moved module to blacklist', 200
-
+    if whitelisted:
+        return 'Whitelisted Module with Id {}'.format(module_id), 200
+    else:
+        return 'Blacklisted Module with Id {}'.format(module_id), 200
+    
 
 # get blacklist
 @app.route('/blacklist', methods=['GET'])
 @cross_origin()
 def get_blacklist():
-    modules = []
-    cnx = mysql.connector.connect(**db_config)
-    cursor = cnx.cursor(dictionary=True)
-    qry = (
-        "SELECT SmObjId, PiqYear, PiqSession, title, held_in FROM blacklist WHERE PiqYear != 0 ORDER BY title ASC")
-    cursor.execute(qry)
-    for module in cursor:
-        for column, value in module.items():
-            if type(value) is bytearray:
-                module[column] = value.decode('utf-8')
-        modules.append(module)
-    return jsonify(modules)
+    return get_modules(whitelisted=0)
 
 
 # add module to blacklist and remove it from whitelist
@@ -301,32 +271,7 @@ def get_blacklist():
 @cross_origin()
 @require_appkey
 def add_blacklist(module_id):
-    cnx = mysql.connector.connect(**db_config)
-    qry = "INSERT IGNORE INTO blacklist (SmObjId, PiqYear, PiqSession, title, held_in) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(held_in)s)"
-    qry2 = "DELETE FROM whitelist WHERE SmObjId = %(SmObjId)s"
-    module = models.Module(module_id)
-    module.update()
-    val = module.get_module()
-    if val:
-        try:
-            cursor = cnx.cursor()
-            cursor.execute(qry2, val)
-            cnx.commit()
-            cursor.close()
-        except mysql.connector.Error as err:
-            pass
-
-        try:
-            cursor = cnx.cursor()
-            cursor.execute(qry, val)
-            cnx.commit()
-            cursor.close()
-            cnx.close()
-            return jsonify(val), 200
-        except mysql.connector.Error as err:
-            return "Error: {}".format(err), 409
-    else:
-        return 'No Module found', 404
+    return add_module(module_id, "%(SmObjId)s", "%(PiqYear)s", "%(PiqSession)s", "%(title)s", whitelisted=0)
 
 
 # remove module from blacklist
@@ -339,7 +284,7 @@ def remove_blacklist(module_id):
     # read module from blacklist
     try:
         val = {'SmObjId': module_id}
-        sel = "SELECT * FROM blacklist WHERE SmObjId = %(SmObjId)s"
+        sel = "SELECT * FROM modules WHERE SmObjId = %(SmObjId)s AND whitelisted == 0"
         cursor = cnx.cursor(dictionary=True, buffered=True)
         cursor.execute(sel, val)
         if cursor.rowcount > 0:
@@ -354,7 +299,7 @@ def remove_blacklist(module_id):
 
     # remove module from whitelist
     try:
-        qry = "DELETE FROM blacklist WHERE SmObjId = %(SmObjId)s"
+        qry = "DELETE FROM modules WHERE SmObjId = %(SmObjId)s AND whitelisted == 0"
         cursor.execute(qry, val)
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 500
@@ -435,6 +380,7 @@ def search():
     cursor.execute("SELECT term FROM searchterms")
     for row in cursor:
         terms.append(row['term'])
+    cursor.close()
 
     # get results for all searchterms
     modules = []
@@ -462,45 +408,49 @@ def search():
     elapsed_time = time.perf_counter() - start_time
     print("elapsed: getting modules", elapsed_time)
 
-    # remove elements that are on whitelist unified with blacklist
-    ids_whitelist = []
-    cursor = cnx.cursor()
-    cursor.execute("SELECT SmObjId FROM whitelist")
-    for row in cursor:
-        ids_whitelist.append(row[0])
-
-    ids_blacklist = []
-    cursor = cnx.cursor()
-    cursor.execute("SELECT SmObjId FROM blacklist")
-    for row in cursor:
-        ids_blacklist.append(row[0])
-    cursor.close()
-    ids_white_u_blacklist = list(set(ids_whitelist + ids_blacklist))
-
-    # print('\n\n\nBEFORE REMOVAL\n\n\n')
-    # for e in modules:
-    #     print(e)
-
-    # for mod in modules:
-    #     if int(mod.get('SmObjId')) in ids_white_u_blacklist:
-    #         modules.remove(mod)
-    #         # modules = [m for m in modules if m != mod]
-    #         # print('To remove:', mod)
-    #         # while mod in modules:
-    #         #     print('REMOVED', mod)
-    #         #     modules.remove(mod)
-    
-    # print('\n\n\nAFTER REMOVAL\n\n\n')
-    # for e in modules:
-    #     print(e)
-
-    for mod in modules:
-        if int(mod.get('SmObjId')) in ids_whitelist:
-            mod['in_whitelist'] = 1
-        if int(mod.get('SmObjId')) in ids_blacklist:
-            mod['in_blacklist'] = 1
+    # flag elements that are on whitelist unified with blacklist
+    modules = check_which_saved(modules)
 
     return jsonify(modules)
+
+
+def check_which_saved(modules):
+    try:
+        # flag elements that are on whitelist unified with blacklist
+        ids_whitelisted = {}
+        cnx = mysql.connector.connect(**db_config)
+        cursor = cnx.cursor(dictionary=True)
+        cursor.execute("SELECT SmObjId, whitelisted FROM modules")
+        for row in cursor:
+            ids_whitelisted[row[0]]=row[1]
+        cursor.close()
+
+
+        # print('\n\n\nBEFORE REMOVAL\n\n\n')
+        # for e in modules:
+        #     print(e)
+
+        # for mod in modules:
+        #     if int(mod.get('SmObjId')) in ids_white_u_blacklist:
+        #         modules.remove(mod)
+        #         # modules = [m for m in modules if m != mod]
+        #         # print('To remove:', mod)
+        #         # while mod in modules:
+        #         #     print('REMOVED', mod)
+        #         #     modules.remove(mod)
+        
+        # print('\n\n\nAFTER REMOVAL\n\n\n')
+        # for e in modules:
+        #     print(e)
+
+        for mod in modules:
+            if int(mod.get('SmObjId')) in list(ids_whitelisted.keys()):
+                mod['whitelited'] = ids_whitelisted[int(mod.get('SmObjId'))]
+
+    except mysql.connector.errors.InterfaceError as e:
+        print(e)
+    return modules
+
 
 """
 Request detail page for course object, add Module subobjects(dicts) as list to given course object 
@@ -521,7 +471,7 @@ def find_modules_for_course(course):
             'PiqSession': module['PiqSession'],
         })
     course['Modules'] = list({frozenset(item.items()) : item for item in course['Modules']}.values())
-    return course
+    return course['Modules']
 
 """
 Request detail page for module object, add Studyprogrm subobjects(dicts) as list to given module obj
@@ -588,6 +538,7 @@ def search_upwards():
 
     # get results for all searchterms
     courses = []
+    modules = []
     for session in [helpers.next_session(), helpers.current_session(), helpers.previous_session()]:
         for searchterm in terms:
             rURI = models.Globals.URI_prefix+"ESearchSet?$skip=0&$top=20&$orderby=EStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages&$format=json".format(
@@ -607,7 +558,7 @@ def search_upwards():
         # takes about 6 seconds for the two dev terms
         with ThreadPoolExecutor(max_workers=len(courses)) as executor:
             executor.map(find_modules_for_course, courses)
-            executor.map(wrap_execute_for_modules_in_course, courses)
+            # executor.map(wrap_execute_for_modules_in_course, courses)
 
         # takes >20 seconds for the two dev terms.        
         # for course in courses:
@@ -616,10 +567,13 @@ def search_upwards():
         #     for module in course['Modules']:
         #         find_studyprograms_for_module(module)
             # print(course)
-
+    for course in courses:
+        modules += course['Modules']
+    modules = list({frozenset(item.items()):item for item in modules}.values())
     elapsed_time = time.perf_counter() - start_time
+    modules = check_which_saved(modules)
     print("elapsed: getting courses->modules->studyprograms", elapsed_time)
-    return jsonify(courses)
+    return jsonify(modules)
 
 
 if __name__ == "__main__":
