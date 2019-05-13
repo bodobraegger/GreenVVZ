@@ -13,10 +13,10 @@ class Module:
         self.SmObjId = SmObjId
         self.PiqSession = 0
         self.PiqYear = 0
-        self.held_in = 0
         self.title = ''
+        self.whitelisted=0
 
-    # check if a module exists in specified year and session and return dict with SmObjId, PiqYear, PiqSession, held_in and title
+    # check if a module exists in specified year and session and return dict with SmObjId, PiqYear, PiqSession, and title
     # return None if module doesn't exist
     def module_exists(self, year, session):
         try:
@@ -33,7 +33,6 @@ class Module:
                 '{http://schemas.microsoft.com/ado/2007/08/dataservices}SmText').text
 
             key['title'] = title
-            key['held_in'] = key['PiqSession']
 
             if key['SmObjId'] == '00000000':
                 return None
@@ -61,17 +60,12 @@ class Module:
         else:
             return True
 
-    # sets module to provided values and sets 'held_in' properly
+    # sets module to provided values
     def set_module(self, values):
         self.SmObjId = values['SmObjId']
         self.PiqSession = values['PiqSession']
         self.PiqYear = values['PiqYear']
         self.title = values['title']
-
-        if self.held_in != 0 and values['held_in'] != 0 and self.held_in != values['held_in']:
-            self.held_in = 999
-        else:
-            self.held_in = values['held_in']
 
     # returns dict of this module's variables if module exits, else None
     def get_module(self):
@@ -80,8 +74,8 @@ class Module:
                 'SmObjId': self.SmObjId,
                 'PiqSession': self.PiqSession,
                 'PiqYear': self.PiqYear,
-                'held_in': self.held_in,
-                'title': self.title
+                'title': self.title,
+                'whitelisted': self.whitelisted
             }
         else:
             return None
