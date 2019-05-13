@@ -207,7 +207,7 @@ def get_modules(whitelisted):
 
 def add_module(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted):
     cnx = mysql.connector.connect(**db_config)
-    qry = "INSERT INTO modules VALUES (SmObjId, PiqYear, PiqSession, title, whitelisted) ({SmObjId}, {PiqYear}, {PiqSession}, {title}, {whitelisted}) ON DUPLICATE KEY UPDATE whitelisted={whitelisted}".format(
+    qry = "INSERT INTO modules (SmObjId, PiqYear, PiqSession, title, whitelisted) VALUES ({SmObjId}, {PiqYear}, {PiqSession}, {title}, {whitelisted}) ON DUPLICATE KEY UPDATE whitelisted={whitelisted}".format(
         SmObjId=SmObjId, PiqYear=PiqYear, PiqSession=PiqSession, title=title, whitelisted=whitelisted)
     module = models.Module(module_id)
     module.update()
