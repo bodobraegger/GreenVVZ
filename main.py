@@ -397,10 +397,10 @@ def search():
 
             for module in r.json()['d']['results']:
                 modules.append({
-                    'SmObjId':    module['Objid'],
-                    'title':      module['SmStext'],
-                    'PiqYear':    module['PiqYear'],
-                    'PiqSession': module['PiqSession'],
+                    'SmObjId':    int(module['Objid']),
+                    'title':          module['SmStext'],
+                    'PiqYear':    int(module['PiqYear']),
+                    'PiqSession': int(module['PiqSession']),
                 })
 
     # print('\n\n\nBEFORE UNIQUE\n\n\n')
@@ -554,10 +554,10 @@ def search_upwards():
             r = requests.get(rURI)
             for course in r.json()['d']['results']:
                 courses.append({
-                    'EObjId':     course['Objid'],
-                    'EStext':     course['EStext'],
-                    'PiqYear':    course['PiqYear'],
-                    'PiqSession': course['PiqSession'],
+                    'EObjId':     int(course['Objid']),
+                    'EStext':         course['EStext'],
+                    'PiqYear':    int(course['PiqYear']),
+                    'PiqSession': int(course['PiqSession']),
                 })
         # remove duplicates
         # courses = list({frozenset(item.items()) : item for item in courses}.values())
