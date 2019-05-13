@@ -473,10 +473,10 @@ def find_modules_for_course(course):
     # select each result of the 'Modules' subelement
     for module in r.json()['d']['Modules']['results']:
         course['Modules'].append({
-            'SmObjId':    module['SmObjId'],
-            'title':      module['SmText'],
-            'PiqYear':    module['PiqYear'],
-            'PiqSession': module['PiqSession'],
+            'SmObjId':    int(module['SmObjId']),
+            'title':          module['SmText'],
+            'PiqYear':    int(module['PiqYear']),
+            'PiqSession': int(module['PiqSession']),
         })
     course['Modules'] = list({frozenset(item.items()) : item for item in course['Modules']}.values())
     return course['Modules']
