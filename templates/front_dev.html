@@ -83,12 +83,12 @@
                         {% for m in found_modules %}
                             <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown">
                                 <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
-                                    <td> <!-- {{ m.PiqSession }} / PiqSession -->
-                                        {% if m.PiqSession == 3 %}
+                                    <td> <!-- int({{ m.PiqSession }}) / PiqSession -->
+                                        {% if int(m.PiqSession) == 3 %}
                                             <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
-                                        {% elif m.PiqSession == 4 %}
+                                        {% elif int(m.PiqSession) == 4 %}
                                             <span class="semester">FS </span>{{'%s' | format(m.PiqYear % 100)}}
-                                        {% elif m.PiqSession == 999 %}
+                                        {% elif int(m.PiqSession) == 999 %}
                                             <span class="semester">HS & FS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% else %}
                                             undefiniert
@@ -126,12 +126,12 @@
                                 <tr id='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown">
                                     <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     {# <td>            {{ m.SmObjId }} </td> #}
-                                    <td> <!-- {{ int(m.PiqSession) }} / int(m.PiqSession) {{ int(m.PiqSession) == 3 }} -->
-                                        {% if int(m.PiqSession) == 3 %}
+                                    <td> <!-- {{ m.PiqSession }} / PiqSession -->
+                                        {% if m.PiqSession == 3 %}
                                             <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
-                                        {% elif int(m.PiqSession) == 4 %}
+                                        {% elif m.PiqSession == 4 %}
                                             <span class="semester">FS </span>{{'%s' | format(m.PiqYear % 100)}}
-                                        {% elif int(m.PiqSession) == 999 %}
+                                        {% elif m.PiqSession == 999 %}
                                             <span class="semester">HS & FS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% else %}
                                             undefiniert
