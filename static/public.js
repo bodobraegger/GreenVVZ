@@ -26,13 +26,10 @@ $(document).ready(function () {
             body.append('<tr><td><strong>'+langName+'</strong></td><td><strong>Semester</strong><br><p>'+langSemester+'</p></td></tr>')
             for (var row in data){
                 var url = baseUrlVvzUzh+data[row].PiqYear+'/'+data[row].PiqSession+'/SM/'+data[row].SmObjId
-                if (data[row].held_in == 3){
-                    var module = $(`<tr data-semester="${data[row].PiqYear} ${data[row].PiqSession} ${data[row].held_in}"><td><a href="${url}">${data[row].title}</a></td><td><span class="semester">HS </span>${data[row].PiqYear % 100}</td></tr>`)
-                }else if (data[row].held_in == 4){
-                    var module = $(`<tr data-semester="${data[row].PiqYear} ${data[row].PiqSession} ${data[row].held_in}"><td><a href="${url}">${data[row].title}</a></td><td><span class="semester">FS </span>${data[row].PiqYear % 100}</td></tr>`)
-                }
-                else {
-                    var module = $(`<tr data-semester="${data[row].PiqYear} ${data[row].PiqSession} ${data[row].held_in}"><td><a href="${url}">${data[row].title}</a></td><td><span class="semester">FS & HS </span>${data[row].PiqYear % 100}</td></tr>`)
+                if (data[row].PiqSession == 3){
+                    var module = $(`<tr data-semester="${data[row].PiqYear} ${data[row].PiqSession} ${data[row].PiqSession}"><td><a href="${url}">${data[row].title}</a></td><td><span class="semester">HS </span>${data[row].PiqYear % 100}</td></tr>`)
+                }else if (data[row].PiqSession == 4){
+                    var module = $(`<tr data-semester="${data[row].PiqYear} ${data[row].PiqSession} ${data[row].PiqSession}"><td><a href="${url}">${data[row].title}</a></td><td><span class="semester">FS </span>${data[row].PiqYear % 100}</td></tr>`)
                 }
                 body.append(module)
             }

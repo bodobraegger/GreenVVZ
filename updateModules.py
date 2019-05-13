@@ -25,7 +25,7 @@ def update_modules():
         cursor2 = cnx.cursor()
         mod = models.Module(row[0])
         if mod.update():
-            qry2 = "UPDATE modules SET PiqYear=%(PiqYear)s, PiqSession=%(PiqSession)s, held_in=%(held_in)s, title=%(title)s WHERE SmObjId=%(SmObjId)s;"
+            qry2 = "UPDATE modules SET PiqYear=%(PiqYear)s, PiqSession=%(PiqSession)s, title=%(title)s WHERE SmObjId=%(SmObjId)s;"
             val = {'SmObjId': mod.SmObjId,
                    'PiqYear': mod.PiqYear,
                    'PiqSession': mod.PiqSession,

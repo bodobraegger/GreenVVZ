@@ -75,11 +75,11 @@ def front_dev():
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
-            'PiqSession': '003',
+            'PiqSession': 3,
             'PiqYear': 2018,
             'SmObjId': 50904112,
-            'held_in': 3,
             'title': "ayy",
+            'whitelisted': 1,
         }
         whitelist.append(test)
         blacklist.append(test)
@@ -116,11 +116,11 @@ def public():
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
-            'PiqSession': '003',
+            'PiqSession': 3,
             'PiqYear': 2018,
             'SmObjId': 50904112,
-            'held_in': 3,
             'title': "ayy",
+            'whitelisted': 1,
         }
         whitelist.append(test)
         blacklist.append(test)
