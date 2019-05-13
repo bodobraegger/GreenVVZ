@@ -13,7 +13,7 @@
     <!--hwat-->
 
     <script type="text/javascript">
-        $('input[name="semester"]').change(function() {
+        $('input[name="semester"]').change(function ShowSelectedSemester() {
             var modules_to_filter = new $(); 
             var year_semesters = {};
             $(`input[name="semester"]:not(:checked)`).each(function() {
@@ -33,7 +33,10 @@
             // console.log(modules_to_filter.length)
             $('[data-semester]').removeClass('hidden')
             $(modules_to_filter).addClass('hidden')
-        return;
+            return;
+        });
+        $( window ).on( "load", function() {
+            ShowSelectedSemester();
         });
     </script>
 
