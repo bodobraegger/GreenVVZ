@@ -66,7 +66,6 @@ class Module:
         self.PiqSession = values['PiqSession']
         self.PiqYear = values['PiqYear']
         self.title = values['title']
-        self.whitelisted = values['whitelisted']
 
     # returns dict of this module's variables if module exits, else None
     def get_module(self):
