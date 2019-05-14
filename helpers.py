@@ -36,16 +36,6 @@ def previous_session():
 def current_year():
     return date.today().year
 
-
-# input: A string in the form "SmDetailsSet(SmObjId='00000000',PiqYear='0000',PiqSession='000')"
-# return: outputs the elements of the key as dictionary (SmObjId, PiqYear, PiqSession)
-def decode_key(key_string):
-    regex = r"((?P<id>SmObjId=\'(\d*)\'),(?P<year>PiqYear=\'(\d*)\'),(?P<session>PiqSession=\'(\d*)\'))"
-    # test_str = unicode(key_string)
-    matches = re.search(regex, key_string)
-    return {'SmObjId': matches.group(3), 'PiqYear': matches.group(5), 'PiqSession': matches.group(7)}
-
-
 class OrderedSet(collections.MutableSet):
 
     def __init__(self, iterable=None):

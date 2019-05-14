@@ -24,22 +24,24 @@ def update_modules():
     for row in cursor:
         cursor2 = cnx.cursor()
         mod = models.Module(row[0])
-        if mod.update():
-            qry2 = "UPDATE modules SET PiqYear=%(PiqYear)s, PiqSession=%(PiqSession)s, title=%(title)s WHERE SmObjId=%(SmObjId)s;"
-            val = {'SmObjId': mod.SmObjId,
-                   'PiqYear': mod.PiqYear,
-                   'PiqSession': mod.PiqSession,
-                   'title': mod.title
-                   }
-        else:
-            qry2 = "DELETE FROM modules WHERE SmObjId=%(SmObjId)s"
-            val = {'SmObjId': mod.SmObjId}
+        previous_values =   mod.find_module(helpers.previous_session()['year'], helpers.previous_session()['session'])
+        current_values =    mod.find_module(helpers.current_session()['year'], helpers.current_session()['session'])
+        next_values =       mod.find_module(helpers.next_session()['year'], helpers.next_session()['session'])
+        for values in [previous_values, current_values, next_values]:
+            if values is not None:
+                mod.set_module(values)
+                qry2 = "UPDATE modules SET title=%(title)s WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s;"
+                val = values
 
-        try:
-            cursor2.execute(qry2, val)
-        except mysql.connector.Error as err:
-            print("Error: {}".format(err))
-            return False
+            else:
+                qry2 = "DELETE FROM modules WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s"
+                val = values
+
+            try:
+                cursor2.execute(qry2, val)
+            except mysql.connector.Error as err:
+                print("Error: {}".format(err))
+                return False
         cursor2.close()
 
     cnx.commit()

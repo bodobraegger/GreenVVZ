@@ -1,6 +1,5 @@
 # coding=utf8
 import requests
-import xml.etree.ElementTree as ET
 
 import helpers
 
@@ -18,26 +17,31 @@ class Module:
 
     # check if a module exists in specified year and session and return dict with SmObjId, PiqYear, PiqSession, and title
     # return None if module doesn't exist
-    def module_exists(self, year, session):
+    def find_module(self, year, session):
+        rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmDetailsSet(SmObjId='{0}',PiqYear='{1}'," \
+               "PiqSession='{2}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods".format(
+            self.SmObjId, year, session)
+
+        r = requests.get(rURI)
         try:
-            rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmDetailsSet(SmObjId='{0}',PiqYear='{1}'," \
-                   "PiqSession='{2}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods".format(
-                self.SmObjId, year, session)
+            # if the module does not exist, raise HTTP error 404
+            r.raise_for_status()
 
-            r = requests.get(rURI)
+            module = {
+                'title':        r.json()['d']['SmText'],
+                'SmObjId':      r.json()['d']['SmObjId'],
+                'PiqSession':   r.json()['d']['PiqSession'],
+                'PiqYear':      r.json()['d']['PiqYear'],
+            }
 
-            root = ET.fromstring(r.content)
-
-            key = helpers.decode_key(root.find('{http://www.w3.org/2005/Atom}title').text)
-            title = root.find('{http://www.w3.org/2005/Atom}content')[0].find(
-                '{http://schemas.microsoft.com/ado/2007/08/dataservices}SmText').text
-
-            key['title'] = title
-
-            if key['SmObjId'] == '00000000':
+            if module['SmObjId'] == '00000000':
                 return None
             else:
-                return key
+                return module
+
+        except requests.exceptions.HTTPError as err:
+            print(err)
+            return None
         except AttributeError as err:
             print(err)
             return None
@@ -45,9 +49,9 @@ class Module:
     # get most recent module from odata-api, and set class-variables
     # return false if not available
     def update(self):
-        previous = self.module_exists(helpers.previous_session()['year'], helpers.previous_session()['session'])
-        current = self.module_exists(helpers.current_session()['year'], helpers.current_session()['session'])
-        next = self.module_exists(helpers.next_session()['year'], helpers.next_session()['session'])
+        previous = self.find_module(helpers.previous_session()['year'], helpers.previous_session()['session'])
+        current = self.find_module(helpers.current_session()['year'], helpers.current_session()['session'])
+        next = self.find_module(helpers.next_session()['year'], helpers.next_session()['session'])
 
         if previous:
             self.set_module(previous)
