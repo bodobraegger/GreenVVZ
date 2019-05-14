@@ -284,7 +284,7 @@ def remove_blacklist(module_id):
     # read module from blacklist
     try:
         val = {'SmObjId': module_id}
-        sel = "SELECT * FROM modules WHERE SmObjId = %(SmObjId)s AND whitelisted = 0"
+        sel = "SELECT * FROM modules WHERE SmObjId = %(SmObjId)s AND whitelisted = 0" # AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s 
         cursor = cnx.cursor(dictionary=True, buffered=True)
         cursor.execute(sel, val)
         if cursor.rowcount > 0:
@@ -299,7 +299,7 @@ def remove_blacklist(module_id):
 
     # remove module from whitelist
     try:
-        qry = "DELETE FROM modules WHERE SmObjId = %(SmObjId)s AND whitelisted = 0"
+        qry = "DELETE FROM modules WHERE SmObjId = %(SmObjId)s AND whitelisted = 0" # AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s
         cursor.execute(qry, val)
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 500

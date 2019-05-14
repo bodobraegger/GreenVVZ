@@ -1,10 +1,11 @@
 CREATE TABLE IF NOT EXISTS `modules` (
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `SmObjId` INT(8) NOT NULL UNIQUE, 
-    `PiqYear` INT(4) NOT NULL,
-    `PiqSession` INT(3) NOT NULL,
-    `title` TEXT,
-    `whitelisted` BOOLEAN
+    SmObjId INT(8) NOT NULL, 
+    PiqYear INT(4) NOT NULL,
+    PiqSession INT(3) ZEROFILL NOT NULL,
+    title TEXT,
+    whitelisted BOOLEAN,
+    CONSTRAINT key_2 UNIQUE (SmObjId, PiqYear, PiqSession)
 );
 
 -- should be searchterms
