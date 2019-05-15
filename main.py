@@ -219,10 +219,11 @@ def add_module(module_id, PiqYear, PiqSession, whitelisted):
             cursor.execute(qry, module_values)
             study_programs = find_studyprograms_for_module(module_id, PiqYear, PiqSession)
             for sp in study_programs:
-                qry1 = "INSERT IGNORE INTO studyprograms (CgHighObjid, CgHighText) VALUES (%(CgHighObjid)s, %(CgHighText)s)"
+                qry1 = "INSERT IGNORE INTO studyprograms (CgHighObjid, CgHighText, CgHighCategory) VALUES (%(CgHighObjid)s, %(CgHighText)s, %(CgHighCategory)s)"
                 val1 = {
                     'CgHighObjid': sp['CgHighObjid'],
                     'CgHighText':  sp['CgHighText'],
+                    'CgHighCategory': sp['CgHighCategory'],
                 }
                 cursor.execute(qry1, val1)
                 qry2 = "INSERT IGNORE INTO modules_studyprograms (SmObjId, CgHighObjid) VALUES (%(SmObjId)s, %(CgHighObjid)s)"
