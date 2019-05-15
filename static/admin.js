@@ -122,13 +122,13 @@ function delete_blacklisted_module(SmObjId, PiqYear, PiqSession){
 }
 
 function remove_from_whitelist(SmObjId, PiqYear, PiqSession){
-    $('#whitelist_body').find(`#${SmObjId} ${PiqYear} ${PiqSession}`).remove()
+    document.getElementById(`${SmObjId} ${PiqYear} ${PiqSession}`).remove()
 }
 function remove_from_blacklist(SmObjId, PiqYear, PiqSession){
-    $('#blacklist_body').find(`#${SmObjId} ${PiqYear} ${PiqSession}`).remove()
+    document.getElementById(`${SmObjId} ${PiqYear} ${PiqSession}`).remove()
 }
 function remove_from_suggestions(SmObjId, PiqYear, PiqSession){
-    $('#suggestions_body').find(`#${SmObjId} ${PiqYear} ${PiqSession}`).remove()
+    document.getElementById(`${SmObjId} ${PiqYear} ${PiqSession}`).remove()
 }
 function remove_from_searchterms(id){
     var term = $('#searchterms_body').find('#'+id)
