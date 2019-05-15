@@ -502,7 +502,7 @@ def find_studyprograms_for_module(module_id, PiqYear, PiqSession):
             'CgHighObjid':    studyprogram['ScObjid'],
             'CgHighText':     studyprogram['CgHighText'],
             # CgCategorySort: "25"
-            # CgHighCategory: "Teaching Subject"
+            'CgHighCategory': studyprogram['Teaching Subject'],
             # CgHighObjid: "50724643"
             # CgHighText: "Allgemeine Ausbildung (1UF)"
             # CgLowCategory: "Area"
