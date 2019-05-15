@@ -550,7 +550,7 @@ def search_upwards():
 
         
         # takes about 6 seconds for the two dev terms
-        with ThreadPoolExecutor(max_workers=len(courses)) as executor:
+        with ThreadPoolExecutor(max_workers=len(courses)+5) as executor:
             executor.map(find_modules_for_course, courses)
             # executor.map(wrap_execute_for_modules_in_course, courses)
 
