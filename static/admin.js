@@ -194,7 +194,7 @@ function populate_whitelist(){
                 add_to_whitelist(data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title)
             }
             whitelist.prepend('<tr><td><input type="text" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%"></td><td colspan="2"><button name="submit_whitelist" style="display: block; width: 100%" type="button" onclick="save_module()">Modul hinzufügen</button></td></tr>')
-
+            ShowSelectedSemester();
         },
         error : function (err) {
             console.log('Whitelist konnte nicht abgerufen werden: '+err)
@@ -214,6 +214,7 @@ function populate_blacklist(){
             for (var row in data) {
                 add_to_blacklist(data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title)
             }
+            ShowSelectedSemester();
         },
         error : function (err) {
             console.log('Blacklist konnte nicht abgerufen werden: '+err)
@@ -233,6 +234,7 @@ function populate_suggestions(){
                 add_to_suggestions(data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].whitelisted)
             }
             $('#suggestions_title_th').trigger("click")
+            ShowSelectedSemester();
         },
         error : function (err) {
             console.log('Suchvorschläge konnten nicht abgerufen werden: '+err)
