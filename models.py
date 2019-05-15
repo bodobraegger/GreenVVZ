@@ -23,6 +23,7 @@ class Module:
             self.SmObjId, year, session)
 
         r = requests.get(rURI)
+        print(r.json())
         try:
             # if the module does not exist, raise HTTP error 404
             r.raise_for_status()
