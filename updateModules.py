@@ -20,29 +20,28 @@ def update_db():
 def update_modules():
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(buffered=True)
-    qry = ("SELECT SmObjId FROM modules")
+    qry = ("SELECT SmObjId, PiqYear, PiqSession FROM modules")
     cursor.execute(qry)
     for row in cursor:
         cursor2 = cnx.cursor()
         mod = models.Module(row[0])
-        previous_values =   mod.find_module_values(helpers.previous_session()['year'], helpers.previous_session()['session'])
-        current_values =    mod.find_module_values(helpers.current_session()['year'], helpers.current_session()['session'])
-        next_values =       mod.find_module_values(helpers.next_session()['year'], helpers.next_session()['session'])
-        for values in [previous_values, current_values, next_values]:
-            if values is not None:
-                mod.set_module(values)
-                qry2 = "UPDATE modules SET title=%(title)s WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s;"
-                val = values
+        current_values = mod.find_module_values(row[1], row[2])
+        if current_values is not None:
+            qry2 = "UPDATE modules SET title=%(title)s WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s;"
+            val = current_values
 
-            else:
-                qry2 = "DELETE FROM modules WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s"
-                val = values
+        else:
+            qry2 = "DELETE FROM modules WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s"
+            val = {'SmObjId': row[0],
+                'PiqYear': row[1],
+                'PiqSession': row[2],
+            }
 
-            try:
-                cursor2.execute(qry2, val)
-            except mysql.connector.Error as err:
-                print("Error: {}".format(err))
-                return False
+        try:
+            cursor2.execute(qry2, val)
+        except mysql.connector.Error as err:
+            print("Error: {}".format(err))
+            return False
         cursor2.close()
 
     cnx.commit()
