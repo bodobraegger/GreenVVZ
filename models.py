@@ -19,7 +19,7 @@ class Module:
     # return None if module doesn't exist
     def find_module_values(self, year, session):
         rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmDetailsSet(SmObjId='{0}',PiqYear='{1}'," \
-               "PiqSession='{2}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods".format(
+               "PiqSession='{2}')?$format=json".format(
             self.SmObjId, year, session)
 
         r = requests.get(rURI)
