@@ -18,12 +18,11 @@ CREATE TABLE IF NOT EXISTS studyprograms (
     CgHighObjid INT(8) NOT NULL UNIQUE,
     CgHighText TEXT,
     CgHighCategory TEXT
-
 );
 
 CREATE TABLE IF NOT EXISTS modules_studyprograms (
     SmObjId INT(8) NOT NULL,
-    ScObjId INT(8) NOT NULL,
+    CgHighObjid INT(8) NOT NULL,
     FOREIGN KEY (SmObjId) REFERENCES modules (SmObjId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (CgHighObjid) REFERENCES studyprograms (CgHighObjid) ON DELETE CASCADE ON UPDATE CASCADE,
     PRIMARY KEY (SmObjId, CgHighObjid)
