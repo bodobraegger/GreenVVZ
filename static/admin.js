@@ -106,7 +106,7 @@ function delete_searchterm(id){
         }
     })
 }
-function delete_blacklisted_module(SmObjId){
+function delete_blacklisted_module(SmObjId, PiqYear, PiqSession){
     $.ajax({
         url: `${apiUrl}blacklist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
         method : 'DELETE',
