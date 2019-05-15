@@ -207,18 +207,32 @@ def get_modules(whitelisted):
 
 def add_module(module_id, PiqYear, PiqSession, whitelisted):
     m = models.Module(module_id)
-    val = m.find_module_values(PiqYear, PiqSession)
-    if val is not None:
+    module_values = m.find_module_values(PiqYear, PiqSession)
+    if module_values is not None:
         try:
             cnx = mysql.connector.connect(**db_config)
             qry = "INSERT INTO modules (SmObjId, PiqYear, PiqSession, title, whitelisted) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
-            val['whitelisted'] = whitelisted
+            module_values['whitelisted'] = whitelisted
             cursor = cnx.cursor()
-            cursor.execute(qry, val)
+            cursor.execute(qry, module_values)
+            study_programs = find_studyprograms_for_module(module_id, PiqYear, PiqSession)
+            for sp in study_programs:
+                qry1 = "INSERT IGNORE INTO studyprograms (ScObjId, ScText) VALUES (%(ScObjId)s, %(ScText)s)"
+                val1 = {
+                    'ScObjId': sp['ScObjid'],
+                    'ScText':  sp['ScText'],
+                }
+                cursor.execute(qry1, val1)
+                qry2 = "INSERT IGNORE INTO modules_studyprograms (SmObjId, ScObjId) VALUES (%(SmObjId)s, %(ScObjId)s)"
+                val2 = {
+                    'SmObjId': module_values['SmObjid'],
+                    'ScObjId': sp['ScObjid'],
+                }
+                cursor.execute(qry1, val1)
             cnx.commit()
             cursor.close()
             cnx.close()
-            return jsonify(val), 200
+            return jsonify(module_values), 200
         except mysql.connector.Error as err:
             return "Error: {}".format(err), 409
     else:
@@ -470,17 +484,19 @@ def find_modules_for_course(course):
 """
 Request detail page for module object, add Studyprogrm subobjects(dicts) as list to given module obj
 """
-def find_studyprograms_for_module(module):
-    module['Partof'] = []
+def find_studyprograms_for_module(module_id, PiqYear, PiqSession):
+    m = models.Module(module_id)
+    module_values = m.find_module_values(PiqYear, PiqSession)
+    module_values['Partof'] = []
     # SmDetailsSet(SmObjId='50934872',PiqYear='2018',PiqSession='004')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods
     rURI = models.Globals.URI_prefix+"SmDetailsSet(SmObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods&$format=json".format(
-        module.get('SmObjId'), module.get('PiqYear'), module.get('PiqSession'))
+        module_values.get('SmObjId'), module_values.get('PiqYear'), module_values.get('PiqSession'))
     # async with aiohttp.ClientSession() as session:
     #     r = await fetch_content(session, rURI)
     r = requests.get(rURI)
 
     for studyprogram in r.json()['d']['Partof']['results']:
-        module['Partof'].append({
+        module_values['Partof'].append({
             'ScObjId':    studyprogram['ScObjid'],
             'ScText':     studyprogram['ScText'],
             # CgCategorySort: "25"
@@ -500,8 +516,8 @@ def find_studyprograms_for_module(module):
             # ScText: "Teaching Diploma for Upper Secondary Education (1 TS)"
             # SmObjId: "50911009"
         })
-    module['Partof'] = list({frozenset(item.items()) : item for item in module['Partof']}.values())
-    return module
+    module_values['Partof'] = list({frozenset(item.items()) : item for item in module_values['Partof']}.values())
+    return module_values['Partof']
 
 """
 Wrapper function to be able to parallelize finding studyprograms for modules
