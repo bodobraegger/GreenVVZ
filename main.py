@@ -64,6 +64,7 @@ def front_dev():
     blacklist = []
     searchterms = []
     found_modules= []
+    # studyprograms_ids = {}
     secret_key = app.config['SECRET_KEY']
 
     try:
@@ -71,7 +72,7 @@ def front_dev():
         blacklist = json.loads(get_blacklist().get_data())
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
-        # found_modules = helpers.OrderedSet(json.loads(search().get_data())) - helpers.OrderedSet(whitelist) - helpers.OrderedSet(blacklist)
+        # studyprograms_ids = json.loads(get_modules_studyprograms().get_data())
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
@@ -93,6 +94,7 @@ def front_dev():
         'baseUrlVvzUzh': baseUrlVvzUzh,
         'secret_key': secret_key,
         'found_modules': found_modules,
+        # 'modules_studyprograms': modules_studyprograms,
         'date':date
     })
 
@@ -217,16 +219,16 @@ def add_module(module_id, PiqYear, PiqSession, whitelisted):
             cursor.execute(qry, module_values)
             study_programs = find_studyprograms_for_module(module_id, PiqYear, PiqSession)
             for sp in study_programs:
-                qry1 = "INSERT IGNORE INTO studyprograms (ScObjId, ScText) VALUES (%(ScObjId)s, %(ScText)s)"
+                qry1 = "INSERT IGNORE INTO studyprograms (CgHighObjid, CgHighText) VALUES (%(CgHighObjid)s, %(CgHighText)s)"
                 val1 = {
-                    'ScObjId': sp['ScObjId'],
-                    'ScText':  sp['ScText'],
+                    'CgHighObjid': sp['CgHighObjid'],
+                    'CgHighText':  sp['CgHighText'],
                 }
                 cursor.execute(qry1, val1)
-                qry2 = "INSERT IGNORE INTO modules_studyprograms (SmObjId, ScObjId) VALUES (%(SmObjId)s, %(ScObjId)s)"
+                qry2 = "INSERT IGNORE INTO modules_studyprograms (SmObjId, CgHighObjid) VALUES (%(SmObjId)s, %(CgHighObjid)s)"
                 val2 = {
                     'SmObjId': module_values['SmObjId'],
-                    'ScObjId': sp['ScObjId'],
+                    'CgHighObjid': sp['CgHighObjid'],
                 }
                 cursor.execute(qry2, val2)
             cnx.commit()
@@ -497,8 +499,8 @@ def find_studyprograms_for_module(module_id, PiqYear, PiqSession):
 
     for studyprogram in r.json()['d']['Partof']['results']:
         module_values['Partof'].append({
-            'ScObjId':    studyprogram['ScObjid'],
-            'ScText':     studyprogram['ScText'],
+            'CgHighObjid':    studyprogram['ScObjid'],
+            'CgHighText':     studyprogram['CgHighText'],
             # CgCategorySort: "25"
             # CgHighCategory: "Teaching Subject"
             # CgHighObjid: "50724643"
@@ -585,6 +587,26 @@ def search_upwards():
     print("elapsed: getting courses->modules->studyprograms", elapsed_time)
     return jsonify(modules)
 
+@app.route('/modules_studyprograms', methods=['GET'])
+@cross_origin()
+def get_modules_studyprograms():
+    # modules_studyprograms = {}
+    # cnx = mysql.connector.connect(**db_config)
+    # cursor = cnx.cursor(dictionary=True)
+    # qry = (
+    #     "SELECT SmObjId, CgHighObjid, CgHighText, CgCategorySort FROM modules JOIN modules_studyprograms JOIN studyprograms ORDER BY title ASC"
+    # cursor.execute(qry)
+    # for row in cursor:
+    #     for column, value in row.items():
+    #         if type(value) is bytearray:
+    #             row[column] = value.decode('utf-8')
+    #     modules_studyprograms[row[0]] = {
+    #         'CgHighObjid': row[1],
+    #         'CgHighText': row[2]
+    #     }
+    # cnx.close()
+    # return jsonify(modules)
+    pass
 
 if __name__ == "__main__":
     app.run()
