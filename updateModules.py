@@ -3,6 +3,7 @@
 import os
 import mysql.connector
 import models
+import helpers
 
 db_config = {
     'user': os.environ.get('DB_USER', 'test'),
@@ -24,9 +25,9 @@ def update_modules():
     for row in cursor:
         cursor2 = cnx.cursor()
         mod = models.Module(row[0])
-        previous_values =   mod.find_module(helpers.previous_session()['year'], helpers.previous_session()['session'])
-        current_values =    mod.find_module(helpers.current_session()['year'], helpers.current_session()['session'])
-        next_values =       mod.find_module(helpers.next_session()['year'], helpers.next_session()['session'])
+        previous_values =   mod.find_module_values(helpers.previous_session()['year'], helpers.previous_session()['session'])
+        current_values =    mod.find_module_values(helpers.current_session()['year'], helpers.current_session()['session'])
+        next_values =       mod.find_module_values(helpers.next_session()['year'], helpers.next_session()['session'])
         for values in [previous_values, current_values, next_values]:
             if values is not None:
                 mod.set_module(values)

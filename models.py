@@ -17,7 +17,7 @@ class Module:
 
     # check if a module exists in specified year and session and return dict with SmObjId, PiqYear, PiqSession, and title
     # return None if module doesn't exist
-    def find_module(self, year, session):
+    def find_module_values(self, year, session):
         rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmDetailsSet(SmObjId='{0}',PiqYear='{1}'," \
                "PiqSession='{2}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods".format(
             self.SmObjId, year, session)
@@ -49,9 +49,9 @@ class Module:
     # get most recent module from odata-api, and set class-variables
     # return false if not available
     def update(self):
-        previous = self.find_module(helpers.previous_session()['year'], helpers.previous_session()['session'])
-        current = self.find_module(helpers.current_session()['year'], helpers.current_session()['session'])
-        next = self.find_module(helpers.next_session()['year'], helpers.next_session()['session'])
+        previous = self.find_module_values(helpers.previous_session()['year'], helpers.previous_session()['session'])
+        current = self.find_module_values(helpers.current_session()['year'], helpers.current_session()['session'])
+        next = self.find_module_values(helpers.next_session()['year'], helpers.next_session()['session'])
 
         if previous:
             self.set_module(previous)
