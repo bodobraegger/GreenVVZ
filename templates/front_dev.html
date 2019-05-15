@@ -63,7 +63,7 @@
                         {% for t in searchterms %}
                             <tr id={{ t.id }}>
                                 <td>{{ t.term }}</td>
-                                <td><button onclick="remove_searchterm({{ t.id }})">Entfernen</button></td>
+                                <td><button onclick="delete_searchterm({{ t.id }})">Entfernen</button></td>
                             </tr>
                         {% endfor %}
                     </tbody>
