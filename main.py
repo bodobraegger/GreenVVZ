@@ -219,16 +219,16 @@ def add_module(module_id, PiqYear, PiqSession, whitelisted):
             for sp in study_programs:
                 qry1 = "INSERT IGNORE INTO studyprograms (ScObjId, ScText) VALUES (%(ScObjId)s, %(ScText)s)"
                 val1 = {
-                    'ScObjId': sp['ScObjid'],
+                    'ScObjId': sp['ScObjId'],
                     'ScText':  sp['ScText'],
                 }
                 cursor.execute(qry1, val1)
                 qry2 = "INSERT IGNORE INTO modules_studyprograms (SmObjId, ScObjId) VALUES (%(SmObjId)s, %(ScObjId)s)"
                 val2 = {
-                    'SmObjId': module_values['SmObjid'],
-                    'ScObjId': sp['ScObjid'],
+                    'SmObjId': module_values['SmObjId'],
+                    'ScObjId': sp['ScObjId'],
                 }
-                cursor.execute(qry1, val1)
+                cursor.execute(qry2, val2)
             cnx.commit()
             cursor.close()
             cnx.close()
