@@ -1,14 +1,15 @@
 var baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
 var apiUrl = 'https://greenvvz.ifi.uzh.ch/'
+// var apiUrl = 'http://127.0.0.1:8080/'
 var secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data('api-key')
 
 function whitelist_from_suggestions(SmObjId, PiqYear, PiqSession, title) {
     
     $.ajax({
-        url: apiUrl+'whitelist/'+SmObjId+'?key='+secret_key,
+        url: `${apiUrl}whitelist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
         method : 'POST',
         success : function (data) {
-            remove_from_suggestions(SmObjId)
+            remove_from_suggestions(SmObjId, PiqYear, PiqSession)
             populate_whitelist()
         },
         error : function (err) {
@@ -18,10 +19,10 @@ function whitelist_from_suggestions(SmObjId, PiqYear, PiqSession, title) {
 }
 function whitelist_from_blacklist(SmObjId, PiqYear, PiqSession, title) {
     $.ajax({
-        url: apiUrl+'whitelist/'+SmObjId+'?key='+secret_key,
+        url: `${apiUrl}whitelist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
         method : 'POST',
         success : function (data) {
-            remove_from_blacklist(SmObjId)
+            remove_from_blacklist(SmObjId, PiqYear, PiqSession)
             populate_whitelist()
         },
         error : function (err) {
@@ -32,10 +33,10 @@ function whitelist_from_blacklist(SmObjId, PiqYear, PiqSession, title) {
 }
 function blacklist_from_suggestions(SmObjId, PiqYear, PiqSession, title){
     $.ajax({
-        url: apiUrl+'blacklist/'+SmObjId+'?key='+secret_key,
+        url: `${apiUrl}blacklist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
         method : 'POST',
         success : function (data) {
-            remove_from_suggestions(SmObjId)
+            remove_from_suggestions(SmObjId, PiqYear, PiqSession)
             populate_blacklist()
         },
         error : function (err) {
@@ -45,10 +46,10 @@ function blacklist_from_suggestions(SmObjId, PiqYear, PiqSession, title){
 }
 function blacklist_from_whitelist(SmObjId, PiqYear, PiqSession, title){
     $.ajax({
-        url: apiUrl+'blacklist/'+SmObjId+'?key='+secret_key,
+        url: `${apiUrl}blacklist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
         method : 'POST',
         success : function (data) {
-            remove_from_whitelist(SmObjId);
+            remove_from_whitelist(SmObjId, PiqYear, PiqSession);
             populate_blacklist();
         },
         error : function (err) {
@@ -75,9 +76,11 @@ function save_searchterm(){
     })
 }
 function save_module(){
-    var id = $('#whitelist_text').val()
+    var SmObjId = $('#whitelist_text').val()
+    var PiqYear = $('option:selected').val().split(' ')[0];
+    var PiqSession = $('option:selected').val().split(' ')[1];
     $.ajax({
-        url :  apiUrl+'whitelist/'+id+'?key='+secret_key,
+        url: `${apiUrl}whitelist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
         method : 'POST',
         success : function (data) {
             add_to_whitelist(data.SmObjId, data.PiqYear, data.PiqSession, data.title)
@@ -103,12 +106,12 @@ function delete_searchterm(id){
         }
     })
 }
-function delete_blacklisted_module(id){
+function delete_blacklisted_module(SmObjId){
     $.ajax({
-        url: apiUrl+'blacklist/'+id+'?key='+secret_key,
+        url: `${apiUrl}blacklist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
         method : 'DELETE',
         success : function (data) {
-            remove_from_blacklist(id)
+            remove_from_blacklist(SmObjId, PiqYear, PiqSession)
             populate_blacklist()
         },
         error : function (err) {
@@ -118,14 +121,14 @@ function delete_blacklisted_module(id){
     })
 }
 
-function remove_from_whitelist(id){
-    $('#whitelist_body').find('#'+id).remove()
+function remove_from_whitelist(SmObjId, PiqYear, PiqSession){
+    $('#whitelist_body').find(`#${SmObjId} ${PiqYear} ${PiqSession}`).remove()
 }
-function remove_from_blacklist(id){
-    $('#blacklist_body').find('#'+id).remove()
+function remove_from_blacklist(SmObjId, PiqYear, PiqSession){
+    $('#blacklist_body').find(`#${SmObjId} ${PiqYear} ${PiqSession}`).remove()
 }
-function remove_from_suggestions(id){
-    $('#suggestions_body').find('#'+id).remove()
+function remove_from_suggestions(SmObjId, PiqYear, PiqSession){
+    $('#suggestions_body').find(`#${SmObjId} ${PiqYear} ${PiqSession}`).remove()
 }
 function remove_from_searchterms(id){
     var term = $('#searchterms_body').find('#'+id)
@@ -134,7 +137,7 @@ function remove_from_searchterms(id){
 
 function write_tr_prefix_for_list(SmObjId, PiqYear, PiqSession, title){
     var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId;
-    return `<tr data-semester="${PiqYear} ${PiqSession}" id="${SmObjId}" class="shown"><td><a target="_blank" href="${url}">${title}</a></td><td>${convert_session_to_string(PiqSession, PiqYear)}</td><td>`
+    return `<tr data-semester="${PiqYear} ${PiqSession}" id="${SmObjId} ${PiqYear} ${PiqSession}" class="shown"><td><a target="_blank" href="${url}">${title}</a></td><td>${convert_session_to_string(PiqSession, PiqYear)}</td><td>`
 }
 function add_to_whitelist(SmObjId, PiqYear, PiqSession, title){
     var module = $(`${write_tr_prefix_for_list(SmObjId, PiqYear, PiqSession, title)}<button name="Anzeigen" onclick="blacklist_from_whitelist('${SmObjId}', '${PiqYear}', '${PiqSession}', '${title}')">Verbergen</button></td></tr>`)
@@ -142,7 +145,7 @@ function add_to_whitelist(SmObjId, PiqYear, PiqSession, title){
 }
 function add_to_blacklist(SmObjId, PiqYear, PiqSession, title){
     var anzeigen_button = `<button name="Anzeigen" onclick="whitelist_from_blacklist('${SmObjId}', '${PiqYear}', '${PiqSession}', '${title}')">Anzeigen</button>`
-    var delete_button = `<button name="Löschen" onclick="delete_blacklisted_module('${SmObjId}')">Löschen</button>`
+    var   delete_button = `<button name="Löschen" onclick="delete_blacklisted_module('${SmObjId}', '${PiqYear}', '${PiqSession}', '${title}')">Löschen</button>`
     var module = $(`${write_tr_prefix_for_list(SmObjId, PiqYear, PiqSession, title)}
         ${anzeigen_button}${delete_button}</td></tr>`)
     $('#blacklist_body').append(module)
@@ -150,7 +153,7 @@ function add_to_blacklist(SmObjId, PiqYear, PiqSession, title){
 function add_to_suggestions(SmObjId, PiqYear, PiqSession, title, whitelisted){
     var anzeigen_button=`<button name="Anzeigen" onclick="whitelist_from_blacklist('${SmObjId}', '${PiqYear}', '${PiqSession}', '${title}')"
         ${whitelisted ? 'disabled' : ''}>Anzeigen</button>`
-    var verbergen_button=`<button name="Verbergen" onclick="whitelist_from_blacklist('${SmObjId}', '${PiqYear}', '${PiqSession}', '${title}')"
+    var verbergen_button=`<button name="Verbergen" onclick="blacklist_from_whitelist('${SmObjId}', '${PiqYear}', '${PiqSession}', '${title}')"
         ${!whitelisted ? 'disabled' : ''}>Verbergen</button>`
     var module = $(`${write_tr_prefix_for_list(SmObjId, PiqYear, PiqSession, title)}
         ${anzeigen_button}${verbergen_button}</td></tr>`);

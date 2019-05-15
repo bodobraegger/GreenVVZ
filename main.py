@@ -209,6 +209,7 @@ def add_module(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted):
     cnx = mysql.connector.connect(**db_config)
     qry = "INSERT INTO modules (SmObjId, PiqYear, PiqSession, title, whitelisted) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
     m = models.Module(module_id)
+    print(module_id)
     val = m.find_module_values(PiqYear, PiqSession)
     if val is not None:
         try:
@@ -223,17 +224,18 @@ def add_module(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted):
             return "Error: {}".format(err), 409
     else:
         return 'No module found', 404
+    
 
 # add module to whitelist and remove it from blacklist
-@app.route('/whitelist/<int:module_id>', methods=['POST'])
+@app.route('/whitelist/<int:PiqYear>/<int:PiqSession>/<int:module_id>', methods=['POST'])
 @cross_origin()
 @require_appkey
-def add_whitelist(module_id):
+def add_whitelist(module_id, PiqYear, PiqSession):
     return add_module(module_id, "%(SmObjId)s", "%(PiqYear)s", "%(PiqSession)s", "%(title)s", whitelisted=1)
 
 
 # remove module from whitelist and add to blacklist
-@app.route('/whitelist/<int:module_id>', methods=['DELETE'])
+@app.route('/whitelist/<int:PiqYear>/<int:PiqSession>/<int:module_id>', methods=['DELETE'])
 @cross_origin()
 @require_appkey
 def remove_whitelist(module_id):
@@ -266,39 +268,24 @@ def get_blacklist():
 
 
 # add module to blacklist and remove it from whitelist
-@app.route('/blacklist/<int:module_id>', methods=['POST'])
+@app.route('/blacklist/<int:PiqYear>/<int:PiqSession>/<int:module_id>', methods=['POST'])
 @cross_origin()
 @require_appkey
-def add_blacklist(module_id):
+def add_blacklist(module_id, PiqYear, PiqSession):
     return add_module(module_id, "%(SmObjId)s", "%(PiqYear)s", "%(PiqSession)s", "%(title)s", whitelisted=0)
 
 
 # remove module from blacklist
-@app.route('/blacklist/<int:module_id>', methods=['DELETE'])
+@app.route('/blacklist/<int:PiqYear>/<int:PiqSession>/<int:module_id>', methods=['DELETE'])
 @cross_origin()
 @require_appkey
-def remove_blacklist(module_id):
-    cnx = mysql.connector.connect(**db_config)
-
-    # read module from blacklist
+def remove_blacklist(module_id, PiqYear, PiqSession):
+    # remove module
     try:
-        val = {'SmObjId': module_id}
-        sel = "SELECT * FROM modules WHERE SmObjId = %(SmObjId)s AND whitelisted = 0" # AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s 
+        cnx = mysql.connector.connect(**db_config)
+        val = {'SmObjId': module_id, 'PiqYear': PiqYear, 'PiqSession': PiqSession}
         cursor = cnx.cursor(dictionary=True, buffered=True)
-        cursor.execute(sel, val)
-        if cursor.rowcount > 0:
-            val = cursor.fetchone()
-            for column, value in val.items():
-                if type(value) is bytearray:
-                    val[column] = value.decode('utf-8')
-        else:
-            return 'There is no module to delete', 404
-    except mysql.connector.Error as err:
-        return "Error: {}".format(err), 500
-
-    # remove module from whitelist
-    try:
-        qry = "DELETE FROM modules WHERE SmObjId = %(SmObjId)s AND whitelisted = 0" # AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s
+        qry = "DELETE FROM modules WHERE SmObjId = %(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s AND whitelisted = 0"
         cursor.execute(qry, val)
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 500
@@ -423,12 +410,12 @@ def search():
 def check_which_saved(modules):
     try:
         # flag elements that are on whitelist unified with blacklist
-        ids_whitelisted = {}
+        saved_modules = {}
         cnx = mysql.connector.connect(**db_config)
         cursor = cnx.cursor(dictionary=True)
-        cursor.execute("SELECT SmObjId, whitelisted FROM modules")
+        cursor.execute("SELECT SmObjId, PiqYear, PiqSession, whitelisted FROM modules")
         for row in cursor:
-            ids_whitelisted[row['SmObjId']]=row['whitelisted']
+            saved_modules[(row['SmObjId'], row['PiqYear'], row['PiqSession'])]=row['whitelisted']
         cursor.close()
 
 
@@ -450,8 +437,9 @@ def check_which_saved(modules):
         #     print(e)
 
         for mod in modules:
-            if int(mod.get('SmObjId')) in list(ids_whitelisted.keys()):
-                mod['whitelisted'] = ids_whitelisted[int(mod.get('SmObjId'))]
+            module_key = (int(mod.get('SmObjId')), int(mod.get('PiqYear')), int(mod.get('PiqSession')))
+            if module_key in saved_modules.keys():
+                mod['whitelisted'] = saved_modules[module_key]
         
 
     except mysql.connector.errors.InterfaceError as e:
