@@ -205,14 +205,13 @@ def get_modules(whitelisted):
     cnx.close()
     return jsonify(modules)
 
-def add_module(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted):
-    cnx = mysql.connector.connect(**db_config)
-    qry = "INSERT INTO modules (SmObjId, PiqYear, PiqSession, title, whitelisted) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
+def add_module(module_id, PiqYear, PiqSession, whitelisted):
     m = models.Module(module_id)
     val = m.find_module_values(PiqYear, PiqSession)
     if val is not None:
-        print(val)
         try:
+            cnx = mysql.connector.connect(**db_config)
+            qry = "INSERT INTO modules (SmObjId, PiqYear, PiqSession, title, whitelisted) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
             val['whitelisted'] = whitelisted
             cursor = cnx.cursor()
             cursor.execute(qry, val)
@@ -231,7 +230,7 @@ def add_module(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted):
 @cross_origin()
 @require_appkey
 def add_whitelist(module_id, PiqYear, PiqSession):
-    return add_module(module_id, "%(SmObjId)s", "%(PiqYear)s", "%(PiqSession)s", "%(title)s", whitelisted=1)
+    return add_module(module_id, PiqYear, PiqSession, whitelisted=1)
 
 
 # remove module from whitelist and add to blacklist
