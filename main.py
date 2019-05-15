@@ -271,7 +271,7 @@ def get_blacklist():
 @cross_origin()
 @require_appkey
 def add_blacklist(module_id, PiqYear, PiqSession):
-    return add_module(module_id, "%(SmObjId)s", "%(PiqYear)s", "%(PiqSession)s", "%(title)s", whitelisted=0)
+    return add_module(module_id, PiqYear, PiqSession, whitelisted=0)
 
 
 # remove module from blacklist
