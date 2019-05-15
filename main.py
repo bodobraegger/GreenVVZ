@@ -209,9 +209,9 @@ def add_module(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted):
     cnx = mysql.connector.connect(**db_config)
     qry = "INSERT INTO modules (SmObjId, PiqYear, PiqSession, title, whitelisted) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
     m = models.Module(module_id)
-    print(module_id)
     val = m.find_module_values(PiqYear, PiqSession)
     if val is not None:
+        print(val)
         try:
             val['whitelisted'] = whitelisted
             cursor = cnx.cursor()
