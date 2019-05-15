@@ -227,7 +227,7 @@ function populate_suggestions(){
         success : function (data) {
             suggestions.empty()
             for (var row in data) {
-                add_to_suggestions(data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].PiqSession, data[row].title, data[row].whitelisted)
+                add_to_suggestions(data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].whitelisted)
             }
             $('#suggestions_title_th').trigger("click")
         },
