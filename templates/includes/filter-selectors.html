@@ -137,7 +137,7 @@
         });
         }
 
-        studyprograms = {{studyprograms}}
+        studyprograms = {{studyprograms | safe}}
         autocomplete(document.getElementById("studyprogram_input"), studyprograms);
     </script>
 
