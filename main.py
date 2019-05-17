@@ -220,6 +220,7 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
             module_values['whitelisted'] = whitelisted
             cursor = cnx.cursor()
             cursor.execute(qry, module_values)
+            cnx.commit()
             module_id = cursor.lastrowid
             studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
             for sp in studyprograms:
@@ -237,6 +238,7 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
                     'studyprogram_id': studyprogram_id,
                 }
                 cursor.execute(qry2, val2)
+                cnx.commit()
             cnx.commit()
             cursor.close()
             cnx.close()
@@ -627,14 +629,14 @@ def get_modules_studyprograms():
     # studyprograms_categories=[]
     # cnx = mysql.connector.connect(**db_config)
     # cursor = cnx.cursor(dictionary=True)
-    # qry = (
-    #     """
-    #     SELECT DISTINCT m.title, ms.SmObjId, s.CgHighObjid, CgHighText, CgHighCategory 
-    #     FROM module AS m INNER JOIN module_studyprogram AS ms 
-    #         ON m.id = ms.module_id
-    #     INNER JOIN studyprogram AS s
-    #         ON ms.studyprogram_id = s.id
-    #     """)
+    qry = (
+        """
+        SELECT DISTINCT m.id, m.title, s.id, CgHighText, CgHighCategory 
+        FROM module AS m JOIN module_studyprogram AS ms 
+            ON m.id = ms.module_id
+        JOIN studyprogram AS s
+            ON ms.studyprogram_id = s.id;
+        """)
     # cursor.execute(qry)
     # for row in cursor:
     #     for column, value in row.items():
