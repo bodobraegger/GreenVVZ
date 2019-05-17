@@ -389,8 +389,10 @@ def search():
             terms.append(row['term'])
         cursor.close()
         cursor = cnx.cursor()
-        cursor.execute("SELECT max(id) FROM module")
+        cursor.execute("SELECT MAX(id) FROM module")
+        print(cursor)
         for row in cursor:
+            print(row)
             id_not_currently_in_use = row[0] + 999
 
     except Exception as e:
