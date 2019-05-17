@@ -236,6 +236,7 @@ function populate_suggestions(){
         method : 'GET',
         success : function (data) {
             suggestions.empty()
+            console.log(data)
             for (var row in data) {
                 add_to_suggestions(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].whitelisted)
             }

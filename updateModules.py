@@ -19,11 +19,11 @@ def update_db():
 
 def update_modules():
     cnx = mysql.connector.connect(**db_config)
-    cursor = cnx.cursor(buffered=True)
+    cursor = cnx.cursor(dictionary=True, buffered=True)
     qry = ("SELECT SmObjId, PiqYear, PiqSession FROM module")
     cursor.execute(qry)
     for row in cursor:
-        cursor2 = cnx.cursor(dictionary=True)
+        cursor2 = cnx.cursor()
         mod = models.Module(row['SmObjId'])
         current_values = mod.find_module_values(row['PiqYear'], row['PiqSession'])
         if current_values is not None:
