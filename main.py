@@ -73,7 +73,7 @@ def front_dev():
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
         studyprograms_objs=json.loads(get_studyprograms().get_data())
-        studyprograms = jsonify([sp['CgHighText']+sp['CgHighCategory'] for sp in studyprograms_objs])
+        studyprograms = json.dumps([sp['CgHighText']+sp['CgHighCategory'] for sp in studyprograms_objs])
         # studyprograms_ids = json.loads(get_modules_studyprograms().get_data())
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
