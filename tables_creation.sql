@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS studyprogram (
 );
 
 CREATE TABLE IF NOT EXISTS module_studyprogram (
-    id INT(8) NOT NULL,
+    module_id INT(8) NOT NULL,
     studyprogram_id INT(8) NOT NULL,
     FOREIGN KEY (module_id) REFERENCES modules (id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (studyprogram_id) REFERENCES studyprograms (id) ON DELETE CASCADE ON UPDATE CASCADE,

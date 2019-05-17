@@ -390,10 +390,11 @@ def search():
         cursor.close()
         cursor = cnx.cursor()
         cursor.execute("SELECT max(id) FROM module")
-        id_not_currently_in_use = cursor[0][0] + 999
+        for row in cursor:
+            id_not_currently_in_use = row[0] + 999
 
     except Exception as e:
-        print('not possible in dev', e)
+        print('/search: not possible in dev', e)
         terms+=['Nachhaltigkeit', 'Sustainability']
 
     # get results for all searchterms
@@ -462,7 +463,7 @@ def check_which_saved(modules):
         # print('\n\n\nAFTER REMOVAL\n\n\n')
         # for e in modules:
         #     print(e)
-        print(saved_modules.keys())
+        print(saved_modules)
         for mod in modules:
             module_key = (int(mod.get('SmObjId')), int(mod.get('PiqYear')), int(mod.get('PiqSession')))
             print(module_key)
