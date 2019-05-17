@@ -232,6 +232,9 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
                 }
                 cursor.execute(qry1, val1)
                 studyprogram_id = cursor.lastrowid
+                if studyprogram_id == 0:
+                    cursor.execute("SELECT id FROM studyprogram WHERE CgHighObjid = %(CgHighObjid)s AND CgHighText = %(CgHighText)s AND CgHighCategory=%(CgHighCategory)s", val1)
+                    studyprogram_id = cursor.fetchone()[0]
                 qry2 = "INSERT IGNORE INTO module_studyprogram (module_id, studyprogram_id) VALUES (%(module_id)s, %(studyprogram_id)s)"
                 val2 = {
                     'module_id': module_id,
@@ -395,8 +398,7 @@ def search():
         cursor.close()
         cursor = cnx.cursor()
         cursor.execute("SELECT MAX(id) FROM module")
-        for row in cursor:
-            id_not_currently_in_use = row[0] + 999
+        id_not_currently_in_use = cursor.fetchone()[0] + 999
 
     except Exception as e:
         print('/search: not possible in dev', e)
