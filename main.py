@@ -73,7 +73,7 @@ def front_dev():
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
         studyprograms_objs=json.loads(get_studyprograms().get_data())
-        studyprograms = json.dumps([sp['CgHighText']+sp['CgHighCategory'] for sp in studyprograms_objs])
+        studyprograms = json.dumps(["{} {}".format(sp['CgHighText'], sp['CgHighCategory']) for sp in studyprograms_objs])
         # studyprograms_ids = json.loads(get_modules_studyprograms().get_data())
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
@@ -416,17 +416,12 @@ def search():
                     'PiqSession': int(module['PiqSession']),
                 })
 
-    # print('\n\n\nBEFORE UNIQUE\n\n\n')
-    # for e in modules:
-    #     print(e)
-    
     # remove duplicates
     #modules = [dict(t) for t in set([tuple(sorted(d.items())) for d in modules])]
     modules += json.loads(search_upwards().get_data())
     modules = list({frozenset(item.items()):item for item in modules}.values())
     elapsed_time = time.perf_counter() - start_time
     print("elapsed: getting modules", elapsed_time)
-
 
     # flag elements that are on whitelist unified with blacklist
     modules = check_which_saved(modules)
