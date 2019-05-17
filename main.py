@@ -220,8 +220,9 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
             module_values['whitelisted'] = whitelisted
             cursor = cnx.cursor()
             cursor.execute(qry, module_values)
-            study_programs = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
-            for sp in study_programs:
+            module_id = cursor.lastrowid
+            studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
+            for sp in studyprograms:
                 qry1 = "INSERT IGNORE INTO studyprogram (CgHighObjid, CgHighText, CgHighCategory) VALUES (%(CgHighObjid)s, %(CgHighText)s, %(CgHighCategory)s)"
                 val1 = {
                     'CgHighObjid': sp['CgHighObjid'],
@@ -229,10 +230,11 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
                     'CgHighCategory': sp['CgHighCategory'],
                 }
                 cursor.execute(qry1, val1)
-                qry2 = "INSERT IGNORE INTO module_studyprogram (SmObjId, CgHighObjid) VALUES (%(SmObjId)s, %(CgHighObjid)s)"
+                studyprogram_id = cursor.lastrowid
+                qry2 = "INSERT IGNORE INTO module_studyprogram (module_id, studyprogram_id) VALUES (%(module_id)s, %(studyprogram_id)s)"
                 val2 = {
-                    'SmObjId': module_values['SmObjId'],
-                    'CgHighObjid': sp['CgHighObjid'],
+                    'module_id': module_id,
+                    'studyprogram_id': studyprogram_id,
                 }
                 cursor.execute(qry2, val2)
             cnx.commit()
@@ -364,7 +366,7 @@ def remove_searchterm(searchterm_id):
     cursor = cnx.cursor()
     qry = "DELETE FROM searchterm WHERE id = %(searchterm_id)s"
     try:
-        cursor.execute(qry, {'id': searchterm_id})
+        cursor.execute(qry, {'searchterm_id': searchterm_id})
         cnx.commit()
         cnx.close()
         return 'deleted', 200
@@ -390,9 +392,7 @@ def search():
         cursor.close()
         cursor = cnx.cursor()
         cursor.execute("SELECT MAX(id) FROM module")
-        print(cursor)
         for row in cursor:
-            print(row)
             id_not_currently_in_use = row[0] + 999
 
     except Exception as e:
@@ -465,10 +465,8 @@ def check_which_saved(modules):
         # print('\n\n\nAFTER REMOVAL\n\n\n')
         # for e in modules:
         #     print(e)
-        print(saved_modules)
         for mod in modules:
             module_key = (int(mod.get('SmObjId')), int(mod.get('PiqYear')), int(mod.get('PiqSession')))
-            print(module_key)
             if module_key in saved_modules.keys():
                 mod['whitelisted'] = saved_modules[module_key]
         
