@@ -20,11 +20,6 @@
     </div>
     <!--hwat-->
 
-<script>
-studyprograms = {{studyprograms}}
-autocomplete(document.getElementById("studyprogram_input"), studyprograms);
-</script>
-
     <script type="text/javascript">
         $('select#semester_selector').change(function() {
             ShowSelectedSemester();
@@ -44,6 +39,7 @@ autocomplete(document.getElementById("studyprogram_input"), studyprograms);
     </script>
 
     <script>
+
         function autocomplete(inp, arr) {
         /*the autocomplete function takes two arguments,
         the text field element and an array of possible autocompleted values:*/
@@ -140,6 +136,9 @@ autocomplete(document.getElementById("studyprogram_input"), studyprograms);
             closeAllLists(e.target);
         });
         }
+
+        studyprograms = {{studyprograms}}
+        autocomplete(document.getElementById("studyprogram_input"), studyprograms);
     </script>
 
     <style>
