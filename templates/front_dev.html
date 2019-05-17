@@ -27,7 +27,7 @@
                                 <td colspan="2"><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
                             </tr>
                             {% for m in whitelist %}
-                                <tr id='{{ m.SmObjId }} {{m.PiqYear}} {{m.PiqSession}}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown">
+                                <tr id='module_{{ m.id }}'data-SmObjId='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown">
                                     <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     {# <td>            {{ m.SmObjId }} </td> #}
                                     <td> <!-- {{ m.PiqSession }} / PiqSession -->
@@ -41,7 +41,7 @@
                                     </td>
                                     {# <td>            {{ m.PiqSession }} </td> #}
                                     {# <td>            {{ m.PiqYear }} </td> #}
-                                    <td><button name="Verbergen" onclick="blacklist_from_whitelist({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.PiqSession }}, '{{ m.title }}')">Verbergen</button></td>
+                                    <td><button name="Verbergen" onclick="blacklist_from_whitelist({{ m.id }}, {{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.PiqSession }}, '{{ m.title }}')">Verbergen</button></td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -80,7 +80,7 @@
                         </thead>
                         <tbody id="suggestions_body">
                         {% for m in found_modules %}
-                            <tr id='{{ m.SmObjId }} {{m.PiqYear}} {{m.PiqSession}}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown">
+                            <tr id='module_{{ m.id }}'data-SmObjId='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown">
                                 <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     <td> <!-- {{ m.PiqSession }} / PiqSession -->
                                         {% if m.PiqSession == 3 %}
@@ -92,13 +92,13 @@
                                         {% endif %}
                                     </td>
                                 <td><button name="Anzeigen" 
-                                    onclick="whitelist_from_suggestions({{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, '{{m.title}}')"
+                                    onclick="whitelist_from_suggestions({{m.id}}, {{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, '{{m.title}}')"
                                     {% if m.whitelisted==1 %}
                                     disabled
                                     {% endif %}
                                 >Anzeigen</button>
                                 <button name="Verbergen" 
-                                    onclick="blacklist_from_suggestions({{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, '{{m.title}}')"
+                                    onclick="blacklist_from_suggestions({{m.id}}, {{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, '{{m.title}}')"
                                     {% if m.whitelisted==0 %}
                                     disabled
                                     {% endif %}
@@ -120,7 +120,7 @@
                         </thead>
                         <tbody id="blacklist_body">
                             {% for m in blacklist %}
-                                <tr id='{{ m.SmObjId }} {{m.PiqYear}} {{m.PiqSession}}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown">
+                                <tr id='module_{{ m.id }}' data-SmObjId='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown">
                                     <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     {# <td>            {{ m.SmObjId }} </td> #}
                                     <td> <!-- {{ m.PiqSession }} / PiqSession -->
@@ -135,8 +135,8 @@
                                     {# <td>            {{ m.PiqSession }} </td> #}
                                     {# <td>            {{ m.PiqYear }} </td> #}
                                     <td>
-                                        <button name="Anzeigen" onclick="whitelist_from_blacklist({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.PiqSession }}, '{{ m.title }}')">Anzeigen</button>
-                                        <button name="Löschen" onclick="delete_blacklisted_module({{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.PiqSession }}, '{{ m.title }}')">Löschen</button>
+                                        <button name="Anzeigen" onclick="whitelist_from_blacklist({{ m.id }}, {{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.PiqSession }}, '{{ m.title }}')">Anzeigen</button>
+                                        <button name="Löschen" onclick="delete_blacklisted_module({{ m.id }})">Löschen</button>
                                     </td>
                                 </tr>
                             {% endfor %}

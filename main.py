@@ -72,6 +72,8 @@ def front_dev():
         blacklist = json.loads(get_blacklist().get_data())
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
+        studyprograms_objs=json.loads(get_studyprograms().get_data())
+        studyprograms = [sp['CgHighText']+sp['CgHighCategory'] for sp in studyprograms_objs]
         # studyprograms_ids = json.loads(get_modules_studyprograms().get_data())
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
@@ -95,7 +97,8 @@ def front_dev():
         'secret_key': secret_key,
         'found_modules': found_modules,
         # 'modules_studyprograms': modules_studyprograms,
-        'date':date
+        'date':date,
+        'studyprograms': studyprograms,
     })
 
 @app.route('/public')
@@ -197,7 +200,7 @@ def get_modules(whitelisted):
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
     qry = (
-        "SELECT * FROM modules WHERE whitelisted = {whitelisted} ORDER BY title ASC".format(whitelisted=whitelisted))
+        "SELECT * FROM module as m WHERE whitelisted = {whitelisted} ORDER BY title ASC".format(whitelisted=whitelisted))
     cursor.execute(qry)
     for module in cursor:
         for column, value in module.items():
@@ -207,26 +210,26 @@ def get_modules(whitelisted):
     cnx.close()
     return jsonify(modules)
 
-def add_module(module_id, PiqYear, PiqSession, whitelisted):
-    m = models.Module(module_id)
+def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
+    m = models.Module(SmObjId)
     module_values = m.find_module_values(PiqYear, PiqSession)
     if module_values is not None:
         try:
             cnx = mysql.connector.connect(**db_config)
-            qry = "INSERT INTO modules (SmObjId, PiqYear, PiqSession, title, whitelisted) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
+            qry = "INSERT INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
             module_values['whitelisted'] = whitelisted
             cursor = cnx.cursor()
             cursor.execute(qry, module_values)
-            study_programs = find_studyprograms_for_module(module_id, PiqYear, PiqSession)
+            study_programs = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
             for sp in study_programs:
-                qry1 = "INSERT IGNORE INTO studyprograms (CgHighObjid, CgHighText, CgHighCategory) VALUES (%(CgHighObjid)s, %(CgHighText)s, %(CgHighCategory)s)"
+                qry1 = "INSERT IGNORE INTO studyprogram (CgHighObjid, CgHighText, CgHighCategory) VALUES (%(CgHighObjid)s, %(CgHighText)s, %(CgHighCategory)s)"
                 val1 = {
                     'CgHighObjid': sp['CgHighObjid'],
                     'CgHighText':  sp['CgHighText'],
                     'CgHighCategory': sp['CgHighCategory'],
                 }
                 cursor.execute(qry1, val1)
-                qry2 = "INSERT IGNORE INTO modules_studyprograms (SmObjId, CgHighObjid) VALUES (%(SmObjId)s, %(CgHighObjid)s)"
+                qry2 = "INSERT IGNORE INTO module_studyprogram (SmObjId, CgHighObjid) VALUES (%(SmObjId)s, %(CgHighObjid)s)"
                 val2 = {
                     'SmObjId': module_values['SmObjId'],
                     'CgHighObjid': sp['CgHighObjid'],
@@ -243,15 +246,15 @@ def add_module(module_id, PiqYear, PiqSession, whitelisted):
     
 
 # add module to whitelist and remove it from blacklist
-@app.route('/whitelist/<int:PiqYear>/<int:PiqSession>/<int:module_id>', methods=['POST'])
+@app.route('/whitelist/<int:PiqYear>/<int:PiqSession>/<int:SmObjId>', methods=['POST'])
 @cross_origin()
 @require_appkey
-def add_whitelist(module_id, PiqYear, PiqSession):
-    return add_module(module_id, PiqYear, PiqSession, whitelisted=1)
+def add_whitelist(SmObjId, PiqYear, PiqSession):
+    return add_module(SmObjId, PiqYear, PiqSession, whitelisted=1)
 
 
 # remove module from whitelist and add to blacklist
-@app.route('/whitelist/<int:PiqYear>/<int:PiqSession>/<int:module_id>', methods=['DELETE'])
+@app.route('/whitelist/<int:module_id>', methods=['DELETE'])
 @cross_origin()
 @require_appkey
 def remove_whitelist(module_id):
@@ -262,7 +265,7 @@ def flag_module(module_id, whitelisted):
     cursor = cnx.cursor(dictionary=True, buffered=True)
     # remove module from whitelist
     try:
-        qry = "UPDATE modules SET whitelisted = {whitelisted} WHERE SmObjId = {module_id}".format(whitelisted=whitelisted, module_id=module_id)
+        qry = "UPDATE modules SET whitelisted = {whitelisted} WHERE id = {module_id}".format(whitelisted=whitelisted, module_id=module_id)
         cursor.execute(qry)
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 500
@@ -284,24 +287,24 @@ def get_blacklist():
 
 
 # add module to blacklist and remove it from whitelist
-@app.route('/blacklist/<int:PiqYear>/<int:PiqSession>/<int:module_id>', methods=['POST'])
+@app.route('/blacklist/<int:PiqYear>/<int:PiqSession>/<int:SmObjId>', methods=['POST'])
 @cross_origin()
 @require_appkey
-def add_blacklist(module_id, PiqYear, PiqSession):
-    return add_module(module_id, PiqYear, PiqSession, whitelisted=0)
+def add_blacklist(SmObjId, PiqYear, PiqSession):
+    return add_module(SmObjId, PiqYear, PiqSession, whitelisted=0)
 
 
 # remove module from blacklist
-@app.route('/blacklist/<int:PiqYear>/<int:PiqSession>/<int:module_id>', methods=['DELETE'])
+@app.route('/blacklist/<int:module_id>', methods=['DELETE'])
 @cross_origin()
 @require_appkey
-def remove_blacklist(module_id, PiqYear, PiqSession):
+def remove_blacklist(module_id):
     # remove module
     try:
         cnx = mysql.connector.connect(**db_config)
-        val = {'SmObjId': module_id, 'PiqYear': PiqYear, 'PiqSession': PiqSession}
+        val = {'module_id': module_id}
         cursor = cnx.cursor(dictionary=True, buffered=True)
-        qry = "DELETE FROM modules WHERE SmObjId = %(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s AND whitelisted = 0"
+        qry = "DELETE FROM module WHERE id = %(module_id)s AND whitelisted = 0"
         cursor.execute(qry, val)
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 500
@@ -320,7 +323,7 @@ def get_searchterms():
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
     qry = (
-        "SELECT id, term FROM searchterms ORDER BY term ASC")
+        "SELECT id, term FROM searchterm ORDER BY term ASC")
     cursor.execute(qry)
     for row in cursor.fetchall():
         for column, value in row.items():
@@ -340,7 +343,7 @@ def add_searchterm():
     data = request.form
     term = data['term']
     # term  =  'test'
-    qry = "INSERT INTO searchterms (term) VALUES (%(term)s)"
+    qry = "INSERT INTO searchterm (term) VALUES (%(term)s)"
     try:
         cursor.execute(qry, data)
         id = cursor.lastrowid
@@ -353,15 +356,15 @@ def add_searchterm():
 
 
 # remove search term
-@app.route('/searchterms/<int:id>', methods=['DELETE'])
+@app.route('/searchterms/<int:searchterm_id>', methods=['DELETE'])
 @cross_origin()
 @require_appkey
-def remove_searchterm(id):
+def remove_searchterm(searchterm_id):
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor()
-    qry = "DELETE FROM searchterms WHERE id= %(id)s"
+    qry = "DELETE FROM searchterm WHERE id = %(searchterm_id)s"
     try:
-        cursor.execute(qry, {'id': id})
+        cursor.execute(qry, {'id': searchterm_id})
         cnx.commit()
         cnx.close()
         return 'deleted', 200
@@ -377,13 +380,18 @@ def search():
     start_time = time.perf_counter()
     # get searchterms
     terms = []
+    id_not_currently_in_use = 999
     try:
         cnx = mysql.connector.connect(**db_config)
         cursor = cnx.cursor(dictionary=True)
-        cursor.execute("SELECT term FROM searchterms")
+        cursor.execute("SELECT term FROM searchterm")
         for row in cursor:
             terms.append(row['term'])
         cursor.close()
+        cursor = cnx.cursor()
+        cursor.execute("SELECT max(id) FROM module")
+        id_not_currently_in_use = cursor[0][0] + 999
+
     except Exception as e:
         print('not possible in dev', e)
         terms+=['Nachhaltigkeit', 'Sustainability']
@@ -419,6 +427,9 @@ def search():
 
     # flag elements that are on whitelist unified with blacklist
     modules = check_which_saved(modules)
+    for i, mod in enumerate(modules):
+        # fake a database-like Id for easier identification in html
+        mod['id'] = id_not_currently_in_use+i
 
     return jsonify(modules)
 
@@ -429,7 +440,7 @@ def check_which_saved(modules):
         saved_modules = {}
         cnx = mysql.connector.connect(**db_config)
         cursor = cnx.cursor(dictionary=True)
-        cursor.execute("SELECT SmObjId, PiqYear, PiqSession, whitelisted FROM modules")
+        cursor.execute("SELECT SmObjId, PiqYear, PiqSession, whitelisted FROM module")
         for row in cursor:
             saved_modules[(row['SmObjId'], row['PiqYear'], row['PiqSession'])]=row['whitelisted']
         cursor.close()
@@ -451,9 +462,10 @@ def check_which_saved(modules):
         # print('\n\n\nAFTER REMOVAL\n\n\n')
         # for e in modules:
         #     print(e)
-
+        print(saved_modules.keys())
         for mod in modules:
             module_key = (int(mod.get('SmObjId')), int(mod.get('PiqYear')), int(mod.get('PiqSession')))
+            print(module_key)
             if module_key in saved_modules.keys():
                 mod['whitelisted'] = saved_modules[module_key]
         
@@ -487,8 +499,8 @@ def find_modules_for_course(course):
 """
 Request detail page for module object, add Studyprogrm subobjects(dicts) as list to given module obj
 """
-def find_studyprograms_for_module(module_id, PiqYear, PiqSession):
-    m = models.Module(module_id)
+def find_studyprograms_for_module(SmObjId, PiqYear, PiqSession):
+    m = models.Module(SmObjId)
     module_values = m.find_module_values(PiqYear, PiqSession)
     module_values['Partof'] = []
     # SmDetailsSet(SmObjId='50934872',PiqYear='2018',PiqSession='004')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods
@@ -542,7 +554,7 @@ def search_upwards():
     try:
         cnx = mysql.connector.connect(**db_config)
         cursor = cnx.cursor(dictionary=True)
-        cursor.execute("SELECT term FROM searchterms")
+        cursor.execute("SELECT term FROM searchterm")
         for row in cursor:
             terms.append(row['term'])
     except Exception as e:
@@ -588,28 +600,58 @@ def search_upwards():
     print("elapsed: getting courses->modules->studyprograms", elapsed_time)
     return jsonify(modules)
 
+
+@app.route('/studyprograms', methods=['GET'])
+@cross_origin()
+def get_studyprograms():
+    studyprograms=[]
+    cnx = mysql.connector.connect(**db_config)
+    cursor = cnx.cursor(dictionary=True)
+    qry = (
+        """
+        SELECT * FROM studyprogram;
+        """)
+    cursor.execute(qry)
+    for row in cursor:
+        for column, value in row.items():
+            if type(value) is bytearray:
+                row[column] = value.decode('utf-8')
+        studyprograms.append(
+            row
+        )
+    cnx.close()
+    return jsonify(studyprograms)
+
 @app.route('/modules_studyprograms', methods=['GET'])
 @cross_origin()
 def get_modules_studyprograms():
-    # modules_studyprograms = {}
+    # module_ids=[]
+    # studyprograms_ids=[]
+    # studyprograms_texts=[]
+    # studyprograms_categories=[]
     # cnx = mysql.connector.connect(**db_config)
     # cursor = cnx.cursor(dictionary=True)
     # qry = (
-    #     "SELECT SmObjId, CgHighObjid, CgHighText, CgCategorySort FROM modules JOIN modules_studyprograms JOIN studyprograms ORDER BY title ASC"
+    #     """
+    #     SELECT DISTINCT m.title, ms.SmObjId, s.CgHighObjid, CgHighText, CgHighCategory 
+    #     FROM module AS m INNER JOIN module_studyprogram AS ms 
+    #         ON m.id = ms.module_id
+    #     INNER JOIN studyprogram AS s
+    #         ON ms.studyprogram_id = s.id
+    #     """)
     # cursor.execute(qry)
     # for row in cursor:
     #     for column, value in row.items():
     #         if type(value) is bytearray:
     #             row[column] = value.decode('utf-8')
-    #     modules_studyprograms[row[0]] = {
-    #         'CgHighObjid': row[1],
-    #         'CgHighText': row[2]
-    #     }
+    #     module_ids.append(row[0])
+    #     studyprograms_ids.append(row[1])
+    #     studyprograms_texts.append(row[2])
+    #     studyprograms_ids.append(row[3])
     # cnx.close()
-    # return jsonify(modules)
+    # return jsonify([module_ids, studyprograms_ids, studyprograms_texts, studyprograms_ids])
     pass
+
 
 if __name__ == "__main__":
     app.run()
-
-# Get modules from either the black or white list database, for in template use.

@@ -20,23 +20,19 @@ def update_db():
 def update_modules():
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(buffered=True)
-    qry = ("SELECT SmObjId, PiqYear, PiqSession FROM modules")
+    qry = ("SELECT SmObjId, PiqYear, PiqSession FROM module")
     cursor.execute(qry)
     for row in cursor:
-        cursor2 = cnx.cursor()
-        mod = models.Module(row[0])
-        current_values = mod.find_module_values(row[1], row[2])
+        cursor2 = cnx.cursor(dictionary=True)
+        mod = models.Module(row['SmObjId'])
+        current_values = mod.find_module_values(row['PiqYear'], row['PiqSession'])
         if current_values is not None:
             qry2 = "UPDATE modules SET title=%(title)s WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s;"
             val = current_values
 
         else:
-            qry2 = "DELETE FROM modules WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s"
-            val = {'SmObjId': row[0],
-                'PiqYear': row[1],
-                'PiqSession': row[2],
-            }
-
+            qry2 = "DELETE FROM module WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s"
+            val = row
         try:
             cursor2.execute(qry2, val)
         except mysql.connector.Error as err:
