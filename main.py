@@ -237,6 +237,7 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
                     'module_id': module_id,
                     'studyprogram_id': studyprogram_id,
                 }
+                print(val2)
                 cursor.execute(qry2, val2)
                 cnx.commit()
             cnx.commit()
