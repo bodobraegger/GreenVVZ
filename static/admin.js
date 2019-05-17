@@ -146,20 +146,20 @@ function write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title
     return `<tr id="module_${module_id}" data-semester="${PiqYear} ${PiqSession}" data-SmObjId="${SmObjId}" class="shown"><td><a target="_blank" href="${url}">${title}</a></td><td>${convert_session_to_string(PiqSession, PiqYear)}</td><td>`
 }
 function add_to_whitelist(module_id, SmObjId, PiqYear, PiqSession, title){
-    var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title)}<button name="Anzeigen" onclick="blacklist_from_whitelist('${SmObjId}', '${PiqYear}', '${PiqSession}', '${title}')">Verbergen</button></td></tr>`)
+    var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title)}<button name="Anzeigen" onclick="blacklist_from_whitelist(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, '${title}')">Verbergen</button></td></tr>`)
     $('#whitelist_body').append(module)
 }
 function add_to_blacklist(module_id, SmObjId, PiqYear, PiqSession, title){
-    var anzeigen_button = `<button name="Anzeigen" onclick="whitelist_from_blacklist('${SmObjId}', '${PiqYear}', '${PiqSession}', '${title}')">Anzeigen</button>`
+    var anzeigen_button = `<button name="Anzeigen" onclick="whitelist_from_blacklist(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, '${title}')">Anzeigen</button>`
     var   delete_button = `<button name="Löschen" onclick="delete_blacklisted_module('${module_id}')">Löschen</button>`
     var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title)}
         ${anzeigen_button}${delete_button}</td></tr>`)
     $('#blacklist_body').append(module)
 }
 function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted){
-    var anzeigen_button=`<button name="Anzeigen" onclick="whitelist_from_blacklist('${SmObjId}', '${PiqYear}', '${PiqSession}', '${title}')"
+    var anzeigen_button=`<button name="Anzeigen" onclick="whitelist_from_blacklist(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, '${title}')"
         ${whitelisted ? 'disabled' : ''}>Anzeigen</button>`
-    var verbergen_button=`<button name="Verbergen" onclick="blacklist_from_whitelist('${SmObjId}', '${PiqYear}', '${PiqSession}', '${title}')"
+    var verbergen_button=`<button name="Verbergen" onclick="blacklist_from_whitelist(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, '${title}')"
         ${!whitelisted ? 'disabled' : ''}>Verbergen</button>`
     var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title)}
         ${anzeigen_button}${verbergen_button}</td></tr>`);
