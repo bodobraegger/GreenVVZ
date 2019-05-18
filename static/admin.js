@@ -117,7 +117,7 @@ function delete_searchterm(id){
 }
 function delete_blacklisted_module(module_id){
     $.ajax({
-        url: `${apiUrl}blacklist/${module_id}?key=${secret_key}`,
+        url: `${apiUrl}modules/${module_id}?key=${secret_key}`,
         method : 'DELETE',
         success : function (data) {
             remove_module(module_id)

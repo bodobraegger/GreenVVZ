@@ -302,7 +302,7 @@ def flag_module(module_id):
 def get_blacklist():
     return get_modules(whitelisted=0)
 
-# remove module from blacklist
+# remove module from database
 @app.route('/modules/<int:module_id>', methods=['DELETE'])
 @cross_origin()
 @require_appkey
@@ -312,7 +312,7 @@ def remove_blacklist(module_id):
         cnx = mysql.connector.connect(**db_config)
         val = {'module_id': module_id}
         cursor = cnx.cursor(dictionary=True, buffered=True)
-        qry = "DELETE FROM module WHERE id = %(module_id)s AND whitelisted = 0"
+        qry = "DELETE FROM module WHERE id = %(module_id)s"
         cursor.execute(qry, val)
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 500
@@ -320,7 +320,7 @@ def remove_blacklist(module_id):
     cnx.commit()
     cursor.close()
     cnx.close()
-    return 'Deleted module from blacklist', 200
+    return 'Deleted module', 200
 
 
 # get all search terms
