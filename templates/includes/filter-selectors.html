@@ -148,9 +148,10 @@
         function ShowSelectedStudyprogram() {
             var studyprogram_id = studyprogram_textlist.indexOf(document.getElementById("studyprogram_input").value)
             var module_ids = studyprogramid_moduleids[studyprogram_id]
-            var modules_to_filter = $(`[data-semester]`).not('.hidden')
-            for(id in module_ids) {
-                modules_to_filter = modules_to_filter.not($(`#module_${id}`))
+            var modules_to_filter = $(`[data-semester]`).not($('.hidden'))
+            
+            for(i = 0; i < module_ids.length; i++) {
+                modules_to_filter = modules_to_filter.not($(`#module_${module_ids[i]}`))
             }
             $(modules_to_filter).addClass('hidden')
             return;
