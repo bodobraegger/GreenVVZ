@@ -134,7 +134,7 @@ function remove_module(module_id){
     document.getElementById(`module_${module_id}`).remove()
 }
 function flag_in_suggestions(module_id, whitelisted){
-    var button_parent = document.getElementById(`module_${module_id}`).lastChild;
+    var button_parent = document.getElementById(`module_${module_id}`).children[2];
     if(whitelisted) {
         button_parent.querySelector('button[name="Anzeigen"]').disabled = true;
         button_parent.querySelector('button[name="Verbergen"]').disabled = false;
