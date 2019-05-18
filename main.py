@@ -76,7 +76,7 @@ def front_dev():
         found_modules = json.loads(search().get_data())
         studyprograms = get_studyprograms().get_data(as_text=True)
         studyprogramid_moduleids = get_studyprograms_modules().get_data(as_text=True)
-        moduleid_studyprogramids = json.loads(get_modules_studyprograms())
+        moduleid_studyprogramids = json.loads(get_modules_studyprograms().get_data())
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
