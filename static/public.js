@@ -16,7 +16,7 @@ $(document).ready(function () {
 
 
     $.ajax({
-        url : apiUrl+"/whitelist",
+        url : apiUrl+"/modules/whitelist",
         method : 'GET',
         success : function (data) {
             console.log(data)

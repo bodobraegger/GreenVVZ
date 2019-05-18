@@ -191,7 +191,7 @@ def update():
 
 
 # get whitelist
-@app.route('/whitelist', methods=['GET'])
+@app.route('/modules/whitelist', methods=['GET'])
 @cross_origin()
 def get_whitelist():
     return get_modules(whitelisted=1)
@@ -211,7 +211,16 @@ def get_modules(whitelisted):
     cnx.close()
     return jsonify(modules)
 
+@app.route('/modules/blacklist', methods=['GET'])
+@cross_origin()
+@require_appkey
 def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
+    req_data = request.get_json()
+    print(req_data)
+    SmObjId = req_data['SmObjId']
+    PiqYear = req_data['PiqYear']
+    PiqSession = req_data['PiqSession']
+    whitelisted = req_data['whitelisted']
     m = models.Module(SmObjId)
     module_values = m.find_module_values(PiqYear, PiqSession)
     if module_values is not None:
@@ -263,22 +272,6 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
             return "Error: {}\nfor module {} and studyprogram {}".format(err, module_id, studyprogram_id), 409
     else:
         return 'No module found', 404
-    
-
-# add module to whitelist and remove it from blacklist
-@app.route('/whitelist/<int:PiqYear>/<int:PiqSession>/<int:SmObjId>', methods=['POST'])
-@cross_origin()
-@require_appkey
-def add_whitelist(SmObjId, PiqYear, PiqSession):
-    return add_module(SmObjId, PiqYear, PiqSession, whitelisted=1)
-
-
-# remove module from whitelist and add to blacklist
-@app.route('/whitelist/<int:module_id>', methods=['DELETE'])
-@cross_origin()
-@require_appkey
-def remove_whitelist(module_id):
-    return flag_module(module_id, whitelisted=0)
 
 @app.route('/modules/<int:module_id>', methods=['PUT'])
 @cross_origin()
@@ -305,22 +298,13 @@ def flag_module(module_id, whitelisted):
     
 
 # get blacklist
-@app.route('/blacklist', methods=['GET'])
+@app.route('/modules/blacklist', methods=['GET'])
 @cross_origin()
 def get_blacklist():
     return get_modules(whitelisted=0)
 
-
-# add module to blacklist and remove it from whitelist
-@app.route('/blacklist/<int:PiqYear>/<int:PiqSession>/<int:SmObjId>', methods=['POST'])
-@cross_origin()
-@require_appkey
-def add_blacklist(SmObjId, PiqYear, PiqSession):
-    return add_module(SmObjId, PiqYear, PiqSession, whitelisted=0)
-
-
 # remove module from blacklist
-@app.route('/blacklist/<int:module_id>', methods=['DELETE'])
+@app.route('/modules/<int:module_id>', methods=['DELETE'])
 @cross_origin()
 @require_appkey
 def remove_blacklist(module_id):

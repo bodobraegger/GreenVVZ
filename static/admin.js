@@ -3,61 +3,54 @@ var apiUrl = 'https://greenvvz.ifi.uzh.ch/'
 // var apiUrl = 'http://127.0.0.1:8080/'
 var secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data('api-key')
 
-function whitelist_from_suggestions(module_id, SmObjId, PiqYear, PiqSession, title) {
-    
+function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted) {
     $.ajax({
-        url: `${apiUrl}whitelist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
+        url: `${apiUrl}modules?key=${secret_key}`,
         method : 'POST',
+        data: {
+            'PiqYear': PiqYear,
+            'PiqSession': PiqSession,
+            'SmObjId': SmObjId,
+            'whitelisted': whitelisted,
+        },
         success : function (data) {
             flag_in_suggestions(module_id, whitelisted=1)
             populate_whitelist();
             populate_blacklist();
         },
         error : function (err) {
-            alert('Das Modul konnte nicht zur Whitelist hinzugefügt werden')
+            alert(`Das Modul konnte nicht als ${whitelisted ? 'whitelisted' : 'blacklisted'} gespeichert hinzugefügt werden`)
         }
     })
 }
-function whitelist_from_blacklist(module_id, SmObjId, PiqYear, PiqSession, title) {
+
+function update_whitelist_status(module_id, whitelisted, SmObjId, PiqYear, PiqSession) {
     $.ajax({
-        url: `${apiUrl}modules/${module_id}?key=${secret_key}&whitelisted=1`,
+        url: `${apiUrl}modules/${module_id}?whitelisted=${whitelisted}&key=${secret_key}`,
         method : 'PUT',
         success : function (data) {
             remove_module(module_id)
             populate_whitelist()
         },
         error : function (err) {
-            alert('Das Modul konnte nicht zur Whitelist hinzugefügt werden')
+            alert(`Das Modul konnte nicht als ${whitelisted ? 'whitelisted' : 'blacklisted'} markiert werden`);
         }
     })
+}
 
+function whitelist_from_suggestions(module_id, SmObjId, PiqYear, PiqSession, title) {
+    post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted=1);
 }
 function blacklist_from_suggestions(module_id, SmObjId, PiqYear, PiqSession, title){
-    $.ajax({
-        url: `${apiUrl}blacklist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
-        method : 'POST',
-        success : function (data) {
-            flag_in_suggestions(module_id, whitelisted=0)
-            populate_whitelist();
-            populate_blacklist();
-        },
-        error : function (err) {
-            alert('Das Modul konnte nicht zur Blacklist hinzugefügt werden')
-        }
-    })
+    post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted=0);
 }
+
+function whitelist_from_blacklist(module_id, SmObjId, PiqYear, PiqSession, title) {
+    update_whitelist_status(module_id, whitelisted=1);
+}
+
 function blacklist_from_whitelist(module_id, SmObjId, PiqYear, PiqSession, title){
-    $.ajax({
-        url: `${apiUrl}modules/${module_id}?key=${secret_key}&whitelisted=0`,
-        method : 'PUT',
-        success : function (data) {
-            remove_module(module_id);
-            populate_blacklist();
-        },
-        error : function (err) {
-            alert('Das Modul konnte nicht zur Blacklist hinzugefügt werden');
-        }
-    })
+    update_whitelist_status(module_id, whitelisted=0);
 }
 function save_searchterm(){
     var term = $('#searchterm_text').val()
@@ -88,7 +81,13 @@ function save_module(){
         var PiqSession = $('option:selected').val().split(' ')[1];
     }
     $.ajax({
-        url: `${apiUrl}whitelist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
+        url: `${apiUrl}modules/?key=${secret_key}`,
+        data: {
+            'PiqYear': PiqYear,
+            'PiqSession': PiqSession,
+            'SmObjId': SmObjId,
+            'whitelisted': 1,
+        },
         method : 'POST',
         success : function (data) {
             add_to_whitelist(data.SmObjId, data.PiqYear, data.PiqSession, data.title)
@@ -198,7 +197,7 @@ function populate_searchterms(){
 function populate_whitelist(){
     var whitelist = $('#whitelist_body')
     $.ajax({
-        url: apiUrl+'whitelist',
+        url: apiUrl+'modules/whitelist',
         method : 'GET',
         success : function (data) {
             whitelist.empty()
@@ -220,7 +219,7 @@ function populate_whitelist(){
 function populate_blacklist(){
     var blacklist = $('#blacklist_body')
     $.ajax({
-        url: apiUrl+'blacklist',
+        url: apiUrl+'modules/blacklist',
         method : 'GET',
         success : function (data) {
             blacklist.empty()
