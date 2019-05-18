@@ -228,7 +228,7 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
 
             studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
             for sp in studyprograms:
-                qry1 = "INSERT IGNORE INTO studyprogram (CgHighObjid, CgHighText, CgHighCategory) VALUES (%(CgHighObjid)s, %(CgHighText)s, %(CgHighCategory)s)"
+                qry1 = "INSERT INTO studyprogram (CgHighObjid, CgHighText, CgHighCategory) VALUES (%(CgHighObjid)s, %(CgHighText)s, %(CgHighCategory)s)"
                 val1 = {
                     'CgHighObjid': sp['CgHighObjid'],
                     'CgHighText':  sp['CgHighText'],
@@ -238,10 +238,11 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
                 studyprogram_id = cursor.lastrowid
                 if studyprogram_id == 0:
                     cursor.execute("SELECT id FROM studyprogram WHERE CgHighObjid = %(CgHighObjid)s", val1)
-                    print(cursor)
-                    studyprogram_id = cursor.fetchone()[0]
+                    for row in cursor:
+                        print(row)
+                        studyprogram_id = row[0]
 
-                qry2 = "INSERT IGNORE INTO module_studyprogram (module_id, studyprogram_id) VALUES (%(module_id)s, %(studyprogram_id)s)"
+                qry2 = "INSERT INTO module_studyprogram (module_id, studyprogram_id) VALUES (%(module_id)s, %(studyprogram_id)s)"
                 val2 = {
                     'module_id': module_id,
                     'studyprogram_id': studyprogram_id,
