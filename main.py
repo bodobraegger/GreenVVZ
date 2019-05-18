@@ -214,7 +214,7 @@ def get_modules(whitelisted):
 @app.route('/modules', methods=['POST'])
 @cross_origin()
 @require_appkey
-def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
+def add_module(): # SmObjId, PiqYear, PiqSession, whitelisted
     req_data = request.get_json()
     print(req_data)
     SmObjId = req_data['SmObjId']
@@ -276,9 +276,8 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
 @app.route('/modules/<int:module_id>', methods=['PUT'])
 @cross_origin()
 @require_appkey
-def flag_module(module_id, whitelisted):
-    if request.args.get('whitelisted') is not None:
-        whitelisted = request.args.get('whitelisted')
+def flag_module(module_id):
+    whitelisted = request.args.get('whitelisted')
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True, buffered=True)
     # remove module from whitelist
@@ -286,7 +285,7 @@ def flag_module(module_id, whitelisted):
         qry = "UPDATE module SET whitelisted = {whitelisted} WHERE id = {module_id}".format(whitelisted=whitelisted, module_id=module_id)
         cursor.execute(qry)
     except mysql.connector.Error as err:
-        return "Error: {}".format(err), 500
+        return "Error: {}".format(err), 409
 
     cnx.commit()
     cursor.close()
