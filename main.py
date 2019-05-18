@@ -73,8 +73,8 @@ def front_dev():
         blacklist = json.loads(get_blacklist().get_data())
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
-        studyprograms = get_studyprograms().get_data()
-        moduleid_studyprogramids = get_modules_studyprograms().get_data()
+        studyprograms = json.dumps(get_studyprograms().get_data(), sort_keys=True)
+        moduleid_studyprogramids = json.dumps(get_modules_studyprograms().get_data(), sort_keys=True)
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
