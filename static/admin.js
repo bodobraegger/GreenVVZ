@@ -21,7 +21,7 @@ function whitelist_from_suggestions(module_id, SmObjId, PiqYear, PiqSession, tit
 function whitelist_from_blacklist(module_id, SmObjId, PiqYear, PiqSession, title) {
     $.ajax({
         url: `${apiUrl}modules/${module_id}?key=${secret_key}&whitelisted=1`,
-        method : 'UPDATE',
+        method : 'PUT',
         success : function (data) {
             remove_module(module_id)
             populate_whitelist()
@@ -49,7 +49,7 @@ function blacklist_from_suggestions(module_id, SmObjId, PiqYear, PiqSession, tit
 function blacklist_from_whitelist(module_id, SmObjId, PiqYear, PiqSession, title){
     $.ajax({
         url: `${apiUrl}modules/${module_id}?key=${secret_key}&whitelisted=0`,
-        method : 'UPDATE',
+        method : 'PUT',
         success : function (data) {
             remove_module(module_id);
             populate_blacklist();

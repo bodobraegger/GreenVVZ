@@ -280,7 +280,7 @@ def add_whitelist(SmObjId, PiqYear, PiqSession):
 def remove_whitelist(module_id):
     return flag_module(module_id, whitelisted=0)
 
-@app.route('/modules/<int:module_id>', methods=['UPDATE'])
+@app.route('/modules/<int:module_id>', methods=['PUT'])
 @cross_origin()
 @require_appkey
 def flag_module(module_id, whitelisted):
