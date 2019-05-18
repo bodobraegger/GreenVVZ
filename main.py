@@ -234,7 +234,7 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
             studyprogram_id = 0
             for sp in studyprograms:
                 cursor = cnx.cursor()
-                qry1 = "INSERT IGNORE INTO studyprogram (CgHighText, CgHighCategory) VALUES %(CgHighText)s, %(CgHighCategory)s)"
+                qry1 = "INSERT INTO studyprogram (CgHighText, CgHighCategory) VALUES %(CgHighText)s, %(CgHighCategory)s)"
                 val1 = {
                     'CgHighText':  sp['CgHighText'],
                     'CgHighCategory': sp['CgHighCategory'],
