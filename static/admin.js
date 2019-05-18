@@ -9,8 +9,9 @@ function whitelist_from_suggestions(module_id, SmObjId, PiqYear, PiqSession, tit
         url: `${apiUrl}whitelist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
         method : 'POST',
         success : function (data) {
-            remove_from_suggestions(module_id)
-            populate_whitelist()
+            flag_in_suggestions(module_id, whitelisted=1)
+            populate_whitelist();
+            populate_blacklist();
         },
         error : function (err) {
             alert('Das Modul konnte nicht zur Whitelist hinzugefügt werden')
@@ -19,10 +20,10 @@ function whitelist_from_suggestions(module_id, SmObjId, PiqYear, PiqSession, tit
 }
 function whitelist_from_blacklist(module_id, SmObjId, PiqYear, PiqSession, title) {
     $.ajax({
-        url: `${apiUrl}whitelist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
-        method : 'POST',
+        url: `${apiUrl}modules/${module_id}?key=${secret_key}&whitelisted=1`,
+        method : 'UPDATE',
         success : function (data) {
-            remove_from_blacklist(module_id)
+            remove_module(module_id)
             populate_whitelist()
         },
         error : function (err) {
@@ -36,8 +37,9 @@ function blacklist_from_suggestions(module_id, SmObjId, PiqYear, PiqSession, tit
         url: `${apiUrl}blacklist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
         method : 'POST',
         success : function (data) {
-            remove_from_suggestions(module_id)
-            populate_blacklist()
+            flag_in_suggestions(module_id, whitelisted=0)
+            populate_whitelist();
+            populate_blacklist();
         },
         error : function (err) {
             alert('Das Modul konnte nicht zur Blacklist hinzugefügt werden')
@@ -46,10 +48,10 @@ function blacklist_from_suggestions(module_id, SmObjId, PiqYear, PiqSession, tit
 }
 function blacklist_from_whitelist(module_id, SmObjId, PiqYear, PiqSession, title){
     $.ajax({
-        url: `${apiUrl}blacklist/${PiqYear}/${PiqSession}/${SmObjId}?key=${secret_key}`,
-        method : 'POST',
+        url: `${apiUrl}modules/${module_id}?key=${secret_key}&whitelisted=0`,
+        method : 'UPDATE',
         success : function (data) {
-            remove_from_whitelist(module_id);
+            remove_module(module_id);
             populate_blacklist();
         },
         error : function (err) {
@@ -117,7 +119,7 @@ function delete_blacklisted_module(module_id){
         url: `${apiUrl}blacklist/${module_id}?key=${secret_key}`,
         method : 'DELETE',
         success : function (data) {
-            remove_from_blacklist(module_id)
+            remove_module(module_id)
             populate_blacklist()
         },
         error : function (err) {
@@ -127,14 +129,19 @@ function delete_blacklisted_module(module_id){
     })
 }
 
-function remove_from_whitelist(module_id){
+function remove_module(module_id){
     document.getElementById(`module_${module_id}`).remove()
 }
-function remove_from_blacklist(module_id){
-    document.getElementById(`module_${module_id}`).remove()
-}
-function remove_from_suggestions(module_id){
-    document.getElementById(`module_${module_id}`).remove()
+function flag_in_suggestions(module_id, whitelisted){
+    var button_parent = document.getElementById(`module_${module_id}`).lastChild;
+    if(whitelisted) {
+        button_parent.querySelector('button[name="Anzeigen"]').disabled = true;
+        button_parent.querySelector('button[name="Verbergen"]').disabled = false;
+    }
+    else {
+        button_parent.querySelector('button[name="Anzeigen"]').disabled = false;
+        button_parent.querySelector('button[name="Verbergen"]').disabled = true;
+    }
 }
 function remove_from_searchterms(id){
     var term = $('#searchterms_body').find('#'+id)
@@ -157,9 +164,9 @@ function add_to_blacklist(module_id, SmObjId, PiqYear, PiqSession, title){
     $('#blacklist_body').append(module)
 }
 function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted){
-    var anzeigen_button=`<button name="Anzeigen" onclick="whitelist_from_blacklist(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, '${title}')"
+    var anzeigen_button=`<button name="Anzeigen" onclick="whitelist_from_suggestions(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, '${title}')"
         ${whitelisted ? 'disabled' : ''}>Anzeigen</button>`
-    var verbergen_button=`<button name="Verbergen" onclick="blacklist_from_whitelist(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, '${title}')"
+    var verbergen_button=`<button name="Verbergen" onclick="blacklist_from_suggestions(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, '${title}')"
         ${!whitelisted ? 'disabled' : ''}>Verbergen</button>`
     var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title)}
         ${anzeigen_button}${verbergen_button}</td></tr>`);

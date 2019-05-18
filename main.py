@@ -280,12 +280,17 @@ def add_whitelist(SmObjId, PiqYear, PiqSession):
 def remove_whitelist(module_id):
     return flag_module(module_id, whitelisted=0)
 
+@app.route('/modules/<int:module_id>', methods=['UPDATE'])
+@cross_origin()
+@require_appkey
 def flag_module(module_id, whitelisted):
+    if request.args.get('whitelisted') is not None:
+        whitelisted = request.args.get('whitelisted')
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True, buffered=True)
     # remove module from whitelist
     try:
-        qry = "UPDATE modules SET whitelisted = {whitelisted} WHERE id = {module_id}".format(whitelisted=whitelisted, module_id=module_id)
+        qry = "UPDATE module SET whitelisted = {whitelisted} WHERE id = {module_id}".format(whitelisted=whitelisted, module_id=module_id)
         cursor.execute(qry)
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 500
