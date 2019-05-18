@@ -231,6 +231,7 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
             cursor.close()
 
             studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
+            studyprogram_id = 0
             for sp in studyprograms:
                 cursor = cnx.cursor()
                 qry1 = "INSERT IGNORE INTO studyprogram (CgHighObjid, CgHighText, CgHighCategory) VALUES (%(CgHighObjid)s, %(CgHighText)s, %(CgHighCategory)s)"
@@ -260,7 +261,7 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
             cnx.close()
             return jsonify(module_values), 200
         except mysql.connector.Error as err:
-            return "Error: {}".format(err), 409
+            return "Error: {}\nfor module {} and studyprogram {}".format(err, module_id, studyprogram_id), 409
     else:
         return 'No module found', 404
     
