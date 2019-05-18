@@ -5,16 +5,17 @@ var secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data
 
 function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted) {
     $.ajax({
+        contentType: 'application/json',
         url: `${apiUrl}modules?key=${secret_key}`,
         method : 'POST',
-        data: {
+        data: JSON.stringify({
             'PiqYear': PiqYear,
             'PiqSession': PiqSession,
             'SmObjId': SmObjId,
             'whitelisted': whitelisted,
-        },
+        }),
         success : function (data) {
-            flag_in_suggestions(module_id, whitelisted=1)
+            flag_in_suggestions(module_id, whitelisted)
             populate_whitelist();
             populate_blacklist();
         },
