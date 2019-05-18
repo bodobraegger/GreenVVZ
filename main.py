@@ -619,7 +619,7 @@ def get_studyprograms():
 @app.route('/modules_studyprograms', methods=['GET'])
 @cross_origin()
 def get_modules_studyprograms():
-    moduleid_studyprogramids = {}
+    studyprogramid_moduleids = {}
     try: 
         cnx = mysql.connector.connect(**db_config)
         cursor = cnx.cursor(dictionary=True)
@@ -628,11 +628,13 @@ def get_modules_studyprograms():
             for column, value in row.items():
                 if type(value) is bytearray:
                     row[column] = value.decode('utf-8')
-            moduleid_studyprogramids[row['module_id']] = row['studyprogram_id']
+            if studyprogramid_moduleids.get(row['studyprogram_id']) is None:
+                studyprogramid_moduleids[row['studyprogram_id']] = []
+            studyprogramid_moduleids[row['studyprogram_id']].append(row['module_id'])
         cnx.close()
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 500
-    return jsonify(moduleid_studyprogramids)
+    return jsonify(studyprogramid_moduleids)
 
 
 if __name__ == "__main__":

@@ -138,8 +138,12 @@
         }
 
         var studyprograms = {{studyprograms | safe}}
-        var moduleid_studyprogramids = {{moduleid_studyprogramids | safe}}
-        autocomplete(document.getElementById("studyprogram_input"), studyprograms);
+        var studyprogram_textlist = Object.keys(studyprograms).map(function(key){
+            return studyprograms[key];
+        });
+        var studyprogram_ids = Object.keys(studyprograms)
+        var studyprogramid_moduleids = {{studyprogramid_moduleids | safe}}
+        autocomplete(document.getElementById("studyprogram_input"), studyprogram_textlist);
     </script>
 
     <style>
