@@ -76,7 +76,7 @@ def front_dev():
         found_modules = json.loads(search().get_data())
         studyprograms = get_studyprograms().get_data(as_text=True)
         studyprogramid_moduleids = get_studyprograms_modules().get_data(as_text=True)
-        moduleid_studyprogramids = json.loads(get_modules_studyprograms().get_data())
+        moduleid_studyprogramidstag = json.loads(get_modules_studyprogramstag().get_data())
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
@@ -100,7 +100,7 @@ def front_dev():
         'found_modules': found_modules,
         'date':date,
         'studyprogramid_moduleids': studyprogramid_moduleids,
-        'moduleid_studyprogramids': moduleid_studyprogramids,
+        'moduleid_studyprogramidstag': moduleid_studyprogramidstag,
         'studyprograms': studyprograms,
     })
 
@@ -639,9 +639,9 @@ def get_studyprograms_modules():
         return "Error: {}".format(err), 500
     return jsonify(studyprogramid_moduleids)
 
-@app.route('/modules_studyprograms', methods=['GET'])
+@app.route('/get_modules_studyprogramstag', methods=['GET'])
 @cross_origin()
-def get_modules_studyprograms():
+def get_modules_studyprogramstag():
     moduleid_studyprogramids = {}
     try: 
         cnx = mysql.connector.connect(**db_config)

@@ -27,7 +27,7 @@
                                 <td colspan="2"><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
                             </tr>
                             {% for m in whitelist %}
-                                <tr id='module_{{ m.id }}' data-SmObjId='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' data-studyprograms='{{moduleid_studyprograms[m.id]}}' class="shown">
+                                <tr id='module_{{ m.id }}' data-SmObjId='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' data-studyprograms='{{moduleid_studyprogramidstag[m.id]}}' class="shown">
                                     <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
                                     {# <td>            {{ m.SmObjId }} </td> #}
                                     <td> <!-- {{ m.PiqSession }} / PiqSession -->
