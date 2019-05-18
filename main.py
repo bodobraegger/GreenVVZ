@@ -234,16 +234,15 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
             studyprogram_id = 0
             for sp in studyprograms:
                 cursor = cnx.cursor()
-                qry1 = "INSERT IGNORE INTO studyprogram (CgHighObjid, CgHighText, CgHighCategory) VALUES (%(CgHighObjid)s, %(CgHighText)s, %(CgHighCategory)s)"
+                qry1 = "INSERT IGNORE INTO studyprogram (CgHighText, CgHighCategory) VALUES %(CgHighText)s, %(CgHighCategory)s)"
                 val1 = {
-                    'CgHighObjid': sp['CgHighObjid'],
                     'CgHighText':  sp['CgHighText'],
                     'CgHighCategory': sp['CgHighCategory'],
                 }
                 cursor.execute(qry1, val1)
                 studyprogram_id = cursor.lastrowid
                 if studyprogram_id == 0:
-                    cursor.execute("SELECT id FROM studyprogram WHERE CgHighObjid = %(CgHighObjid)s", val1)
+                    cursor.execute("SELECT id FROM studyprogram WHERE CgHighText = %(CgHighText)s AND CgHighCategory = %(CgHighCategory)s", val1)
                     for row in cursor:
                         print("studyprogram_id = cursor.lastrowid did not work", row)
                         studyprogram_id = row[0]
@@ -526,7 +525,7 @@ def find_studyprograms_for_module(SmObjId, PiqYear, PiqSession):
 
     for studyprogram in r.json()['d']['Partof']['results']:
         module_values['Partof'].append({
-            'CgHighObjid':    studyprogram['ScObjid'],
+            # 'CgHighObjid':    studyprogram['ScObjid'],
             'CgHighText':     studyprogram['CgHighText'],
             # CgCategorySort: "25"
             'CgHighCategory': studyprogram['CgHighCategory'],
