@@ -74,7 +74,7 @@ def front_dev():
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
         studyprograms = get_studyprograms().get_data(as_text=True)
-        moduleid_studyprogramids = get_modules_studyprograms().get_data(as_text=True)
+        studyprogramid_moduleids = get_modules_studyprograms().get_data(as_text=True)
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
@@ -97,7 +97,7 @@ def front_dev():
         'secret_key': secret_key,
         'found_modules': found_modules,
         'date':date,
-        'moduleid_studyprogramids': moduleid_studyprogramids,
+        'studyprogramid_moduleids': studyprogramid_moduleids,
         'studyprograms': studyprograms,
     })
 
