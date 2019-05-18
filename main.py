@@ -211,7 +211,7 @@ def get_modules(whitelisted):
     cnx.close()
     return jsonify(modules)
 
-@app.route('/modules/blacklist', methods=['GET'])
+@app.route('/modules', methods=['POST'])
 @cross_origin()
 @require_appkey
 def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
