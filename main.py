@@ -64,8 +64,8 @@ def front_dev():
     blacklist = []
     searchterms = []
     found_modules= []
-    studyprograms = ["Informatik Hauptfach 150"]
-    # studyprograms_ids = {}
+    studyprograms = {1: "Informatik Hauptfach 150"}
+    moduleid_studyprogramids = {}
     secret_key = app.config['SECRET_KEY']
 
     try:
@@ -73,9 +73,8 @@ def front_dev():
         blacklist = json.loads(get_blacklist().get_data())
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
-        studyprograms_objs=json.loads(get_studyprograms().get_data())
-        studyprograms = ["{} {}".format(sp['CgHighText'], sp['CgHighCategory']) for sp in studyprograms_objs]
-        # studyprograms_ids = json.loads(get_modules_studyprograms().get_data())
+        studyprograms = get_studyprograms().get_data()
+        moduleid_studyprogramids = get_modules_studyprograms().get_data()
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
@@ -97,8 +96,8 @@ def front_dev():
         'baseUrlVvzUzh': baseUrlVvzUzh,
         'secret_key': secret_key,
         'found_modules': found_modules,
-        # 'modules_studyprograms': modules_studyprograms,
         'date':date,
+        'moduleid_studyprogramids': moduleid_studyprogramids,
         'studyprograms': studyprograms,
     })
 
@@ -482,7 +481,7 @@ Request detail page for course object, add Module subobjects(dicts) as list to g
 def find_modules_for_course(course):
     course['Modules'] = []
     rURI = models.Globals.URI_prefix+"EDetailsSet(EObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links&$format=json".format(
-        course.get('EObjId'), course.get('PiqYear'), course.get('PiqSession'))
+        course.get('EObjId'), course.get('PiqYear'), course.get('PiqSession')) #named params with **dict
 
     r = requests.get(rURI)
 
@@ -605,53 +604,35 @@ def search_upwards():
 @app.route('/studyprograms', methods=['GET'])
 @cross_origin()
 def get_studyprograms():
-    studyprograms=[]
+    studyprograms={}
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
-    qry = (
-        """
-        SELECT * FROM studyprogram;
-        """)
-    cursor.execute(qry)
+    cursor.execute("SELECT * FROM studyprogram;")
     for row in cursor:
         for column, value in row.items():
             if type(value) is bytearray:
                 row[column] = value.decode('utf-8')
-        studyprograms.append(
-            row
-        )
+        studyprograms[row['id']] = "{CgHighText}: {CgHighCategory}".format(**row)
     cnx.close()
     return jsonify(studyprograms)
 
 @app.route('/modules_studyprograms', methods=['GET'])
 @cross_origin()
 def get_modules_studyprograms():
-    # module_ids=[]
-    # studyprograms_ids=[]
-    # studyprograms_texts=[]
-    # studyprograms_categories=[]
-    # cnx = mysql.connector.connect(**db_config)
-    # cursor = cnx.cursor(dictionary=True)
-    qry = (
-        """
-        SELECT DISTINCT m.id, m.title, s.id, CgHighText, CgHighCategory 
-        FROM module AS m JOIN module_studyprogram AS ms 
-            ON m.id = ms.module_id
-        JOIN studyprogram AS s
-            ON ms.studyprogram_id = s.id;
-        """)
-    # cursor.execute(qry)
-    # for row in cursor:
-    #     for column, value in row.items():
-    #         if type(value) is bytearray:
-    #             row[column] = value.decode('utf-8')
-    #     module_ids.append(row[0])
-    #     studyprograms_ids.append(row[1])
-    #     studyprograms_texts.append(row[2])
-    #     studyprograms_ids.append(row[3])
-    # cnx.close()
-    # return jsonify([module_ids, studyprograms_ids, studyprograms_texts, studyprograms_ids])
-    pass
+    moduleid_studyprogramids = {}
+    try: 
+        cnx = mysql.connector.connect(**db_config)
+        cursor = cnx.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM module_studyprogram;")
+        for row in cursor:
+            for column, value in row.items():
+                if type(value) is bytearray:
+                    row[column] = value.decode('utf-8')
+            moduleid_studyprogramids[row['module_id']] = row['studyprogram_id']
+        cnx.close()
+    except mysql.connector.Error as err:
+        return "Error: {}".format(err), 500
+    return jsonify(moduleid_studyprogramids)
 
 
 if __name__ == "__main__":

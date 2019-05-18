@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS module_studyprogram (
     PRIMARY KEY (module_id, studyprogram_id)
 );
 
-SELECT m.title, s.CgHighCategory, m.id, s.id 
+SELECT m.title, s.CgHighText, s.CgHighCategory, m.id, s.id 
 FROM module AS m INNER JOIN module_studyprogram AS ms ON m.id = ms.module_id 
                  INNER JOIN studyprogram AS s ON s.id = ms.studyprogram_id 
 WHERE whitelisted=1;
