@@ -226,7 +226,7 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
                 cursor.execute("SELECT id FROM module WHERE SmObjId = %(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession=%(PiqSession)s", module_values)
                 for row in cursor:
                     print("module_id = cursor.lastrowid did not work", row)
-                    studyprogram_id = row[0]
+                    module_id = row[0]
             cnx.commit()
             cursor.close()
 
