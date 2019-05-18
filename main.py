@@ -224,10 +224,15 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
             module_id = cursor.lastrowid
             if module_id == 0:
                 cursor.execute("SELECT id FROM module WHERE SmObjId = %(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession=%(PiqSession)s", module_values)
-                module_id = cursor.fetchone()[0]
+                for row in cursor:
+                    print("module_id = cursor.lastrowid did not work", row)
+                    studyprogram_id = row[0]
+            cnx.commit()
+            cursor.close()
 
             studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
             for sp in studyprograms:
+                cursor = cnx.cursor()
                 qry1 = "INSERT INTO studyprogram (CgHighObjid, CgHighText, CgHighCategory) VALUES (%(CgHighObjid)s, %(CgHighText)s, %(CgHighCategory)s)"
                 val1 = {
                     'CgHighObjid': sp['CgHighObjid'],
@@ -239,8 +244,9 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
                 if studyprogram_id == 0:
                     cursor.execute("SELECT id FROM studyprogram WHERE CgHighObjid = %(CgHighObjid)s", val1)
                     for row in cursor:
-                        print(row)
+                        print("studyprogram_id = cursor.lastrowid did not work", row)
                         studyprogram_id = row[0]
+                cnx.commit()
 
                 qry2 = "INSERT INTO module_studyprogram (module_id, studyprogram_id) VALUES (%(module_id)s, %(studyprogram_id)s)"
                 val2 = {
@@ -249,8 +255,8 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
                 }
                 print(val2)
                 cursor.execute(qry2, val2)
-            cnx.commit()
-            cursor.close()
+                cnx.commit()
+                cursor.close()
             cnx.close()
             return jsonify(module_values), 200
         except mysql.connector.Error as err:
