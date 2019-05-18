@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS searchterm (
 
 CREATE TABLE IF NOT EXISTS studyprogram (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    CgHighObjid INT(8) NOT NULL UNIQUE,
     CgHighText VARCHAR(255),
     CgHighCategory VARCHAR(255),
     CONSTRAINT key_2 UNIQUE (CgHighText, CgHighCategory)
@@ -24,13 +23,12 @@ CREATE TABLE IF NOT EXISTS studyprogram (
 CREATE TABLE IF NOT EXISTS module_studyprogram (
     module_id INT(8) NOT NULL,
     studyprogram_id INT(8) NOT NULL,
-    FOREIGN KEY (module_id) REFERENCES modules (id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (studyprogram_id) REFERENCES studyprograms (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (module_id) REFERENCES module (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (studyprogram_id) REFERENCES studyprogram (id) ON DELETE CASCADE ON UPDATE CASCADE,
     PRIMARY KEY (module_id, studyprogram_id)
 );
 
-SELECT DISTINCT m.SmObjId, CgHighText, CgHighCategory 
-    FROM module AS m INNER JOIN modules_studyprograms AS ms 
-        ON m.SmObjId = ms.SmObjId
-    INNER JOIN studyprograms AS s
-        ON ms.CgHighObjid = s.CgHighObjid;
+SELECT m.title, s.CgHighCategory, m.id, s.id 
+FROM module AS m INNER JOIN module_studyprogram AS ms ON m.id = ms.module_id 
+                 INNER JOIN studyprogram AS s ON s.id = ms.studyprogram_id 
+WHERE whitelisted=1;

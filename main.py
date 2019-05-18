@@ -248,7 +248,7 @@ def add_module(SmObjId, PiqYear, PiqSession, whitelisted):
                         studyprogram_id = row[0]
                 cnx.commit()
 
-                qry2 = "INSERT INTO module_studyprogram (module_id, studyprogram_id) VALUES (%(module_id)s, %(studyprogram_id)s)"
+                qry2 = "INSERT IGNORE INTO module_studyprogram (module_id, studyprogram_id) VALUES (%(module_id)s, %(studyprogram_id)s)"
                 val2 = {
                     'module_id': module_id,
                     'studyprogram_id': studyprogram_id,
