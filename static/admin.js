@@ -31,7 +31,8 @@ function update_whitelist_status(module_id, whitelisted, SmObjId, PiqYear, PiqSe
         method : 'PUT',
         success : function (data) {
             remove_module(module_id)
-            populate_whitelist()
+            if(whitelisted) populate_whitelist();
+            else populate_blacklist;
         },
         error : function (err) {
             alert(`Das Modul konnte nicht als ${whitelisted ? 'whitelisted' : 'blacklisted'} markiert werden`);
