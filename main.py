@@ -65,7 +65,8 @@ def front_dev():
     searchterms = []
     found_modules= []
     studyprograms = {1: "Informatik Hauptfach 150"}
-    moduleid_studyprogramids = {}
+    studyprogramid_moduleids = {1: [2]}
+    moduleid_studyprogramids = {2: "1 "}
     secret_key = app.config['SECRET_KEY']
 
     try:
@@ -74,7 +75,8 @@ def front_dev():
         searchterms = json.loads(get_searchterms().get_data())
         found_modules = json.loads(search().get_data())
         studyprograms = get_studyprograms().get_data(as_text=True)
-        studyprogramid_moduleids = get_modules_studyprograms().get_data(as_text=True)
+        studyprogramid_moduleids = get_studyprograms_modules().get_data(as_text=True)
+        moduleid_studyprogramids = json.loads(get_modules_studyprograms())
     except mysql.connector.errors.InterfaceError as e:
         print(e, "\n!!!only works on server!!!")
         test = {
@@ -98,6 +100,7 @@ def front_dev():
         'found_modules': found_modules,
         'date':date,
         'studyprogramid_moduleids': studyprogramid_moduleids,
+        'moduleid_studyprogramids': moduleid_studyprogramids,
         'studyprograms': studyprograms,
     })
 
@@ -616,9 +619,9 @@ def get_studyprograms():
     cnx.close()
     return jsonify(studyprograms)
 
-@app.route('/modules_studyprograms', methods=['GET'])
+@app.route('/studyprograms_modules', methods=['GET'])
 @cross_origin()
-def get_modules_studyprograms():
+def get_studyprograms_modules():
     studyprogramid_moduleids = {}
     try: 
         cnx = mysql.connector.connect(**db_config)
@@ -636,6 +639,25 @@ def get_modules_studyprograms():
         return "Error: {}".format(err), 500
     return jsonify(studyprogramid_moduleids)
 
+@app.route('/modules_studyprograms', methods=['GET'])
+@cross_origin()
+def get_modules_studyprograms():
+    moduleid_studyprogramids = {}
+    try: 
+        cnx = mysql.connector.connect(**db_config)
+        cursor = cnx.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM module_studyprogram;")
+        for row in cursor:
+            for column, value in row.items():
+                if type(value) is bytearray:
+                    row[column] = value.decode('utf-8')
+            if moduleid_studyprogramids.get(row['module_id']) is None:
+                moduleid_studyprogramids[row['module_id']] = ""
+            moduleid_studyprogramids[row['module_id']] += str(row['studyprogram_id']) + " "
+        cnx.close()
+    except mysql.connector.Error as err:
+        return "Error: {}".format(err), 500
+    return jsonify(moduleid_studyprogramids)
 
 if __name__ == "__main__":
     app.run()
