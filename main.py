@@ -454,23 +454,6 @@ def check_which_saved(modules):
             saved_modules[(row['SmObjId'], row['PiqYear'], row['PiqSession'])]=row['whitelisted']
         cursor.close()
 
-
-        # print('\n\n\nBEFORE REMOVAL\n\n\n')
-        # for e in modules:
-        #     print(e)
-
-        # for mod in modules:
-        #     if int(mod.get('SmObjId')) in ids_white_u_blacklist:
-        #         modules.remove(mod)
-        #         # modules = [m for m in modules if m != mod]
-        #         # print('To remove:', mod)
-        #         # while mod in modules:
-        #         #     print('REMOVED', mod)
-        #         #     modules.remove(mod)
-        
-        # print('\n\n\nAFTER REMOVAL\n\n\n')
-        # for e in modules:
-        #     print(e)
         for mod in modules:
             module_key = (int(mod.get('SmObjId')), int(mod.get('PiqYear')), int(mod.get('PiqSession')))
             if module_key in saved_modules.keys():
@@ -571,7 +554,14 @@ def search_upwards():
     # get results for all searchterms
     courses = []
     modules = []
-    for session in [helpers.get_session(date.today()+relativedelta(months=6)), helpers.get_session(date.today()), helpers.previous_session()]:
+        for session in [
+        helpers.get_session(date.today()+relativedelta(months=6)), 
+        helpers.get_session(date.today()), 
+        helpers.get_session(date.today()-relativedelta(months=6)), 
+        helpers.get_session(date.today()-relativedelta(months=12)), 
+        helpers.get_session(date.today()-relativedelta(months=18)), 
+        helpers.get_session(date.today()-relativedelta(months=24))
+    ]:
         for searchterm in terms:
             rURI = models.Globals.URI_prefix+"ESearchSet?$skip=0&$top=20&$orderby=EStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages&$format=json".format(
                 searchterm, session['year'], session['session'])
