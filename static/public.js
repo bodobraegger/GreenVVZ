@@ -31,6 +31,7 @@ $(document).ready(function () {
             }
             table.append(body)
             root.append(table)
+            ShowSelectedModules();
         },
         error : function (err) {
             console.log(err)

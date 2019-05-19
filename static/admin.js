@@ -282,4 +282,5 @@ function convert_session_to_string(session, year){
 
 $(document).ready(function () {
     $('#anchor-admin-2').accordion({collapsible:true,heightStyle:'content'})
+    ShowSelectedModules();
 });
