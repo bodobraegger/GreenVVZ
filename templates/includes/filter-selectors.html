@@ -33,14 +33,14 @@
             return;
         }
         function FlagSelectedStudyprogram() {
-            var studyprogram_id = studyprogram_textlist.indexOf(document.getElementById("studyprogram_input").value);
+            var studyprogram_id = studyprogram_ids[studyprogram_textlist.indexOf(document.getElementById("studyprogram_input").value)];
             if(studyprogram_id == -1) {
                 console.log("invalid input: " + document.getElementById("studyprogram_input").value);
                 $('#whitelist_body').find($(`[data-semester]`)).addClass('selected-studyprogram');
                 return;
             }
             var module_ids = studyprogramid_moduleids[studyprogram_id];
-            var modules_to_unflag = $(`[data-studyprogram]`);
+            var modules_to_unflag = $('#whitelist_body').find($(`[data-semester]`));
             
             for(i = 0; i < module_ids.length; i++) {
                 modules_to_unflag = modules_to_unflag.not($(`#module_${module_ids[i]}`));
