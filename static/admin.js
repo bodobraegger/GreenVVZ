@@ -174,9 +174,9 @@ function add_to_blacklist(module_id, SmObjId, PiqYear, PiqSession, title){
 }
 function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted){
     var anzeigen_button=`<button name="Anzeigen" onclick="whitelist_from_suggestions(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, '${title}')"
-        ${whitelisted==1 ? '' : 'disabled'}>Anzeigen</button>`
+        ${whitelisted==1 ? 'disabled' : ''}>Anzeigen</button>`
     var verbergen_button=`<button name="Verbergen" onclick="blacklist_from_suggestions(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, '${title}')"
-        ${whitelisted!=1 ? '' : 'disabled'}>Verbergen</button>`
+        ${whitelisted==0 ? 'disabled' : ''}>Verbergen</button>`
     var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title)}
         ${anzeigen_button}${verbergen_button}</td></tr>`);
     $('#suggestions_body').append(module)
