@@ -96,6 +96,7 @@ def front_dev():
         'baseUrlVvzUzh': baseUrlVvzUzh,
         'secret_key': secret_key,
         'found_modules': found_modules,
+        # for filter-selectors.html
         'date':date,
         'studyprogramid_moduleids': studyprogramid_moduleids,
         'studyprograms': studyprograms,
@@ -118,6 +119,8 @@ def public():
 
     return render_template('public.html', **{
         'secret_key': secret_key,
+        # for filter-selectors.html
+        'date':date,
         'studyprogramid_moduleids': studyprogramid_moduleids,
         'studyprograms': studyprograms,
     })
