@@ -404,11 +404,12 @@ def search():
     # get results for all searchterms
     modules = []
     for session in [
-        helpers.get_session(date.today()+relativedelta(months=6)), helpers.get_session(date.today()), 
-        helpers.previous_session(date.today()), 
-        helpers.previous_session(date.today()-relativedelta(months=6)), 
-        helpers.previous_session(date.today()-relativedelta(months=12)), 
-        helpers.previous_session(date.today()-relativedelta(months=18))
+        helpers.get_session(date.today()+relativedelta(months=6)), 
+        helpers.get_session(date.today()), 
+        helpers.get_session(date.today()-relativedelta(months=6)), 
+        helpers.get_session(date.today()-relativedelta(months=12)), 
+        helpers.get_session(date.today()-relativedelta(months=18)), 
+        helpers.get_session(date.today()-relativedelta(months=24))
     ]:
         for searchterm in terms:
             rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmSearchSet?$skip=0&$top=20&$orderby=SmStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages&$format=json".format(
