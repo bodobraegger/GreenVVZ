@@ -33,6 +33,7 @@ function update_whitelist_status(module_id, whitelisted, SmObjId, PiqYear, PiqSe
             remove_module(module_id)
             if(whitelisted) populate_whitelist();
             else populate_blacklist;
+            populate_suggestions();
         },
         error : function (err) {
             alert(`Das Modul konnte nicht als ${whitelisted ? 'whitelisted' : 'blacklisted'} markiert werden`);
@@ -109,7 +110,7 @@ function delete_searchterm(id){
         method : 'DELETE',
         success : function (data) {
             remove_from_searchterms(id)
-            populate_suggestions()
+            populate_suggestions();
         },
         error : function (err) {
             alert('Der Suchbegriff konnte nicht gelöscht werden')
@@ -123,7 +124,8 @@ function delete_blacklisted_module(module_id){
         success : function (data) {
             remove_module(module_id)
             populate_blacklist();
-            flag_in_suggestions(module_id, -1);
+            populate_suggestions();
+            // flag_in_suggestions(module_id, -1); ids won't match!
         },
         error : function (err) {
             console.log(err);
