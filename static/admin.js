@@ -272,7 +272,7 @@ function convert_session_to_string(session, year){
         return `<span class="semester">HS </span>${year % 100 || ''}`
     }
     if (session == 4){
-        return `<span class="semester">FS </span>${year % 100 || ''}`
+        return `<span class="semester">FS </span>${(year+1) % 100 || ''}`
     }
     else{
         return 'undefiniert'

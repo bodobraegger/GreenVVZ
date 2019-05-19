@@ -34,7 +34,7 @@
                                         {% if m.PiqSession == 3 %}
                                             <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% elif m.PiqSession == 4 %}
-                                            <span class="semester">FS </span>{{'%s' | format(m.PiqYear % 100)}}
+                                            <span class="semester">FS </span>{{'%s' | format((m.PiqYear+1) % 100)}}
                                         {% else %}
                                             undefiniert
                                         {% endif %}
@@ -86,7 +86,7 @@
                                         {% if m.PiqSession == 3 %}
                                             <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% elif m.PiqSession == 4 %}
-                                            <span class="semester">FS </span>{{'%s' | format(m.PiqYear % 100)}}
+                                            <span class="semester">FS </span>{{'%s' | format((m.PiqYear+1) % 100)}}
                                         {% else %}
                                             undefiniert
                                         {% endif %}
@@ -127,7 +127,7 @@
                                         {% if m.PiqSession == 3 %}
                                             <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
                                         {% elif m.PiqSession == 4 %}
-                                            <span class="semester">FS </span>{{'%s' | format(m.PiqYear % 100)}}
+                                            <span class="semester">FS </span>{{'%s' | format((m.PiqYear+1) % 100)}}
                                         {% else %}
                                             undefiniert
                                         {% endif %}
