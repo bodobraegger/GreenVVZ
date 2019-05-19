@@ -8,6 +8,7 @@ import time
 # from multiprocessing.pool import ThreadPool
 from concurrent.futures import ThreadPoolExecutor
 from itertools import groupby
+from dateutil.relativedelta import relativedelta
 
 from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
@@ -98,7 +99,13 @@ def front_dev():
         'secret_key': secret_key,
         'found_modules': found_modules,
         # for filter-selectors.html
-        'date':date,
+        'sessions': [
+            helpers.next_session(), helpers.current_session(), 
+            helpers.previous_session(date.today()), 
+            helpers.previous_session(date.today()-relativedelta(months=6)), 
+            helpers.previous_session(date.today()-relativedelta(months=12)), 
+            helpers.previous_session(date.today()-relativedelta(months=18))
+        ],
         'studyprogramid_moduleids': studyprogramid_moduleids,
         'studyprograms': studyprograms,
     })
@@ -107,7 +114,6 @@ def front_dev():
 @cross_origin()
 @require_appkey
 def public():
-    baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
     studyprograms = {0: "Theologie: Vollstudienfach 120"}
     studyprogramid_moduleids = {0: [2]}
     secret_key = app.config['SECRET_KEY']
@@ -121,7 +127,13 @@ def public():
     return render_template('public.html', **{
         'secret_key': secret_key,
         # for filter-selectors.html
-        'date':date,
+        'sessions': [
+            helpers.next_session(), helpers.current_session(), 
+            helpers.previous_session(date.today()), 
+            helpers.previous_session(date.today()-relativedelta(months=6)), 
+            helpers.previous_session(date.today()-relativedelta(months=12)), 
+            helpers.previous_session(date.today()-relativedelta(months=18))
+        ],
         'studyprogramid_moduleids': studyprogramid_moduleids,
         'studyprograms': studyprograms,
     })
@@ -389,10 +401,16 @@ def search():
 
     # get results for all searchterms
     modules = []
-    for session in [helpers.next_session(), helpers.current_session(), helpers.previous_session()]:
+    for session in [
+        helpers.next_session(), helpers.current_session(), 
+        helpers.previous_session(date.today()), 
+        helpers.previous_session(date.today()-relativedelta(months=6)), 
+        helpers.previous_session(date.today()-relativedelta(months=12)), 
+        helpers.previous_session(date.today()-relativedelta(months=18))
+    ]:
         for searchterm in terms:
             rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmSearchSet?$skip=0&$top=20&$orderby=SmStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages&$format=json".format(
-                searchterm, session['year'], session['session'])
+                searchterm, str(session['year']).zfill(3), str(session['session']).zfill(3))
 
             r = requests.get(rURI)
 

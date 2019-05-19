@@ -10,14 +10,13 @@
     <div id="filter_selectors" class="right-align">
         <select name="semester" id="semester_selector">
             <option value="all" id="all_semesters">Zeige alle Semester</option>
-            <optgroup label="{{date.today().year}}">
-                <option value="{{date.today().year}} 4" id="{{date.today().year}} 4">Frühjahrssemester {{date.today().year}}</option> 
-                <option value="{{date.today().year}} 3" id="{{date.today().year}} 3">Herbstsemester {{date.today().year}}</option>
-            </optgroup>
-            <optgroup label="{{date.today().year-1}}">
-                <option value="{{date.today().year-1}} 4" id="{{date.today().year-1}} 4">Frühjahrssemester {{date.today().year-1}}</option> {# {{'%s' | format((date.today().year-1) % 100)}} #}
-                <option value="{{date.today().year-1}} 3" id="{{date.today().year-1}} 3">Herbstsemester {{date.today().year-1}}</option>
-            </optgroup>
+            <!--<optgroup label="">-->
+            <!--</optgroup>-->
+            {% for sesh in sessions %}
+            <option value="{{sesh['year']}} {{sesh['session']}}" id="{{sesh['year']}} {{sesh['session']}}" {% if loop.index == 2 %} selected {% endif %}>
+                {% if sesh['session'] == 3 %} Herbstsemester {% else %} Frühlingssemester {% endif %} {{'%s' | format(sesh['year'] % 100)}}  
+            </option>
+            {% endfor %}       
         </select>
     </div>
     <div class="spacer" style="height: 2em">
