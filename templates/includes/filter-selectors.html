@@ -14,7 +14,8 @@
             <!--</optgroup>-->
             {% for sesh in sessions %}
             <option value="{{sesh['year']}} {{sesh['session']}}" id="{{sesh['year']}} {{sesh['session']}}" {% if loop.index == 2 %} selected {% endif %}>
-                {% if sesh['session'] == 3 %} Herbstsemester {% else %} Frühlingssemester {% endif %} {{'%s' | format(sesh['year'] % 100)}}  
+                {% if sesh['session'] == 3 %} Herbstsemester {{sesh['year']}} 
+                {% else %} Frühlingssemester {{sesh['year']+1}}{% endif %} 
             </option>
             {% endfor %}       
         </select>

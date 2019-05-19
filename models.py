@@ -1,5 +1,7 @@
 # coding=utf8
 import requests
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 import helpers
 
@@ -49,9 +51,9 @@ class Module:
     # get most recent module from odata-api, and set class-variables
     # return false if not available
     def update(self):
-        previous = self.find_module_values(helpers.previous_session()['year'], helpers.previous_session()['session'])
-        current = self.find_module_values(helpers.current_session()['year'], helpers.current_session()['session'])
-        next = self.find_module_values(helpers.next_session()['year'], helpers.next_session()['session'])
+        previous = self.find_module_values(helpers.get_session(date.today()-relativedelta(months=6))['year'], helpers.get_session(date.today()-relativedelta(months=6))['session'])
+        current = self.find_module_values(helpers.get_session(date.today())['year'], helpers.get_session(date.today())['session'])
+        next = self.find_module_values(helpers.get_session(date.today()+relativedelta(months=6))['year'], helpers.get_session(date.today()+relativedelta(months=6))['session'])
 
         if previous:
             self.set_module(previous)
