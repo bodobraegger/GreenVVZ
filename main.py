@@ -7,6 +7,7 @@ import requests
 import time
 # from multiprocessing.pool import ThreadPool
 from concurrent.futures import ThreadPoolExecutor
+from itertools import groupby
 
 from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
@@ -403,23 +404,22 @@ def search():
                     'PiqSession': int(module['PiqSession']),
                 })
 
-    # remove duplicates
-    #modules = [dict(t) for t in set([tuple(sorted(d.items())) for d in modules])]
     modules += json.loads(search_upwards().get_data())
-    modules = list({frozenset(item.items()):item for item in modules}.values())
     elapsed_time = time.perf_counter() - start_time
     print("elapsed: getting modules", elapsed_time)
-
+    
     # remove duplicates for mutable types
-    modules = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in modules)]
+    keyfunc = lambda d: (d['SmObjId'], d['PiqYear'], d['PiqSession'])
+    giter = groupby(sorted(modules, key=keyfunc), keyfunc)
+    modules_no_duplicates = [next(g[1]) for g in giter]
 
     # flag elements that are already in database
-    modules = check_which_saved(modules)
-    for i, mod in enumerate(modules):
+    modules = check_which_saved(modules_no_duplicates)
+    for i, mod in enumerate(modules_no_duplicates):
         # fake a database-like Id for easier identification in html
         mod['id'] = id_not_currently_in_use+i
 
-    return jsonify(modules)
+    return jsonify(modules_no_duplicates)
 
 
 def check_which_saved(modules):
