@@ -94,7 +94,8 @@ function save_module(){
         success : function (data) {
             add_to_whitelist(data.SmObjId, data.PiqYear, data.PiqSession, data.title)
             $('#whitelist_text').val('')
-            populate_blacklist()
+            populate_blacklist();
+            populate_suggestions();
         },
         error : function (err) {
             alert('Das Modul konnte nicht gespeichert werden')
@@ -121,7 +122,8 @@ function delete_blacklisted_module(module_id){
         method : 'DELETE',
         success : function (data) {
             remove_module(module_id)
-            populate_blacklist()
+            populate_blacklist();
+            flag_in_suggestions(module_id, -1);
         },
         error : function (err) {
             console.log(err);
@@ -135,13 +137,17 @@ function remove_module(module_id){
 }
 function flag_in_suggestions(module_id, whitelisted){
     var button_parent = document.getElementById(`module_${module_id}`).children[2];
-    if(whitelisted) {
+    if(whitelisted==1) {
         button_parent.querySelector('button[name="Anzeigen"]').disabled = true;
         button_parent.querySelector('button[name="Verbergen"]').disabled = false;
     }
-    else {
+    else if(whitelisted==0) {
         button_parent.querySelector('button[name="Anzeigen"]').disabled = false;
         button_parent.querySelector('button[name="Verbergen"]').disabled = true;
+    }
+    else {
+        button_parent.querySelector('button[name="Anzeigen"]').disabled = false;
+        button_parent.querySelector('button[name="Verbergen"]').disabled = false;
     }
 }
 function remove_from_searchterms(id){
