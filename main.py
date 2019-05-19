@@ -7,7 +7,6 @@ import requests
 import time
 # from multiprocessing.pool import ThreadPool
 from concurrent.futures import ThreadPoolExecutor
-import itertools
 
 from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
@@ -412,7 +411,7 @@ def search():
     print("elapsed: getting modules", elapsed_time)
 
     # remove duplicates for mutable types
-    modules = [k for k,g in itertools.groupby(sorted(modules))]
+    modules = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in modules)]
 
     # flag elements that are already in database
     modules = check_which_saved(modules)
