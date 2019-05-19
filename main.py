@@ -554,7 +554,7 @@ def search_upwards():
     # get results for all searchterms
     courses = []
     modules = []
-        for session in [
+    for session in [
         helpers.get_session(date.today()+relativedelta(months=6)), 
         helpers.get_session(date.today()), 
         helpers.get_session(date.today()-relativedelta(months=6)), 
