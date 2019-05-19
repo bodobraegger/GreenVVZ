@@ -111,8 +111,8 @@ def public():
     secret_key = app.config['SECRET_KEY']
 
     try:
+        studyprograms = get_studyprograms().get_data(as_text=True)
         studyprogramid_moduleids = get_studyprograms_modules().get_data(as_text=True)
-        moduleid_studyprogramidstag = json.loads(get_modules_studyprogramstag().get_data())
     except mysql.connector.errors.InterfaceError as e:
         print("not possible in dev", e)
 
