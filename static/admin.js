@@ -32,7 +32,7 @@ function update_whitelist_status(module_id, whitelisted, SmObjId, PiqYear, PiqSe
         success : function (data) {
             remove_module(module_id)
             if(whitelisted) populate_whitelist();
-            else populate_blacklist;
+            else populate_blacklist();
             populate_suggestions();
         },
         error : function (err) {
