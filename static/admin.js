@@ -165,7 +165,7 @@ function add_to_whitelist(module_id, SmObjId, PiqYear, PiqSession, title){
 }
 function add_to_blacklist(module_id, SmObjId, PiqYear, PiqSession, title){
     var anzeigen_button = `<button name="Anzeigen" onclick="whitelist_from_blacklist(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, '${title}')">Anzeigen</button>`
-    var   delete_button = `<button name="Löschen" onclick="delete_blacklisted_module('${module_id}')">Löschen</button>`
+    var   delete_button = `<button name="Löschen" onclick="delete_blacklisted_module(${module_id})">Löschen</button>`
     var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title)}
         ${anzeigen_button}${delete_button}</td></tr>`)
     $('#blacklist_body').append(module)

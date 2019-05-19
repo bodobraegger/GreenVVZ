@@ -7,6 +7,7 @@ import requests
 import time
 # from multiprocessing.pool import ThreadPool
 from concurrent.futures import ThreadPoolExecutor
+import itertools
 
 from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
@@ -410,7 +411,10 @@ def search():
     elapsed_time = time.perf_counter() - start_time
     print("elapsed: getting modules", elapsed_time)
 
-    # flag elements that are on whitelist unified with blacklist
+    # remove duplicates for mutable types
+    modules = [k for k,g in itertools.groupby(sorted(modules))]
+
+    # flag elements that are already in database
     modules = check_which_saved(modules)
     for i, mod in enumerate(modules):
         # fake a database-like Id for easier identification in html
@@ -421,7 +425,7 @@ def search():
 
 def check_which_saved(modules):
     try:
-        # flag elements that are on whitelist unified with blacklist
+        # flag elements that are already in database
         saved_modules = {}
         cnx = mysql.connector.connect(**db_config)
         cursor = cnx.cursor(dictionary=True)
@@ -619,7 +623,7 @@ def get_studyprograms_modules():
         return "Error: {}".format(err), 500
     return jsonify(studyprogramid_moduleids)
 
-@app.route('/get_modules_studyprogramstag', methods=['GET'])
+@app.route('/modules_studyprogramstag', methods=['GET'])
 @cross_origin()
 def get_modules_studyprogramstag():
     moduleid_studyprogramids = {}
