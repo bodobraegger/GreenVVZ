@@ -151,7 +151,7 @@ function remove_from_searchterms(id){
 
 function write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title){
     var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId;
-    return `<tr id="module_${module_id}" data-semester="${PiqYear} ${PiqSession}" data-SmObjId="${SmObjId}" class="shown"><td><a target="_blank" href="${url}">${title}</a></td><td>${convert_session_to_string(PiqSession, PiqYear)}</td><td>`
+    return `<tr id="module_${module_id}" data-SmObjId="${SmObjId}" data-semester="${PiqYear} ${PiqSession}" class="shown"><td><a target="_blank" href="${url}">${title}</a></td><td>${convert_session_to_string(PiqSession, PiqYear)}</td><td>`
 }
 function add_to_whitelist(module_id, SmObjId, PiqYear, PiqSession, title){
     var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title)}<button name="Anzeigen" onclick="blacklist_from_whitelist(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, '${title}')">Verbergen</button></td></tr>`)
