@@ -22,7 +22,7 @@ $(document).ready(function () {
             console.log(data)
             var table = $("<table></table>")
             table.append('<thead><th colspan="2"><strong>'+langTitle+'</strong></th></thead>')
-            var body = $('<tbody></tbody>')
+            var body = $('<tbody id="whitelist_body"></tbody>')
             body.append('<tr><td><strong>'+langName+'</strong></td><td><strong>Semester</strong><br><p>'+langSemester+'</p></td></tr>')
             for (var row in data){
                 var url = baseUrlVvzUzh+data[row].PiqYear+'/'+data[row].PiqSession+'/SM/'+data[row].SmObjId

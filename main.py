@@ -64,9 +64,9 @@ def front_dev():
     blacklist = []
     searchterms = []
     found_modules= []
-    studyprograms = {1: "Informatik Hauptfach 150"}
-    studyprogramid_moduleids = {1: [2]}
-    moduleid_studyprogramids = {2: "1 "}
+    studyprograms = {0: "Theologie: Vollstudienfach 120"}
+    studyprogramid_moduleids = {0: [2]}
+    moduleid_studyprogramidstag = {2: "0 "}
     secret_key = app.config['SECRET_KEY']
 
     try:
