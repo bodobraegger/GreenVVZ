@@ -549,6 +549,65 @@ def wrap_execute_for_modules_in_course(course):
         return executor.map(find_studyprograms_for_module, course['Modules'])
     # return ThreadPool(len(course['Modules'])).imap_unordered(find_studyprograms_for_module, course['Modules'])
 
+"""
+Find course matches, then find containing modules, containing study programs
+"""
+@app.route('/search_upwards', methods=['GET'])
+@cross_origin()
+def search_upwards():
+    pass
+    # start_time = time.perf_counter()
+    # # get searchterms
+    # terms = []
+    # try:
+    #     cnx = mysql.connector.connect(**db_config)
+    #     cursor = cnx.cursor(dictionary=True)
+    #     cursor.execute("SELECT term FROM searchterm")
+    #     for row in cursor:
+    #         terms.append(row['term'])
+    # except Exception as e:
+    #     print('not possible in dev', e)
+    #     terms+=['Nachhaltigkeit', 'Sustainability']
+
+    # # get results for all searchterms
+    # courses = []
+    # modules = []
+    # for session in [helpers.get_session(date.today()+relativedelta(months=6)), helpers.get_session(date.today()), helpers.previous_session()]:
+    #     for searchterm in terms:
+    #         rURI = models.Globals.URI_prefix+"ESearchSet?$skip=0&$top=20&$orderby=EStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages&$format=json".format(
+    #             searchterm, session['year'], session['session'])
+    #         r = requests.get(rURI)
+    #         for course in r.json()['d']['results']:
+    #             courses.append({
+    #                 'EObjId':     int(course['Objid']),
+    #                 'EStext':         course['EStext'],
+    #                 'PiqYear':    int(course['PiqYear']),
+    #                 'PiqSession': int(course['PiqSession']),
+    #             })
+    #     # remove duplicates
+    #     # courses = list({frozenset(item.items()) : item for item in courses}.values())
+
+        
+    #     # takes about 6 seconds for the two dev terms
+    #     with ThreadPoolExecutor(max_workers=len(courses)+5) as executor:
+    #         executor.map(find_modules_for_course, courses)
+    #         # executor.map(wrap_execute_for_modules_in_course, courses)
+
+    #     # takes >20 seconds for the two dev terms.        
+    #     # for course in courses:
+    #     #     find_modules_for_course(course)
+            
+    #     #     for module in course['Modules']:
+    #     #         find_studyprograms_for_module(module)
+    #         # print(course)
+    # for course in courses:
+    #     modules += course['Modules']
+    # modules = list({frozenset(item.items()):item for item in modules}.values())
+    # elapsed_time = time.perf_counter() - start_time
+    # modules = check_which_saved(modules)
+    # print("elapsed: getting courses->modules->studyprograms", elapsed_time)
+    # return jsonify(modules)
+
 
 @app.route('/studyprograms', methods=['GET'])
 @cross_origin()
