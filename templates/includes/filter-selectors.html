@@ -1,11 +1,13 @@
 <!-- FILTER SELECTOR INCLUDE -->
-<div id="filter_selectors_wrapper">
-    <div class="autocomplete" style="width:300px;">
-        <input id="studyprogram_input" type="text" name="studyprogram" placeholder="Studienprogramm">
+<div id="filter_selectors_wrapper" class="parent">
+    <div class="left-align">
+        <div class="autocomplete" style="width:300px;">
+            <input id="studyprogram_input" type="text" name="studyprogram" placeholder="Studienprogramm">
+            <button id="studyprogram_btn" onclick="ShowSelectedModules()">Auswählen</button>
+        </div>
     </div>
-    <button id="studyprogram_btn" onclick="ShowSelectedModules()">Auswählen</button>
 
-    <div id="filter_selectors" style="position:absolute; top:3px; right: 3px;">
+    <div id="filter_selectors" class="right-align">
         <select name="semester" id="semester_selector">
             <option value="all" id="all_semesters">Zeige alle Semester</option>
             <optgroup label="{{date.today().year}}">
@@ -18,6 +20,7 @@
             </optgroup>
         </select>
     </div>
+    <div class="spacer" style="height: 2em">
     <!--hwat-->
 
     <script type="text/javascript">
@@ -185,55 +188,72 @@
         margin:0;
         opacity:0;
         }
-    * { box-sizing: border-box; }
-body {
-  font: 16px Arial; 
-}
-.autocomplete {
-  /*the container must be positioned relative:*/
-  position: relative;
-  display: inline-block;
-}
-input {
-  border: 1px solid transparent;
-  background-color: #f1f1f1;
-  padding: 10px;
-  font-size: 16px;
-}
-input[type=text] {
-  background-color: #f1f1f1;
-  width: 100%;
-}
-input[type=submit] {
-  background-color: DodgerBlue;
-  color: #fff;
-}
-.autocomplete-items {
-  position: absolute;
-  border: 1px solid #d4d4d4;
-  border-bottom: none;
-  border-top: none;
-  z-index: 99;
-  /*position the autocomplete items to be the same width as the container:*/
-  top: 100%;
-  left: 0;
-  right: 0;
-}
-.autocomplete-items div {
-  padding: 10px;
-  cursor: pointer;
-  background-color: #fff; 
-  border-bottom: 1px solid #d4d4d4; 
-}
-.autocomplete-items div:hover {
-  /*when hovering an item:*/
-  background-color: #e9e9e9; 
-}
-.autocomplete-active {
-  /*when navigating through the items using the arrow keys:*/
-  background-color: DodgerBlue !important; 
-  color: #ffffff; 
-}
+
+        #studyprogram_btn {
+            display: inline-block;
+            width: 29%;
+        }
+
+        #studyprogram_input {
+            padding: 3px;
+            margin: 3px;
+        }
+        .parent {
+        position: relative;
+        width: 100%;
+
+        }
+        .left-align, .right-align {
+        position: absolute;
+        margin: auto;
+        top: 3px;
+
+        }
+        .left-align {
+        left: 0;
+        margin-left: 3px;
+        }
+        .right-align {
+        right: 0;
+        margin-right: 3px;
+        }
+
+        .autocomplete {
+        /*the container must be positioned relative:*/
+        position: relative;
+        display: inline-block;
+        }
+        input {
+        border: 1px solid transparent;
+        background-color: #f1f1f1;
+        }
+
+        .autocomplete-items {
+        position: absolute;
+        border: 1px solid #d4d4d4;
+        border-bottom: none;
+        border-top: none;
+        z-index: 99;
+        /*position the autocomplete items to be the same width as the container:*/
+        top: 100%;
+        left: 0;
+        right: 0;
+        }
+        .autocomplete-items div {
+        padding: 10px;
+        cursor: pointer;
+        background-color: #fff; 
+        border-bottom: 1px solid #d4d4d4; 
+        }
+        .autocomplete-items div:hover {
+        /*when hovering an item:*/
+        background-color: #e9e9e9; 
+        }
+        .autocomplete-active {
+        /*when navigating through the items using the arrow keys:*/
+        background-color: DodgerBlue !important; 
+        color: #ffffff; 
+        }
     </style>
 </div>
 <!-- END FILTER SELECTOR INCLUDE -->
