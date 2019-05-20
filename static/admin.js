@@ -277,7 +277,6 @@ function convert_session_to_string(session, year){
     else{
         return 'undefiniert'
     }
-
 }
 
 $(document).ready(function () {

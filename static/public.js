@@ -14,7 +14,6 @@ $(document).ready(function () {
         var langSemester = '(FS = Frühjahressemester, HS = Herbstsemester)'
     }
 
-
     $.ajax({
         url : apiUrl+"/modules/whitelist",
         method : 'GET',
@@ -26,7 +25,10 @@ $(document).ready(function () {
             body.append('<tr><td><strong>'+langName+'</strong></td><td><strong>Semester</strong><br><p>'+langSemester+'</p></td></tr>')
             for (var row in data){
                 var url = baseUrlVvzUzh+data[row].PiqYear+'/'+data[row].PiqSession+'/SM/'+data[row].SmObjId
-                var module = $(`<tr id="module_${data[row].id}" data-SmObjId="${data[row].SmObjId}" data-semester="${data[row].PiqYear} ${data[row].PiqSession}" class="shown"><td><a href="${url}">${data[row].title}</a></td><td><span class="semester">HS </span>${data[row].PiqYear % 100}</td></tr>`)
+                var module = $(`
+                <tr id="module_${data[row].id}" data-SmObjId="${data[row].SmObjId}" data-semester="${data[row].PiqYear} ${data[row].PiqSession}" class="shown">
+                    <td><a href="${url}">${data[row].title}</a></td><td>${convert_session_to_string(data[row].PiqSession, data[row].PiqYear)}</td>
+                </tr>`)
                 body.append(module)
             }
             table.append(body)
@@ -38,3 +40,15 @@ $(document).ready(function () {
         }
     })
 });
+
+function convert_session_to_string(session, year){
+    if (session == 3){
+        return `<span class="semester">HS </span>${year % 100 || ''}`
+    }
+    if (session == 4){
+        return `<span class="semester">FS </span>${(year+1) % 100 || ''}`
+    }
+    else{
+        return 'undefiniert'
+    }
+}
