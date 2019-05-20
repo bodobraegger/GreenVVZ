@@ -17,6 +17,15 @@ def get_session(ref_date=date.today(), target_date=None):
     else:
         return {'year': ref_date.year, 'session': 3}
 
+def get_current_sessions(num_prev_semesters=4):
+    sessions = [ # next session (6 months from now)
+        get_session(date.today()+relativedelta(months=6)), 
+        get_session(date.today())
+    ] # current session
+    # previous sessions: 6 months back per semester
+    for months in range(6, 6*num_prev_semesters+1, 6):
+        sessions.append(get_session(date.today()-relativedelta(months=months)))
+    return sessions
 
 # returns current year as int
 def current_year():

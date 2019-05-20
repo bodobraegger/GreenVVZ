@@ -99,14 +99,7 @@ def front_dev():
         'secret_key': secret_key,
         'found_modules': found_modules,
         # for filter-selectors.html
-        'sessions': [
-            helpers.get_session(date.today()+relativedelta(months=6)),
-            helpers.get_session(date.today()), 
-            helpers.get_session(date.today()-relativedelta(months=6)), 
-            helpers.get_session(date.today()-relativedelta(months=12)), 
-            helpers.get_session(date.today()-relativedelta(months=18)), 
-            helpers.get_session(date.today()-relativedelta(months=24))
-        ],
+        'sessions': helpers.get_current_sessions(),
         'studyprogramid_moduleids': studyprogramid_moduleids,
         'studyprograms': studyprograms,
     })
@@ -128,14 +121,7 @@ def public():
     return render_template('public.html', **{
         'secret_key': secret_key,
         # for filter-selectors.html
-        'sessions': [
-            helpers.get_session(date.today()+relativedelta(months=6)), 
-            helpers.get_session(date.today()), 
-            helpers.get_session(date.today()-relativedelta(months=12)), 
-            helpers.get_session(date.today()-relativedelta(months=12)), 
-            helpers.get_session(date.today()-relativedelta(months=18)), 
-            helpers.get_session(date.today()-relativedelta(months=24))
-        ],
+        'sessions': helpers.get_current_sessions(),
         'studyprogramid_moduleids': studyprogramid_moduleids,
         'studyprograms': studyprograms,
     })
@@ -403,14 +389,7 @@ def search():
 
     # get results for all searchterms
     modules = []
-    for session in [
-        helpers.get_session(date.today()+relativedelta(months=6)), 
-        helpers.get_session(date.today()), 
-        helpers.get_session(date.today()-relativedelta(months=6)), 
-        helpers.get_session(date.today()-relativedelta(months=12)), 
-        helpers.get_session(date.today()-relativedelta(months=18)), 
-        helpers.get_session(date.today()-relativedelta(months=24))
-    ]:
+    for session in helpers.get_current_sessions():
         for searchterm in terms:
             rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmSearchSet?$skip=0&$top=20&$orderby=SmStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages&$format=json".format(
                 searchterm, str(session['year']).zfill(3), str(session['session']).zfill(3))
@@ -554,14 +533,7 @@ def search_upwards():
     # get results for all searchterms
     courses = []
     modules = []
-    for session in [
-        helpers.get_session(date.today()+relativedelta(months=6)), 
-        helpers.get_session(date.today()), 
-        helpers.get_session(date.today()-relativedelta(months=6)), 
-        helpers.get_session(date.today()-relativedelta(months=12)), 
-        helpers.get_session(date.today()-relativedelta(months=18)), 
-        helpers.get_session(date.today()-relativedelta(months=24))
-    ]:
+    for session in helpers.get_current_sessions():
         for searchterm in terms:
             rURI = models.Globals.URI_prefix+"ESearchSet?$skip=0&$top=20&$orderby=EStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages&$format=json".format(
                 searchterm, session['year'], session['session'])
