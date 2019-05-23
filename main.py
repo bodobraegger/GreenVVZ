@@ -265,12 +265,13 @@ def add_module(): # required: SmObjId, PiqYear, PiqSession, whitelisted, searcht
 def flag_module(module_id):
     whitelisted = request.args.get('whitelisted')
     cnx = mysql.connector.connect(**db_config)
-    cursor = cnx.cursor(dictionary=True, buffered=True)
+    cursor = cnx.cursor(buffered=True)
     # flag module as either black or whitelisted.
     try:
         cursor.execute("UPDATE module SET whitelisted = {whitelisted} WHERE id = {module_id}".format(**locals()))
         # if module got blacklisted, delete all studyprograms associated with that module...
         if not whitelisted:
+            print(**locals())
             cursor.execute("SELECT studyprogram_id FROM module_studyprogram WHERE module_id = {module_id};".format(**locals()))
             studyprogram_ids=set()
             for row in cursor:
@@ -278,10 +279,12 @@ def flag_module(module_id):
             for sp_id in studyprogram_ids:
                 module_ids=set()
                 cursor.execute("SELECT module_id FROM module_studyprogram WHERE studyprogram_id = {sp_id};".format(**locals()))
+                print(**locals())
                 for row in cursor:
                     module_ids.add(row[0]) 
                 # ... but only if they are not associated with any other module
                 if len(module_ids) == 1:
+                    print(**locals())
                     cursor.execute("DELETE FROM studyprogram WHERE id = {sp_id};".format(**locals()))
             
     except mysql.connector.Error as err:
