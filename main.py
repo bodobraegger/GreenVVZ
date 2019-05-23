@@ -465,6 +465,7 @@ def find_modules_for_course(course):
             'title':          module['SmText'],
             'PiqYear':    int(module['PiqYear']),
             'PiqSession': int(module['PiqSession']),
+            'searchterm': course['searchterm'],
         })
     course['Modules'] = list({frozenset(item.items()) : item for item in course['Modules']}.values())
     return course['Modules']
@@ -548,6 +549,7 @@ def search_upwards():
                     'EStext':         course['EStext'],
                     'PiqYear':    int(course['PiqYear']),
                     'PiqSession': int(course['PiqSession']),
+                    'searchterm': searchterm,
                 })
         # remove duplicates
         # courses = list({frozenset(item.items()) : item for item in courses}.values())
