@@ -268,9 +268,9 @@ def flag_module(module_id):
     cursor = cnx.cursor(buffered=True)
     # flag module as either black or whitelisted.
     try:
+        print(locals())
         cursor.execute("UPDATE module SET whitelisted = {whitelisted} WHERE id = {module_id}".format(locals()))
         # if module got blacklisted, delete all studyprograms associated with that module...
-        print(locals())
         if not whitelisted:
             print(locals())
             cursor.execute("SELECT studyprogram_id FROM module_studyprogram WHERE module_id = {module_id};".format(locals()))
