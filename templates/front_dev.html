@@ -13,11 +13,12 @@
         </div>
         <div class="mod mod-text skin-text-basics"> <!-- add this outer div to match UZH styling -->
             <div id="anchor-admin-2" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
-                <h3>Angezeigte Elemente (Whitelist)</h3>
-                <div style="padding: 0">
+                <h3>Angezeigte Elemente (Whitelist) <div class="count" id="count_whitelist">{{whitelist|length}}</div></h3>
+                <div id="whitelist" style="padding: 0">
+                    <div class="loading"><h3> Module data is loading... </h3></div>
                     <table> <!--class="sortable"-->
                         <thead>
-                            <td>Name der Lehrveranstaltung</td>
+                            <td>Name des Moduls <span class="searchterm">Suchbegriff</span></td>
                             <td class="semester">Semster</td>
                             <td>Verbergen</td>
                         </thead>
@@ -28,8 +29,10 @@
                             </tr>
                             {% for m in whitelist %}
                                 <tr id='module_{{ m.id }}' data-SmObjId='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown selected-semester selected-studyprogram">
-                                    <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
-                                    {# <td>            {{ m.SmObjId }} </td> #}
+                                    <td>
+                                        <a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a>
+                                        <span class="searchterm">{{ m.searchterm }}</span>
+                                    </td>
                                     <td> <!-- {{ m.PiqSession }} / PiqSession -->
                                         {% if m.PiqSession == 3 %}
                                             <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
@@ -70,27 +73,31 @@
                 </table>
                 </div>
 
-                <h3>Vorschläge basierend auf Suchbegriffen</h3>
-                <div style="padding: 0">
+                <h3>Vorschläge basierend auf Suchbegriffen <div class="count" id="count_suggestions">{{found_modules|length}}</div></h3>
+                <div id="suggestions" style="padding: 0">
+                    <div class="loading"><h3> Module data is loading... </h3></div>
                     <table class="sortable">
                         <thead>
-                            <td id="suggestions_title_th">Name der Lehrveranstaltung</td>
+                            <td id="suggestions_title_th">Name des Moduls <span class="searchterm">Suchbegriff</span> </td>
                             <td class="semester">Semster</td>
                             <td>Anzeigen/Verbergen</td>
                         </thead>
                         <tbody id="suggestions_body">
                         {% for m in found_modules %}
                             <tr id='module_{{ m.id }}'data-SmObjId='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown selected-semester">
-                                <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
-                                    <td> <!-- {{ m.PiqSession }} / PiqSession -->
-                                        {% if m.PiqSession == 3 %}
-                                            <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
-                                        {% elif m.PiqSession == 4 %}
-                                            <span class="semester">FS </span>{{'%s' | format((m.PiqYear+1) % 100)}}
-                                        {% else %}
-                                            undefiniert
-                                        {% endif %}
-                                    </td>
+                                <td>
+                                    <a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a>
+                                    <span class="searchterm">{{ m.searchterm }}</span>
+                                </td>
+                                <td> <!-- {{ m.PiqSession }} / PiqSession -->
+                                    {% if m.PiqSession == 3 %}
+                                        <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
+                                    {% elif m.PiqSession == 4 %}
+                                        <span class="semester">FS </span>{{'%s' | format((m.PiqYear+1) % 100)}}
+                                    {% else %}
+                                        undefiniert
+                                    {% endif %}
+                                </td>
                                 <td><button name="Anzeigen" 
                                     onclick="whitelist_from_suggestions({{m.id}}, {{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, '{{m.title}}')"
                                     {% if m.whitelisted==1 %}
@@ -110,19 +117,22 @@
                     </table>
                 </div>
 
-                <h3>Verborgene Elemente (Blacklist)</h3>
-                <div style="padding: 0">
+                <h3>Verborgene Elemente (Blacklist) <div class="count" id="count_blacklist">{{blacklist|length}}</div></h3>
+                <div id="blacklist" style="padding: 0">
+                    <div class="loading"> <h3> Module data is loading... </h3></div>
                     <table> <!--class="sortable"-->
                         <thead>
-                            <td>Name der Lehrveranstaltung</td>
+                            <td>Name des Moduls <span class="searchterm">Suchbegriff</span></td>
                             <td class="semester">Semster</td>
                             <td>Anzeigen</td>
                         </thead>
                         <tbody id="blacklist_body">
                             {% for m in blacklist %}
                                 <tr id='module_{{ m.id }}' data-SmObjId='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown selected-semester">
-                                    <td><a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a></td>
-                                    {# <td>            {{ m.SmObjId }} </td> #}
+                                    <td>
+                                        <a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a>
+                                        <span class="searchterm">{{ m.searchterm }}</span>
+                                    </td>
                                     <td> <!-- {{ m.PiqSession }} / PiqSession -->
                                         {% if m.PiqSession == 3 %}
                                             <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
