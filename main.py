@@ -226,38 +226,67 @@ def add_module(): # required: SmObjId, PiqYear, PiqSession, whitelisted, searcht
             # if a module is to be saved to the whitelist, find the corresponding studyprograms and save them too
             if whitelisted:
                 studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
-                studyprogram_id = 0
-                for sp in studyprograms:
-                    cursor = cnx.cursor()
-                    qry1 = "INSERT IGNORE INTO studyprogram (CgHighText, CgHighCategory) VALUES (%(CgHighText)s, %(CgHighCategory)s)"
-                    val1 = {
-                        'CgHighText':  sp['CgHighText'],
-                        'CgHighCategory': sp['CgHighCategory'],
-                    }
-                    cursor.execute(qry1, val1)
-                    studyprogram_id = cursor.lastrowid
-                    if studyprogram_id == 0:
-                        cursor.execute("SELECT id FROM studyprogram WHERE CgHighText = %(CgHighText)s AND CgHighCategory = %(CgHighCategory)s", val1)
-                        for row in cursor:
-                            print("studyprogram_id = cursor.lastrowid did not work", row)
-                            studyprogram_id = row[0]
-                    cnx.commit()
-
-                    qry2 = "INSERT IGNORE INTO module_studyprogram (module_id, studyprogram_id) VALUES (%(module_id)s, %(studyprogram_id)s)"
-                    val2 = {
-                        'module_id': module_id,
-                        'studyprogram_id': studyprogram_id,
-                    }
-                    print(val2)
-                    cursor.execute(qry2, val2)
-                    cnx.commit()
-                    cursor.close()
+                save_studyprograms_for_module(module_id, studyprograms)
+            # else, if it's already saved, go ahead and delete them.
+            else:
+                delete_studyprograms_for_module(module_id)
             cnx.close()
             return jsonify(module_values), 200
         except mysql.connector.Error as err:
-            return "Error: {}\nfor module {} and studyprogram {}".format(err, module_id, studyprogram_id), 409
+            return "Error: {}\nfor module {}".format(err, module_id), 409
     else:
         return 'No module found', 404
+
+def save_studyprograms_for_module(module_id, studyprograms):
+    cnx = mysql.connector.connect(**db_config)
+    studyprogram_id = 0
+    for sp in studyprograms:
+        cursor = cnx.cursor()
+        qry1 = "INSERT IGNORE INTO studyprogram (CgHighText, CgHighCategory) VALUES (%(CgHighText)s, %(CgHighCategory)s)"
+        val1 = {
+            'CgHighText':  sp['CgHighText'],
+            'CgHighCategory': sp['CgHighCategory'],
+        }
+        cursor.execute(qry1, val1)
+        studyprogram_id = cursor.lastrowid
+        if studyprogram_id == 0:
+            cursor.execute("SELECT id FROM studyprogram WHERE CgHighText = %(CgHighText)s AND CgHighCategory = %(CgHighCategory)s", val1)
+            for row in cursor:
+                print("studyprogram_id = cursor.lastrowid did not work", row)
+                studyprogram_id = row[0]
+        cnx.commit()
+
+        qry2 = "INSERT IGNORE INTO module_studyprogram (module_id, studyprogram_id) VALUES (%(module_id)s, %(studyprogram_id)s)"
+        val2 = {
+            'module_id': module_id,
+            'studyprogram_id': studyprogram_id,
+        }
+        print(val2)
+        cursor.execute(qry2, val2)
+        cnx.commit()
+        cursor.close()
+
+# delete studyprograms for module if there are no other modules with that SP.
+def delete_studyprograms_for_module(module_id):
+    cnx = mysql.connector.connect(**db_config)
+    cursor = cnx.cursor(buffered=True)
+    # delete all studyprograms associated with that module...
+    cursor.execute("SELECT studyprogram_id FROM module_studyprogram WHERE module_id = {};".format(module_id))
+    studyprogram_ids=set()
+    for row in cursor:
+        studyprogram_ids.add(row[0])
+    for sp_id in studyprogram_ids:
+        module_ids=set()
+        cursor.execute("SELECT module_id FROM module_studyprogram WHERE studyprogram_id = {};".format(sp_id))
+        for row in cursor:
+            module_ids.add(row[0]) 
+        # ... but only if they are not associated with any other module
+        if len(module_ids) == 1:
+            cursor.execute("DELETE FROM studyprogram WHERE id = {};".format(sp_id))
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+            
 
 @app.route('/modules/<int:module_id>', methods=['PUT'])
 @cross_origin()
@@ -265,26 +294,18 @@ def add_module(): # required: SmObjId, PiqYear, PiqSession, whitelisted, searcht
 def flag_module(module_id):
     whitelisted = int(request.args.get('whitelisted'))
     cnx = mysql.connector.connect(**db_config)
-    cursor = cnx.cursor(buffered=True)
+    cursor = cnx.cursor(dictionary=True, buffered=True)
     # flag module as either black or whitelisted.
     try:
         cursor.execute("UPDATE module SET whitelisted = {} WHERE id = {}".format(whitelisted, module_id))
-        # if module got blacklisted, delete all studyprograms associated with that module...
-        if not whitelisted:
-            cursor.execute("SELECT studyprogram_id FROM module_studyprogram WHERE module_id = {};".format(module_id))
-            studyprogram_ids=set()
+        if whitelisted:
+            cursor.execute("SELECT SmObjId, PiqYear, PiqSession FROM module WHERE id={}".format(module_id))
             for row in cursor:
-                studyprogram_ids.add(row[0])
-            for sp_id in studyprogram_ids:
-                module_ids=set()
-                cursor.execute("SELECT module_id FROM module_studyprogram WHERE studyprogram_id = {};".format(sp_id))
-                for row in cursor:
-                    module_ids.add(row[0]) 
-                # ... but only if they are not associated with any other module
-                if len(module_ids) == 1:
-                    cursor.execute("DELETE FROM studyprogram WHERE id = {};".format(sp_id))
-                print(locals())
-            
+                studyprograms = find_studyprograms_for_module(row[0],row[1], row[2])
+            save_studyprograms_for_module(module_id, studyprograms)
+        else:
+            delete_studyprograms_for_module(module_id)
+
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 409
 
@@ -489,36 +510,16 @@ def find_modules_for_course(course):
 Request detail page for module object, add Studyprogrm subobjects(dicts) as list to given module obj
 """
 def find_studyprograms_for_module(SmObjId, PiqYear, PiqSession):
-    m = models.Module(SmObjId)
-    module_values = m.find_module_values(PiqYear, PiqSession)
-    module_values['Partof'] = []
     # SmDetailsSet(SmObjId='50934872',PiqYear='2018',PiqSession='004')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods
     rURI = models.Globals.URI_prefix+"SmDetailsSet(SmObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods&$format=json".format(
-        module_values.get('SmObjId'), module_values.get('PiqYear'), module_values.get('PiqSession'))
-    # async with aiohttp.ClientSession() as session:
-    #     r = await fetch_content(session, rURI)
+        SmObjId, PiqYear, PiqSession)
+    module_values = {"Partof": []}
     r = requests.get(rURI)
 
     for studyprogram in r.json()['d']['Partof']['results']:
         module_values['Partof'].append({
-            # 'CgHighObjid':    studyprogram['ScObjid'],
             'CgHighText':     studyprogram['CgHighText'],
-            # CgCategorySort: "25"
             'CgHighCategory': studyprogram['CgHighCategory'],
-            # CgHighObjid: "50724643"
-            # CgHighText: "Allgemeine Ausbildung (1UF)"
-            # CgLowCategory: "Area"
-            # CgLowObjid: "50724651"
-            # CgLowText: "Fachdidaktik"
-            # Corestep: true
-            # OObjid: "50000007"
-            # OText: "00\nFaculty of Arts and Social Sciences"
-            # Oblig: false
-            # PiqSession: "000"
-            # PiqYear: "0000"
-            # ScObjid: "50720073"
-            # ScText: "Teaching Diploma for Upper Secondary Education (1 TS)"
-            # SmObjId: "50911009"
         })
     module_values['Partof'] = list({frozenset(item.items()) : item for item in module_values['Partof']}.values())
     return module_values['Partof']
