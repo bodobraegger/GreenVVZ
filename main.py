@@ -270,6 +270,7 @@ def flag_module(module_id):
     try:
         cursor.execute("UPDATE module SET whitelisted = {whitelisted} WHERE id = {module_id}".format(**locals()))
         # if module got blacklisted, delete all studyprograms associated with that module...
+        print(**locals())
         if not whitelisted:
             print(**locals())
             cursor.execute("SELECT studyprogram_id FROM module_studyprogram WHERE module_id = {module_id};".format(**locals()))
@@ -427,7 +428,7 @@ def search():
 
     modules += json.loads(search_upwards().get_data())
     elapsed_time = time.perf_counter() - start_time
-    print("elapsed: getting modules", elapsed_time)
+    # print("elapsed: getting modules", elapsed_time)
     
     # remove duplicates for mutable types
     keyfunc = lambda d: (d['SmObjId'], d['PiqYear'], d['PiqSession'])
@@ -589,7 +590,7 @@ def search_upwards():
     modules = list({frozenset(item.items()):item for item in modules}.values())
     elapsed_time = time.perf_counter() - start_time
     modules = check_which_saved(modules)
-    print("elapsed: getting courses->modules->studyprograms", elapsed_time)
+    # print("elapsed: getting courses->modules->studyprograms", elapsed_time)
     return jsonify(modules)
 
 
