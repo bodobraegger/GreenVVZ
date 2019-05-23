@@ -80,7 +80,7 @@ function save_module(){
         },
         method : 'POST',
         success : function (data) {
-            add_to_whitelist(data.SmObjId, data.PiqYear, data.PiqSession, data.title)
+            add_to_whitelist(data.SmObjId, data.PiqYear, data.PiqSession, data.title, data.searchterm)
             $('#whitelist_text').val('')
             populate_blacklist();
             populate_suggestions();
@@ -149,13 +149,13 @@ function write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title
     return `<tr id="module_${module_id}" data-SmObjId="${SmObjId}" data-semester="${PiqYear} ${PiqSession}" class="shown"><td><a target="_blank" href="${url}">${title}</a><span class="searchterm">${searchterm}</span></td><td>${convert_session_to_string(PiqSession, PiqYear)}</td><td>`
 }
 function add_to_whitelist(module_id, SmObjId, PiqYear, PiqSession, title, searchterm){
-    var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title)}<button name="Anzeigen" onclick="update_whitelist_status(${module_id}, 0)">Verbergen</button></td></tr>`)
+    var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm)}<button name="Anzeigen" onclick="update_whitelist_status(${module_id}, 0)">Verbergen</button></td></tr>`)
     $('#whitelist_body').append(module)
 }
 function add_to_blacklist(module_id, SmObjId, PiqYear, PiqSession, title, searchterm){
     var anzeigen_button = `<button name="Anzeigen" onclick="update_whitelist_status(${module_id}, 1)">Anzeigen</button>`
     var   delete_button = `<button name="Löschen" onclick="delete_blacklisted_module(${module_id})">Löschen</button>`
-    var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title)}
+    var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm)}
         ${anzeigen_button}${delete_button}</td></tr>`)
     $('#blacklist_body').append(module)
 }
