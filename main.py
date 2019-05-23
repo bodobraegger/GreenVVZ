@@ -268,25 +268,21 @@ def flag_module(module_id):
     cursor = cnx.cursor(buffered=True)
     # flag module as either black or whitelisted.
     try:
-        print(locals())
-        cursor.execute("UPDATE module SET whitelisted = {whitelisted} WHERE id = {module_id}".format(locals()))
+        cursor.execute("UPDATE module SET whitelisted = {} WHERE id = {}".format(whitelisted, module_id))
         # if module got blacklisted, delete all studyprograms associated with that module...
         if not whitelisted:
-            print(locals())
-            cursor.execute("SELECT studyprogram_id FROM module_studyprogram WHERE module_id = {module_id};".format(locals()))
+            cursor.execute("SELECT studyprogram_id FROM module_studyprogram WHERE module_id = {};".format(module_id))
             studyprogram_ids=set()
             for row in cursor:
                 studyprogram_ids.add(row[0])
             for sp_id in studyprogram_ids:
                 module_ids=set()
-                cursor.execute("SELECT module_id FROM module_studyprogram WHERE studyprogram_id = {sp_id};".format(locals()))
-                print(locals())
+                cursor.execute("SELECT module_id FROM module_studyprogram WHERE studyprogram_id = {};".format(sp_id))
                 for row in cursor:
                     module_ids.add(row[0]) 
                 # ... but only if they are not associated with any other module
                 if len(module_ids) == 1:
-                    print(locals())
-                    cursor.execute("DELETE FROM studyprogram WHERE id = {sp_id};".format(locals()))
+                    cursor.execute("DELETE FROM studyprogram WHERE id = {};".format(sp_id))
             
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 409
