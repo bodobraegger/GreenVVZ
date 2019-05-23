@@ -1,15 +1,16 @@
 <!-- FILTER SELECTOR INCLUDE -->
 <div id="filter_selectors_wrapper" class="parent">
     <div class="left-align">
-        <div class="autocomplete" style="width:300px;">
-            <input id="studyprogram_input" type="text" name="studyprogram" placeholder="Studienprogramm">
-            <button id="studyprogram_btn" onclick="ShowSelectedModules()">Auswählen</button>
+        <div class="autocomplete" style="width:400px;">
+            <input  class="studyprogram" id="studyprogram_input" type="text" name="studyprogram" placeholder="Studienprogramm">
+            <button class="studyprogram btn" id="studyprogram_btn" onclick="ShowSelectedModules()">Filtern</button>
+            <button class="studyprogram btn" id="studyprogram_btn_clear" onclick="ClearStudyProgramFilter()">Filter löschen</button>
         </div>
     </div>
 
     <div id="filter_selectors" class="right-align">
         <select name="semester" id="semester_selector">
-            <option value="all" id="all_semesters">Zeige alle Semester</option>
+            <option value="all" id="all_semesters">Alle Semester</option>
             <!--<optgroup label="">-->
             <!--</optgroup>-->
             {% for sesh in sessions %}
@@ -61,9 +62,17 @@
             
             $('#whitelist_body').find($('[data-semester]')).addClass('hidden').removeClass('shown');
             $('#whitelist_body').find($(`[data-semester].selected-semester.selected-studyprogram`)).removeClass('hidden').addClass('shown');
-            //ShowSelectedStudyprogram();
+            
+            $('#count_whitelist').html($('#whitelist_body').find($(`.shown`)).length)
+            $('#count_suggestions').html($('#suggestions_body').find($(`.shown`)).length)
+            $('#count_blacklist').html($('#blacklist_body').find($(`.shown`)).length)
             return;
         }
+        function ClearStudyProgramFilter() {
+            document.getElementById("studyprogram_input").value = "";
+            ShowSelectedModules();
+        }
+
         $( window ).on( "load", function() {
             ShowSelectedModules();
         });
@@ -190,9 +199,18 @@
         opacity:0;
         }
 
-        #studyprogram_btn {
+        .studyprogram {
+            width: 50%;
             display: inline-block;
-            width: 29%;
+        }
+
+        .studyprogram.btn {
+            display: inline-block;
+            width: 20%;
+        }
+
+        #studyprogram_btn_clear {
+            width: 25%
         }
 
         #studyprogram_input {
@@ -241,7 +259,7 @@
         right: 0;
         }
         .autocomplete-items div {
-        padding: 10px;
+        padding: 5px;
         cursor: pointer;
         background-color: #fff; 
         border-bottom: 1px solid #d4d4d4; 
