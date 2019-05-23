@@ -197,20 +197,21 @@ def get_modules(whitelisted):
 @app.route('/modules', methods=['POST'])
 @cross_origin()
 @require_appkey
-def add_module(): # SmObjId, PiqYear, PiqSession, whitelisted
+def add_module(): # required: SmObjId, PiqYear, PiqSession, whitelisted, searchterm
     req_data = request.get_json()
-    print(req_data)
     SmObjId = req_data['SmObjId']
     PiqYear = req_data['PiqYear']
     PiqSession = req_data['PiqSession']
     whitelisted = req_data['whitelisted']
+    searchterm = req_data['searchterm']
     m = models.Module(SmObjId)
     module_values = m.find_module_values(PiqYear, PiqSession)
     if module_values is not None:
         try:
             cnx = mysql.connector.connect(**db_config)
-            qry = "INSERT INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
+            qry = "INSERT INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s, %(searchterm)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
             module_values['whitelisted'] = whitelisted
+            module_values['searchterm'] = searchterm
             cursor = cnx.cursor()
             cursor.execute(qry, module_values)
             module_id = cursor.lastrowid
@@ -222,33 +223,35 @@ def add_module(): # SmObjId, PiqYear, PiqSession, whitelisted
             cnx.commit()
             cursor.close()
 
-            studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
-            studyprogram_id = 0
-            for sp in studyprograms:
-                cursor = cnx.cursor()
-                qry1 = "INSERT IGNORE INTO studyprogram (CgHighText, CgHighCategory) VALUES (%(CgHighText)s, %(CgHighCategory)s)"
-                val1 = {
-                    'CgHighText':  sp['CgHighText'],
-                    'CgHighCategory': sp['CgHighCategory'],
-                }
-                cursor.execute(qry1, val1)
-                studyprogram_id = cursor.lastrowid
-                if studyprogram_id == 0:
-                    cursor.execute("SELECT id FROM studyprogram WHERE CgHighText = %(CgHighText)s AND CgHighCategory = %(CgHighCategory)s", val1)
-                    for row in cursor:
-                        print("studyprogram_id = cursor.lastrowid did not work", row)
-                        studyprogram_id = row[0]
-                cnx.commit()
+            # if a module is to be saved to the whitelist, find the corresponding studyprograms and save them too
+            if whitelisted:
+                studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
+                studyprogram_id = 0
+                for sp in studyprograms:
+                    cursor = cnx.cursor()
+                    qry1 = "INSERT IGNORE INTO studyprogram (CgHighText, CgHighCategory) VALUES (%(CgHighText)s, %(CgHighCategory)s)"
+                    val1 = {
+                        'CgHighText':  sp['CgHighText'],
+                        'CgHighCategory': sp['CgHighCategory'],
+                    }
+                    cursor.execute(qry1, val1)
+                    studyprogram_id = cursor.lastrowid
+                    if studyprogram_id == 0:
+                        cursor.execute("SELECT id FROM studyprogram WHERE CgHighText = %(CgHighText)s AND CgHighCategory = %(CgHighCategory)s", val1)
+                        for row in cursor:
+                            print("studyprogram_id = cursor.lastrowid did not work", row)
+                            studyprogram_id = row[0]
+                    cnx.commit()
 
-                qry2 = "INSERT IGNORE INTO module_studyprogram (module_id, studyprogram_id) VALUES (%(module_id)s, %(studyprogram_id)s)"
-                val2 = {
-                    'module_id': module_id,
-                    'studyprogram_id': studyprogram_id,
-                }
-                print(val2)
-                cursor.execute(qry2, val2)
-                cnx.commit()
-                cursor.close()
+                    qry2 = "INSERT IGNORE INTO module_studyprogram (module_id, studyprogram_id) VALUES (%(module_id)s, %(studyprogram_id)s)"
+                    val2 = {
+                        'module_id': module_id,
+                        'studyprogram_id': studyprogram_id,
+                    }
+                    print(val2)
+                    cursor.execute(qry2, val2)
+                    cnx.commit()
+                    cursor.close()
             cnx.close()
             return jsonify(module_values), 200
         except mysql.connector.Error as err:
@@ -402,6 +405,7 @@ def search():
                     'title':          module['SmStext'],
                     'PiqYear':    int(module['PiqYear']),
                     'PiqSession': int(module['PiqSession']),
+                    'searchterm': searchterm,
                 })
 
     modules += json.loads(search_upwards().get_data())
