@@ -270,6 +270,7 @@ def flag_module(module_id):
     try:
         cursor.execute("UPDATE module SET whitelisted = {} WHERE id = {}".format(whitelisted, module_id))
         # if module got blacklisted, delete all studyprograms associated with that module...
+        print(locals())
         if not whitelisted:
             cursor.execute("SELECT studyprogram_id FROM module_studyprogram WHERE module_id = {};".format(module_id))
             studyprogram_ids=set()
