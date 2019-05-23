@@ -263,14 +263,13 @@ def add_module(): # required: SmObjId, PiqYear, PiqSession, whitelisted, searcht
 @cross_origin()
 @require_appkey
 def flag_module(module_id):
-    whitelisted = request.args.get('whitelisted')
+    whitelisted = int(request.args.get('whitelisted'))
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(buffered=True)
     # flag module as either black or whitelisted.
     try:
         cursor.execute("UPDATE module SET whitelisted = {} WHERE id = {}".format(whitelisted, module_id))
         # if module got blacklisted, delete all studyprograms associated with that module...
-        print(locals())
         if not whitelisted:
             cursor.execute("SELECT studyprogram_id FROM module_studyprogram WHERE module_id = {};".format(module_id))
             studyprogram_ids=set()
