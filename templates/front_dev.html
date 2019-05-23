@@ -44,7 +44,7 @@
                                     </td>
                                     {# <td>            {{ m.PiqSession }} </td> #}
                                     {# <td>            {{ m.PiqYear }} </td> #}
-                                    <td><button name="Verbergen" onclick="blacklist_from_whitelist({{ m.id }}, {{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.PiqSession }}, '{{ m.title }}')">Verbergen</button></td>
+                                    <td><button name="Verbergen" onclick="update_whitelist_status({{ m.id }}, 0)">Verbergen</button></td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -99,13 +99,13 @@
                                     {% endif %}
                                 </td>
                                 <td><button name="Anzeigen" 
-                                    onclick="whitelist_from_suggestions({{m.id}}, {{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, '{{m.title}}')"
+                                    onclick="post_module_to_db({{m.id}}, {{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, whitelisted=1, '{{m.searchterm}}')"
                                     {% if m.whitelisted==1 %}
                                     disabled
                                     {% endif %}
                                 >Anzeigen</button>
                                 <button name="Verbergen" 
-                                    onclick="blacklist_from_suggestions({{m.id}}, {{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, '{{m.title}}')"
+                                    onclick="post_module_to_db({{m.id}}, {{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, whitelisted=0, '{{m.searchterm}}')"
                                     {% if m.whitelisted==0 %}
                                     disabled
                                     {% endif %}
@@ -145,7 +145,7 @@
                                     {# <td>            {{ m.PiqSession }} </td> #}
                                     {# <td>            {{ m.PiqYear }} </td> #}
                                     <td>
-                                        <button name="Anzeigen" onclick="whitelist_from_blacklist({{ m.id }}, {{ m.SmObjId }}, {{ m.PiqYear }}, {{ m.PiqSession }}, '{{ m.title }}')">Anzeigen</button>
+                                        <button name="Anzeigen" onclick="update_whitelist_status({{ m.id }}, 1)">Anzeigen</button>
                                         <button name="Löschen" onclick="delete_blacklisted_module({{ m.id }})">Löschen</button>
                                     </td>
                                 </tr>
