@@ -5,12 +5,12 @@ $(document).ready(function () {
     //https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/2017/004/SM/50825256
     var root = $('#anchor-public')
     if(root.data("lang") === 'en'){
-        var langTitle = 'UZH Courses related to sustainability';
-        var langName = 'Name of the course';
+        var langTitle = 'UZH Modules related to sustainability';
+        var langName = 'Name of the Module';
         var langSemester = '(FS = Spring Semester, HS=Fall Semester)'
     } else {
-        var langTitle = 'Lehrveranstaltungen der UZH mit Nachhaltigkeitsbezug';
-        var langName = 'Name der Lehrveranstaltung';
+        var langTitle = 'Module der UZH mit Nachhaltigkeitsbezug';
+        var langName = 'Name des Moduls';
         var langSemester = '(FS = Frühjahressemester, HS = Herbstsemester)'
     }
 
@@ -27,7 +27,7 @@ $(document).ready(function () {
                 var url = baseUrlVvzUzh+data[row].PiqYear+'/'+data[row].PiqSession+'/SM/'+data[row].SmObjId
                 var module = $(`
                 <tr id="module_${data[row].id}" data-SmObjId="${data[row].SmObjId}" data-semester="${data[row].PiqYear} ${data[row].PiqSession}" class="shown">
-                    <td><a href="${url}">${data[row].title}</a></td><td>${convert_session_to_string(data[row].PiqSession, data[row].PiqYear)}</td>
+                    <td><a target="_blank" href="${url}">${data[row].title}</a></td><td>${convert_session_to_string(data[row].PiqSession, data[row].PiqYear)}</td>
                 </tr>`)
                 body.append(module)
             }

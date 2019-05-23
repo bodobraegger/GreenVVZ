@@ -12,3 +12,34 @@ span.semester {
     display: inline-block;
     width: 4.5em;
 }
+span.searchterm{
+    color: #a3adb7;
+    float: right;
+}
+div.count {
+    width: 2em;
+    background: lightgrey;
+    border-radius: 10px;
+    display: inline-block;
+    text-align: center;
+}
+
+.loading {
+    position:absolute; 
+    height:75%;
+    width:100%; 
+    background-color: rgba(177, 177, 177, 0.9);
+    z-index:1000000;
+    display: none;
+    margin-top: -30px;
+}
+
+.loading h3 {
+    display: block;
+    cursor: pointer;
+    position: relative;
+    margin-top: 0.5em !important;
+    padding-left: 1.8em;
+    font-size: 100%;
+    background-color: rgba(177, 177, 177, 1)
+}
