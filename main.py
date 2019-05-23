@@ -283,6 +283,7 @@ def flag_module(module_id):
                 # ... but only if they are not associated with any other module
                 if len(module_ids) == 1:
                     cursor.execute("DELETE FROM studyprogram WHERE id = {};".format(sp_id))
+                print(locals())
             
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 409
