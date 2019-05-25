@@ -1,0 +1,126 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="static/general.css">
+        <link rel="stylesheet" href="static/uzh/app.css">
+        <link rel="stylesheet" href="static/jquery-ui.min.css">
+        <script type="text/javascript" src="static/external/jquery/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="static/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="static/additional/iframeResizer.contentWindow.min.js"></script>
+        <script type="text/javascript" src="static/additional/sorttable.js"></script>
+    </head>
+    <body>
+        {% include 'includes/filter-selectors.html' %}
+        <div class="mod mod-text skin-text-basics"> <!-- add this outer div to match UZH styling -->
+            <div id="anchor-admin-2" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
+                <h3>Angezeigte Elemente (Whitelist) <div class="count" id="count_whitelist"></div></h3>
+                <div id="whitelist" style="padding: 0">
+                    <div class="loading"><h3 class="loading ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
+                        <table> <!--class="sortable"-->
+                            <thead>
+                                <td>Name des Moduls</td>
+                                <td class="searchterm">Suchbegriff</td>
+                                <td class="semester">Semster</td>
+                                <td>Verbergen</td>
+                            </thead>
+                            <tbody id="whitelist_body">
+                                <tr>
+                                    <td colspan="3"><input type="number" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%"></td>
+                                    <td><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                <h3>Suchbegriffe</h3>
+                <div style="padding: 0">
+                    <table> <!--class="sortable"-->
+                        <thead>
+                            <td>Begriff</td>
+                            <td>Entfernen</td>
+                        </thead>
+                        <tbody id="searchterms_body">
+                            <tr>
+                                <td><input type="text" pattern="\S+" id="searchterm_text" spellcheck="true" placeholder="Suchbegriff für Titel, Beschrieb oder Kürzel" style="width: 90%"></td>
+                                <td><button name="submit_searchterm" type="button" onclick="save_searchterm()">Suchbegriff speichern</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Vorschläge basierend auf Suchbegriffen <div class="count" id="count_suggestions"></div></h3>
+                <div id="suggestions" style="padding: 0">
+                    <div class="loading"><h3 class="loading ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
+                    <table class="sortable">
+                        <thead>
+                            <td id="suggestions_title_th">Name des Moduls</td>
+                            <td class="searchterm">Suchbegriff</td> 
+                            <td class="semester">Semester</td>
+                            <td>Anzeigen/Verbergen</td>
+                            <td>Angezeigt</td>
+                        </thead>
+                        <tbody id="suggestions_body">
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Verborgene Elemente (Blacklist) <div class="count" id="count_blacklist"></div></h3>
+                <div id="blacklist" style="padding: 0">
+                    <div class="loading"><h3 class="loading ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
+                    <table> <!--class="sortable"-->
+                        <thead>
+                            <td>Name des Moduls</td>
+                            <td class="searchterm">Suchbegriff</td>
+                            <td class="semester">Semster</td>
+                            <td>Anzeigen</td>
+                        </thead>
+                        <tbody id="blacklist_body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> <!-- END outer div to match UZH styling -->
+        <script type="text/javascript" src="static/admin.js"></script> 
+         
+        <script type="text/javascript">
+            $(document).ready(function () {
+                // update modules
+                $.ajax({
+                    url: apiUrl+'update',
+                    method : 'GET',
+                    beforeSend: function () {
+                        // $(":input").prop("disabled", true);
+                        $('#anchor-admin').before('<div id="loading"><h2>Module werden aktualisiert</h2><p>Bitte haben Sie Geduld, dies kann je nach Anzahl der Module bis zu einer Minute dauern</p></div>')
+                    },
+                    success : function (data) {
+                        // populate searchterms
+                        populate_searchterms()
+
+                        // populate whitelist
+                        populate_whitelist()
+
+                        // populate blacklist
+                        populate_blacklist()
+
+                        // populate suggestions
+                        populate_suggestions()
+
+                        populate_studyprograms()
+
+                        // make accordion
+                        $('#anchor-admin').accordion({collapsible:true,heightStyle:'content'})
+                    },
+                    error : function (err) {
+                        alert('Die Module konnten nicht aktualisiert werden')
+                    },
+                    complete: function () {
+                        $(":input").prop("disabled", false);
+                        $('#loading').hide()
+                    }
+
+                })
+
+                
+            });
+        </script>
+    </body>
+</html>

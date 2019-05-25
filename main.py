@@ -54,7 +54,7 @@ def hello_world():
 @require_appkey
 def front():
     secret_key = app.config['SECRET_KEY']
-    return render_template('front_test.html', secret_key=secret_key)
+    return render_template('front.html', secret_key=secret_key)
 
 # Front End Dev Page
 @app.route('/front_dev')
@@ -296,7 +296,7 @@ def flag_module(module_id):
     # flag module as either black or whitelisted.
     try:
         cursor.execute("UPDATE module SET whitelisted = {} WHERE id = {}".format(whitelisted, module_id))
-        
+
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 409
 
