@@ -39,7 +39,7 @@
         function FlagSelectedStudyprogram() {
             var studyprogram_index = studyprogram_textlist.indexOf(document.getElementById("studyprogram_input").value);
             if(studyprogram_index == -1) {
-                console.log("invalid input: " + document.getElementById("studyprogram_input").value);
+                document.getElementById("studyprogram_input").value ? console.log("invalid input: " + document.getElementById("studyprogram_input").value) : "";
                 $('#whitelist_body').find($(`[data-semester]`)).addClass('selected-studyprogram');
                 return;
             }
