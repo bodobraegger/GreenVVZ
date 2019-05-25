@@ -6,7 +6,7 @@ var secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data
 function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted, searchterm) {
     $.ajax({
         contentType: 'application/json',
-        url: `${apiUrl}modules?key=${secret_key}`,
+        url: `${apiUrl}/modules?key=${secret_key}`,
         method : 'POST',
         data: JSON.stringify({
             'PiqYear': PiqYear,
@@ -28,7 +28,7 @@ function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted,
 
 function update_whitelist_status(module_id, whitelisted, SmObjId, PiqYear, PiqSession) {
     $.ajax({
-        url: `${apiUrl}modules/${module_id}?whitelisted=${whitelisted}&key=${secret_key}`,
+        url: `${apiUrl}/modules/${module_id}?whitelisted=${whitelisted}&key=${secret_key}`,
         method : 'PUT',
         success : function (data) {
             remove_module(module_id)
@@ -45,7 +45,7 @@ function update_whitelist_status(module_id, whitelisted, SmObjId, PiqYear, PiqSe
 function save_searchterm(){
     var term = $('#searchterm_text').val()
     $.ajax({
-        url :  apiUrl+'searchterms?key='+secret_key,
+        url :  apiUrl+'/searchterms?key='+secret_key,
         method : 'POST',
         dataType : 'json',
         data : {'term':term},
@@ -71,7 +71,7 @@ function save_module(){
         var PiqSession = $('option:selected').val().split(' ')[1];
     }
     $.ajax({
-        url: `${apiUrl}modules/?key=${secret_key}`,
+        url: `${apiUrl}/modules/?key=${secret_key}`,
         data: {
             'PiqYear': PiqYear,
             'PiqSession': PiqSession,
@@ -93,7 +93,7 @@ function save_module(){
 }
 function delete_searchterm(id){
     $.ajax({
-        url: apiUrl+'searchterms/'+id+'?key='+secret_key,
+        url: apiUrl+'/searchterms/'+id+'?key='+secret_key,
         method : 'DELETE',
         success : function (data) {
             remove_from_searchterms(id)
@@ -106,7 +106,7 @@ function delete_searchterm(id){
 }
 function delete_blacklisted_module(module_id){
     $.ajax({
-        url: `${apiUrl}modules/${module_id}?key=${secret_key}`,
+        url: `${apiUrl}/modules/${module_id}?key=${secret_key}`,
         method : 'DELETE',
         success : function (data) {
             remove_module(module_id)
@@ -188,7 +188,7 @@ function add_to_searchterms(id, term){
 function populate_searchterms(){
     var searchterms = $('#searchterms_body')
     $.ajax({
-        url: apiUrl+'searchterms',
+        url: apiUrl+'/searchterms',
         method: 'GET',
         success: function (data) {
             searchterms.empty()
@@ -205,7 +205,7 @@ function populate_searchterms(){
 function populate_whitelist(){
     var whitelist = $('#whitelist_body')
     $.ajax({
-        url: apiUrl+'modules/whitelist',
+        url: apiUrl+'/modules/whitelist',
         method : 'GET',
         beforeSend: function () { $('#whitelist').find('div.loading').toggle(); },
         success : function (data) {
@@ -231,7 +231,7 @@ function populate_whitelist(){
 function populate_blacklist(){
     var blacklist = $('#blacklist_body');
     $.ajax({
-        url: apiUrl+'modules/blacklist',
+        url: apiUrl+'/modules/blacklist',
         method : 'GET',
         beforeSend: function () { $('#blacklist').find('div.loading').toggle(); },
         success : function (data) {
@@ -253,7 +253,7 @@ function populate_blacklist(){
 function populate_suggestions(){
     var suggestions = $('#suggestions_body')
     $.ajax({
-        url: apiUrl+'search',
+        url: apiUrl+'/search',
         method : 'GET',
         beforeSend: function () { $('#suggestions').find('div.loading').toggle(); },
         success : function (data) {
@@ -273,6 +273,36 @@ function populate_suggestions(){
             $('#suggestions').find('div.loading').toggle();
         }
 
+    })
+}
+
+async function populate_studyprograms() {
+    await $.ajax({
+        url: apiUrl+'/studyprograms',
+        method : 'GET',
+        beforeSend: function () { $('#suggestions').find('div.loading').toggle(); },
+        success : function (data) {
+            studyprograms = data;
+            studyprogram_textlist = Object.keys(studyprograms).map(function(key){
+                return studyprograms[key];
+            });
+            studyprogram_ids = Object.keys(studyprograms)
+
+        },
+        error : function (err) {
+            console.log('/studyprograms konnten nicht abgerufen werden: '+err)
+        },
+    })
+    await $.ajax({
+        url: apiUrl+'/studyprograms_modules',
+        method : 'GET',
+        beforeSend: function () { $('#suggestions').find('div.loading').toggle(); },
+        success : function (data) {
+            studyprogramid_moduleids = data;
+        },
+        error : function (err) {
+            console.log('/studyprograms_modules konnte nicht abgerufen werden: '+err)
+        },
     })
 }
 
