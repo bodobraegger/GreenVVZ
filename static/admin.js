@@ -159,7 +159,7 @@ function add_to_whitelist(module_id, SmObjId, PiqYear, PiqSession, title, search
     var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm)}
         <td><button name="Anzeigen" onclick="update_whitelist_status(${module_id}, 0)">Verbergen</button></td>
     </tr>`)
-    $('#whitelist_body').append(module)
+    $('#whitelist_body').append(module);
 }
 function add_to_blacklist(module_id, SmObjId, PiqYear, PiqSession, title, searchterm){
     var anzeigen_button = `<button name="Anzeigen" onclick="update_whitelist_status(${module_id}, 1)">Anzeigen</button>`
@@ -167,7 +167,7 @@ function add_to_blacklist(module_id, SmObjId, PiqYear, PiqSession, title, search
     var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm)}
             <td>${anzeigen_button}${delete_button}</td>
         </tr>`)
-    $('#blacklist_body').append(module)
+    $('#blacklist_body').append(module);
 }
 function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm){
     var anzeigen_button=`<button name="Anzeigen" onclick="post_module_to_db(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, whitelisted=1, '${searchterm}')"
@@ -224,6 +224,7 @@ async function populate_whitelist(){
             console.log('Whitelist konnte nicht abgerufen werden: '+err)
         },
         complete : function() {
+            $('#whitelist').find($('td')).removeClass().first().trigger('click');
             $('#whitelist').find('div.loading').toggle();
         }
 
@@ -248,6 +249,7 @@ async function populate_blacklist(){
             console.log('Blacklist konnte nicht abgerufen werden: '+err)
         },
         complete : function() {
+            $('#blacklist').find($('td')).removeClass().first().trigger('click');
             $('#blacklist').find('div.loading').toggle();
         }
     })
@@ -265,14 +267,13 @@ async function populate_suggestions(){
             for (var row in data) {
                 add_to_suggestions(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].whitelisted, data[row].searchterm)
             }
-            $('#suggestions_title_th').removeClass();
-            $('#suggestions_title_th').trigger("click")
             ShowSelectedModules();
         },
         error : function (err) {
             console.log('Suchvorschläge konnten nicht abgerufen werden: '+err)
         },
         complete : function() {
+            $('#suggestions').find($('td')).removeClass().first().trigger('click');
             $('#suggestions').find('div.loading').toggle();
         }
 
