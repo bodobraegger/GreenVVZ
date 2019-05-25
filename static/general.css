@@ -5,16 +5,13 @@ button {
 td {
     font-size: 80%;
 }
-td.semester {
-    width: 5.8em;
-}
 span.semester {
     display: inline-block;
-    width: 4.5em;
+    width: 2.8em;
 }
-span.searchterm{
-    color: #a3adb7;
-    float: right;
+.searchterm {
+    /* color: #a3adb7; */
+    /* float: right; */
 }
 div.count {
     width: 2em;
@@ -28,19 +25,7 @@ div.count {
     position:absolute; 
     height:100%;
     width:100%; 
-    background-color: rgb(246, 246, 246, 0.7);
+    background-color: rgb(246, 246, 246, 0.7) !important;
     z-index:1000000;
     display: none;
-    margin-top: -30px;
-}
-
-h3.loading {
-    /* display: block; */
-    /* cursor: pointer; */
-    /* position: relative; */
-    /* margin-top: 0.5em !important; */
-    /* padding-left: 1.8em; */
-    /* font-size: 100%; */
-    /* background-color: rgba(177, 177, 177, 1) */
-    background-color: rgb(246, 246, 246, 0.95)
 }

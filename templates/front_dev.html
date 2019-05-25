@@ -18,21 +18,22 @@
                     <div class="loading"><h3 class="loading ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
                     <table> <!--class="sortable"-->
                         <thead>
-                            <td>Name des Moduls <span class="searchterm">Suchbegriff</span></td>
+                            <td>Name des Moduls</td>
+                            <td class="searchterm">Suchbegriff</td>
                             <td class="semester">Semster</td>
                             <td>Verbergen</td>
                         </thead>
                         <tbody id="whitelist_body">
                             <tr>
-                                <td><input type="number" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%"></td>
-                                <td colspan="2"><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
+                                <td colspan="3"><input type="number" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%"></td>
+                                <td><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
                             </tr>
                             {% for m in whitelist %}
                                 <tr id='module_{{ m.id }}' data-SmObjId='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown selected-semester selected-studyprogram">
                                     <td>
                                         <a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a>
-                                        <span class="searchterm">{{ m.searchterm }}</span>
                                     </td>
+                                    <td class="searchterm">{{ m.searchterm }}</td>
                                     <td> <!-- {{ m.PiqSession }} / PiqSession -->
                                         {% if m.PiqSession == 3 %}
                                             <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
@@ -78,17 +79,19 @@
                     <div class="loading"><h3 class="loading ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
                     <table class="sortable">
                         <thead>
-                            <td id="suggestions_title_th">Name des Moduls <span class="searchterm">Suchbegriff</span> </td>
-                            <td class="semester">Semster</td>
+                            <td id="suggestions_title_th">Name des Moduls</td>
+                            <td class="searchterm">Suchbegriff</td> 
+                            <td class="semester">Semester</td>
                             <td>Anzeigen/Verbergen</td>
+                            <td>Angezeigt</td>
                         </thead>
                         <tbody id="suggestions_body">
                         {% for m in found_modules %}
                             <tr id='module_{{ m.id }}'data-SmObjId='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown selected-semester">
                                 <td>
                                     <a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a>
-                                    <span class="searchterm">{{ m.searchterm }}</span>
                                 </td>
+                                <td class="searchterm">{{ m.searchterm }}</td>
                                 <td> <!-- {{ m.PiqSession }} / PiqSession -->
                                     {% if m.PiqSession == 3 %}
                                         <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
@@ -99,17 +102,24 @@
                                     {% endif %}
                                 </td>
                                 <td><button name="Anzeigen" 
-                                    onclick="post_module_to_db({{m.id}}, {{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, whitelisted=1, '{{m.searchterm}}')"
+                                        onclick="post_module_to_db({{m.id}}, {{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, whitelisted=1, '{{m.searchterm}}')"
+                                        {% if m.whitelisted==1 %}
+                                        disabled
+                                        {% endif %}
+                                    >Anzeigen</button>
+                                    <button name="Verbergen" 
+                                        onclick="post_module_to_db({{m.id}}, {{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, whitelisted=0, '{{m.searchterm}}')"
+                                        {% if m.whitelisted==0 %}
+                                        disabled
+                                        {% endif %}
+                                    >Verbergen</button>
+                                </td>
+                                <td class="whitelist_status whitelisted_{{m.whitelisted}}">
                                     {% if m.whitelisted==1 %}
-                                    disabled
+                                        Ja
+                                    {% else %}
+                                        Nein
                                     {% endif %}
-                                >Anzeigen</button>
-                                <button name="Verbergen" 
-                                    onclick="post_module_to_db({{m.id}}, {{m.SmObjId}}, {{m.PiqYear}}, {{m.PiqSession}}, whitelisted=0, '{{m.searchterm}}')"
-                                    {% if m.whitelisted==0 %}
-                                    disabled
-                                    {% endif %}
-                                >Verbergen</button>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -122,7 +132,8 @@
                     <div class="loading"><h3 class="loading ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
                     <table> <!--class="sortable"-->
                         <thead>
-                            <td>Name des Moduls <span class="searchterm">Suchbegriff</span></td>
+                            <td>Name des Moduls</td>
+                            <td class="searchterm">Suchbegriff</td>
                             <td class="semester">Semster</td>
                             <td>Anzeigen</td>
                         </thead>
@@ -131,8 +142,8 @@
                                 <tr id='module_{{ m.id }}' data-SmObjId='{{ m.SmObjId }}' data-semester='{{m.PiqYear}} {{m.PiqSession}}' class="shown selected-semester">
                                     <td>
                                         <a target="_blank" href="{{baseUrlVvzUzh}}{{m.PiqYear}}/{{m.PiqSession}}/SM/{{m.SmObjId}}">{{ m.title }}</a>
-                                        <span class="searchterm">{{ m.searchterm }}</span>
                                     </td>
+                                    <td class="searchterm">{{ m.searchterm }}</td>
                                     <td> <!-- {{ m.PiqSession }} / PiqSession -->
                                         {% if m.PiqSession == 3 %}
                                             <span class="semester">HS </span>{{'%s' | format(m.PiqYear % 100)}}
