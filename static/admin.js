@@ -3,8 +3,8 @@ var apiUrl = 'https://greenvvz.ifi.uzh.ch/'
 // var apiUrl = 'http://127.0.0.1:8080/'
 var secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data('api-key')
 
-function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted, searchterm) {
-    $.ajax({
+async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted, searchterm) {
+    await $.ajax({
         contentType: 'application/json',
         url: `${apiUrl}/modules?key=${secret_key}`,
         method : 'POST',
@@ -26,8 +26,8 @@ function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted,
     })
 }
 
-function update_whitelist_status(module_id, whitelisted, SmObjId, PiqYear, PiqSession) {
-    $.ajax({
+async function update_whitelist_status(module_id, whitelisted, SmObjId, PiqYear, PiqSession) {
+    await $.ajax({
         url: `${apiUrl}/modules/${module_id}?whitelisted=${whitelisted}&key=${secret_key}`,
         method : 'PUT',
         success : function (data) {
@@ -42,9 +42,9 @@ function update_whitelist_status(module_id, whitelisted, SmObjId, PiqYear, PiqSe
     })
 }
 
-function save_searchterm(){
+async function save_searchterm(){
     var term = $('#searchterm_text').val()
-    $.ajax({
+    await $.ajax({
         url :  apiUrl+'/searchterms?key='+secret_key,
         method : 'POST',
         dataType : 'json',
@@ -60,7 +60,7 @@ function save_searchterm(){
 
     })
 }
-function save_module(){
+async function save_module(){
     var SmObjId = $('#whitelist_text').val()
     if($('option:selected') == 'all') {
         var PiqSession = $('#filter_selectors').find('optgroup').find('option').val().split(' ')[0]
@@ -70,7 +70,7 @@ function save_module(){
         var PiqYear = $('option:selected').val().split(' ')[0];
         var PiqSession = $('option:selected').val().split(' ')[1];
     }
-    $.ajax({
+    await $.ajax({
         url: `${apiUrl}/modules/?key=${secret_key}`,
         data: {
             'PiqYear': PiqYear,
@@ -91,8 +91,8 @@ function save_module(){
 
     })
 }
-function delete_searchterm(id){
-    $.ajax({
+async function delete_searchterm(id){
+    await $.ajax({
         url: apiUrl+'/searchterms/'+id+'?key='+secret_key,
         method : 'DELETE',
         success : function (data) {
@@ -104,8 +104,8 @@ function delete_searchterm(id){
         }
     })
 }
-function delete_blacklisted_module(module_id){
-    $.ajax({
+async function delete_blacklisted_module(module_id){
+    await $.ajax({
         url: `${apiUrl}/modules/${module_id}?key=${secret_key}`,
         method : 'DELETE',
         success : function (data) {
@@ -185,9 +185,9 @@ function add_to_searchterms(id, term){
     $('#searchterms_body').append(searchterm)
 }
 
-function populate_searchterms(){
+async function populate_searchterms(){
     var searchterms = $('#searchterms_body')
-    $.ajax({
+    await $.ajax({
         url: apiUrl+'/searchterms',
         method: 'GET',
         success: function (data) {
@@ -202,9 +202,9 @@ function populate_searchterms(){
 
 }
 
-function populate_whitelist(){
+async function populate_whitelist(){
     var whitelist = $('#whitelist_body')
-    $.ajax({
+    await $.ajax({
         url: apiUrl+'/modules/whitelist',
         method : 'GET',
         beforeSend: function () { $('#whitelist').find('div.loading').toggle(); },
@@ -228,9 +228,9 @@ function populate_whitelist(){
 
 }
 
-function populate_blacklist(){
+async function populate_blacklist(){
     var blacklist = $('#blacklist_body');
-    $.ajax({
+    await $.ajax({
         url: apiUrl+'/modules/blacklist',
         method : 'GET',
         beforeSend: function () { $('#blacklist').find('div.loading').toggle(); },
@@ -250,9 +250,9 @@ function populate_blacklist(){
     })
 }
 
-function populate_suggestions(){
+async function populate_suggestions(){
     var suggestions = $('#suggestions_body')
-    $.ajax({
+    await $.ajax({
         url: apiUrl+'/search',
         method : 'GET',
         beforeSend: function () { $('#suggestions').find('div.loading').toggle(); },
