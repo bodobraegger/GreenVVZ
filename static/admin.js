@@ -174,7 +174,6 @@ function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whit
         ${whitelisted==1 ? 'disabled' : ''}>Anzeigen</button>`
     var verbergen_button=`<button name="Verbergen" onclick="post_module_to_db(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, whitelisted=0, '${searchterm}')"
         ${whitelisted==0 ? 'disabled' : ''}>Verbergen</button>`
-    var whitelist_status_td = `<td class="whitelist_status whitelisted_${whitelisted}">${whitelisted==1 ? 'Ja' : 'Nein'}</td>`
     if(whitelisted==1) sug_status='Angezeigt';
     else if(whitelisted==0) sug_status='Verborgen';
     else sug_status='Neu';
