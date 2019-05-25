@@ -54,7 +54,11 @@ def hello_world():
 @require_appkey
 def front():
     secret_key = app.config['SECRET_KEY']
-    return render_template('front.html', secret_key=secret_key)
+    # for filter-selectors.html
+    return render_template('front.html', **{
+        'secret_key': secret_key,
+        'sessions': helpers.get_current_sessions(),
+    })
 
 # Front End Dev Page
 @app.route('/front_dev')
