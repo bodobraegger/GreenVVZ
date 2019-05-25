@@ -174,13 +174,18 @@
                 closeAllLists(e.target);
             });
         }
-
-        studyprograms = {{studyprograms | safe}}
+        studyprograms = {}
+        studyprogram_ids = Object.keys(studyprograms)
         studyprogram_textlist = Object.keys(studyprograms).map(function(key){
             return studyprograms[key];
         });
-        studyprogram_ids = Object.keys(studyprograms)
-        studyprogramid_moduleids = {{studyprogramid_moduleids | safe}}
+        {% if studyprograms is not none %}   
+            studyprograms = {{studyprograms | safe}}
+        {% endif %}
+        studyprogramid_moduleids = {}
+        {% if studyprogramid_moduleids is not none %}   
+            studyprogramid_moduleids = {{studyprogramid_moduleids | safe}}
+        {% endif %}
         autocomplete(document.getElementById("studyprogram_input"), studyprogram_textlist);
 
     </script>
