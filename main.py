@@ -223,13 +223,9 @@ def add_module(): # required: SmObjId, PiqYear, PiqSession, whitelisted, searcht
             cnx.commit()
             cursor.close()
 
-            # if a module is to be saved to the whitelist, find the corresponding studyprograms and save them too
-            if whitelisted:
-                studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
-                save_studyprograms_for_module(module_id, studyprograms)
-            # else, if it's already saved, go ahead and delete them.
-            else:
-                delete_studyprograms_for_module(module_id)
+            # if a module is to be saved, find the corresponding studyprograms and save them too
+            studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
+            save_studyprograms_for_module(module_id, studyprograms)
             cnx.close()
             return jsonify(module_values), 200
         except mysql.connector.Error as err:
@@ -300,14 +296,7 @@ def flag_module(module_id):
     # flag module as either black or whitelisted.
     try:
         cursor.execute("UPDATE module SET whitelisted = {} WHERE id = {}".format(whitelisted, module_id))
-        if whitelisted:
-            cursor.execute("SELECT SmObjId, PiqYear, PiqSession FROM module WHERE id={}".format(module_id))
-            for row in cursor:
-                studyprograms = find_studyprograms_for_module(row['SmObjId'],row['PiqYear'], row['PiqSession'])
-            save_studyprograms_for_module(module_id, studyprograms)
-        else:
-            delete_studyprograms_for_module(module_id)
-
+        
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 409
 
@@ -600,7 +589,7 @@ def get_studyprograms():
     studyprograms={}
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM studyprogram;")
+    cursor.execute("SELECT DISTINCT s.* FROM studyprogram AS s INNER JOIN module_studyprogram AS m_s INNER JOIN module AS m WHERE m.id = m_s.module_id AND s.id = m_s.studyprogram_id AND m.whitelisted = 1;")
     for row in cursor:
         for column, value in row.items():
             if type(value) is bytearray:
@@ -616,7 +605,7 @@ def get_studyprograms_modules():
     try: 
         cnx = mysql.connector.connect(**db_config)
         cursor = cnx.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM module_studyprogram;")
+        cursor.execute("SELECT * FROM module_studyprogram AS m_s INNER JOIN module AS m WHERE m_s.module_id = m.id AND whitelisted = 1;")
         for row in cursor:
             for column, value in row.items():
                 if type(value) is bytearray:
