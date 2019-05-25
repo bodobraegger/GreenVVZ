@@ -128,18 +128,22 @@ function remove_module(module_id){
     document.getElementById(`module_${module_id}`).remove()
 }
 function flag_in_suggestions(module_id, whitelisted){
-    var button_parent = document.getElementById(`module_${module_id}`).children[3];
+    var tr_module = document.getElementById(`module_${module_id}`);
+
     if(whitelisted==1) {
-        button_parent.querySelector('button[name="Anzeigen"]').disabled = true;
-        button_parent.querySelector('button[name="Verbergen"]').disabled = false;
+        tr_module.querySelector('button[name="Anzeigen"]').disabled = true;
+        tr_module.querySelector('button[name="Verbergen"]').disabled = false;
+        tr_module.children[4].innerHTML = "Angezeigt";
     }
     else if(whitelisted==0) {
-        button_parent.querySelector('button[name="Anzeigen"]').disabled = false;
-        button_parent.querySelector('button[name="Verbergen"]').disabled = true;
+        tr_module.querySelector('button[name="Anzeigen"]').disabled = false;
+        tr_module.querySelector('button[name="Verbergen"]').disabled = true;
+        tr_module.children[4].innerHTML = "Verborgen";
     }
     else {
-        button_parent.querySelector('button[name="Anzeigen"]').disabled = false;
-        button_parent.querySelector('button[name="Verbergen"]').disabled = false;
+        tr_module.querySelector('button[name="Anzeigen"]').disabled = false;
+        tr_module.querySelector('button[name="Verbergen"]').disabled = false;
+        tr_module.children[4].innerHTML = "Neu";
     }
 }
 function remove_from_searchterms(id){
