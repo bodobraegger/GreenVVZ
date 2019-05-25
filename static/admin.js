@@ -313,10 +313,10 @@ async function populate_studyprograms() {
 
 function convert_session_to_string(session, year){
     if (session == 3){
-        return `<span class="semester">HS </span>${year % 100 || ''}`
+        return `<span style="display: none;">${year % 100 || ''}</span><span class="semester">HS </span>${year % 100 || ''}`
     }
     if (session == 4){
-        return `<span class="semester">FS </span>${(year+1) % 100 || ''}`
+        return `<span style="display: none;">${(year+1) % 100 || ''}</span><span class="semester">FS </span>${(year+1) % 100 || ''}`
     }
     else{
         return 'undefiniert'

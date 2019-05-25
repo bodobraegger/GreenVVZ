@@ -28,4 +28,5 @@ div.count {
     background-color: rgb(246, 246, 246, 0.7) !important;
     z-index:1000000;
     display: none;
+    overflow: hidden;
 }
