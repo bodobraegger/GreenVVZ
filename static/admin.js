@@ -265,8 +265,8 @@ async function populate_suggestions(){
             for (var row in data) {
                 add_to_suggestions(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].whitelisted, data[row].searchterm)
             }
-            $('#suggestions_title_th').removeClass();
-            $('#suggestions_title_th').trigger("click")
+            $('#suggestions_title').removeClass();
+            $('#suggestions_title').trigger("click")
             ShowSelectedModules();
         },
         error : function (err) {
