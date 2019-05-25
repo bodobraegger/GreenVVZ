@@ -27,7 +27,7 @@ def update_modules():
         mod = models.Module(row['SmObjId'])
         current_values = mod.find_module_values(row['PiqYear'], row['PiqSession'])
         if current_values is not None:
-            qry2 = "UPDATE modules SET title=%(title)s WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s;"
+            qry2 = "UPDATE module SET title=%(title)s WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s;"
             val = current_values
 
         else:
