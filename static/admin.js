@@ -19,6 +19,7 @@ async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitel
             flag_in_suggestions(module_id, whitelisted)
             populate_whitelist();
             populate_blacklist();
+            populate_studyprograms();
         },
         error : function (err) {
             alert(`Das Modul konnte nicht als ${whitelisted ? 'whitelisted' : 'blacklisted'} gespeichert hinzugefügt werden`)
@@ -35,6 +36,7 @@ async function update_whitelist_status(module_id, whitelisted, SmObjId, PiqYear,
             if(whitelisted) populate_whitelist();
             else populate_blacklist();
             populate_suggestions();
+            populate_studyprograms();
         },
         error : function (err) {
             alert(`Das Modul konnte nicht als ${whitelisted ? 'whitelisted' : 'blacklisted'} markiert werden`);
@@ -84,6 +86,7 @@ async function save_module(){
             $('#whitelist_text').val('')
             populate_blacklist();
             populate_suggestions();
+            populate_studyprograms();
         },
         error : function (err) {
             alert('Das Modul konnte nicht gespeichert werden')
@@ -304,6 +307,8 @@ async function populate_studyprograms() {
             console.log('/studyprograms_modules konnte nicht abgerufen werden: '+err)
         },
     })
+    // update the autocomplete list
+    autocomplete(document.getElementById("studyprogram_input"), studyprogram_textlist);
 }
 
 function convert_session_to_string(session, year){

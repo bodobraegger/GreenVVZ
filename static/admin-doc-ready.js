@@ -27,6 +27,8 @@ $(document).ready(function () {
             // populate suggestions
             populate_suggestions()
 
+            populate_studyprograms()
+
             // make accordion
             $('#anchor-admin').accordion({collapsible:true,heightStyle:'content'})
         },
