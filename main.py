@@ -202,7 +202,7 @@ def add_module(): # required: SmObjId, PiqYear, PiqSession, whitelisted, searcht
     SmObjId = req_data['SmObjId']
     PiqYear = req_data['PiqYear']
     PiqSession = req_data['PiqSession']
-    whitelisted = req_data['whitelisted']
+    whitelisted = int(req_data['whitelisted'])
     searchterm = req_data['searchterm']
     m = models.Module(SmObjId)
     module_values = m.find_module_values(PiqYear, PiqSession)
@@ -238,6 +238,7 @@ def add_module(): # required: SmObjId, PiqYear, PiqSession, whitelisted, searcht
         return 'No module found', 404
 
 def save_studyprograms_for_module(module_id, studyprograms):
+    print('deleting studyprogams', studyprograms, 'for module', module_id)
     cnx = mysql.connector.connect(**db_config)
     studyprogram_id = 0
     for sp in studyprograms:
@@ -275,6 +276,7 @@ def delete_studyprograms_for_module(module_id):
     studyprogram_ids=set()
     for row in cursor:
         studyprogram_ids.add(row[0])
+    print('deleting studyprogams', studyprogram_ids, 'for module', module_id)
     for sp_id in studyprogram_ids:
         module_ids=set()
         cursor.execute("SELECT module_id FROM module_studyprogram WHERE studyprogram_id = {};".format(sp_id))
