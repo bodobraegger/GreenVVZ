@@ -303,7 +303,7 @@ def flag_module(module_id):
         if whitelisted:
             cursor.execute("SELECT SmObjId, PiqYear, PiqSession FROM module WHERE id={}".format(module_id))
             for row in cursor:
-                studyprograms = find_studyprograms_for_module(row[0],row[1], row[2])
+                studyprograms = find_studyprograms_for_module(row['SmObjId'],row['PiqYear'], row['PiqSession'])
             save_studyprograms_for_module(module_id, studyprograms)
         else:
             delete_studyprograms_for_module(module_id)
