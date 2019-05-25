@@ -1,5 +1,5 @@
 var baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
-var apiUrl = 'https://greenvvz.ifi.uzh.ch/'
+var apiUrl = 'https://greenvvz.ifi.uzh.ch'
 
 $(document).ready(function () {
     //https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/2017/004/SM/50825256
@@ -18,7 +18,6 @@ $(document).ready(function () {
         url : apiUrl+"/modules/whitelist",
         method : 'GET',
         success : function (data) {
-            console.log(data)
             var table = $("<table></table>")
             table.append('<thead><th colspan="2"><strong>'+langTitle+'</strong></th></thead>')
             var body = $('<tbody id="whitelist_body"></tbody>')
@@ -33,6 +32,9 @@ $(document).ready(function () {
             }
             table.append(body)
             root.append(table)
+            // get newewst saved studyprograms for modules
+            populate_studyprograms();
+            // only show current selected semester
             ShowSelectedModules();
         },
         error : function (err) {
