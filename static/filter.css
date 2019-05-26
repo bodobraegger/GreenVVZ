@@ -1,90 +1,87 @@
-input[type="radio"] {
-  display:none;
-}
-input[type="checkbox"] {
-    display:none;
-}
-label {
-  border-radius: 5px;
-  width:23%;
-  float:left;
-  text-align:center;
-  background:#ffffff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  color:#222222;
-  padding:0.5%;
-  margin:0.5%;
-  margin-bottom:8px;
-  cursor:pointer;
-
-}
-input[type="radio"][id="blue"]:checked + label {
-  background:#6666ff;
-}
-input[type="radio"][id="blue"]:checked ~ .red, input[type="radio"][id="blue"]:checked ~ .green {
-  width:0;
-  height:0;
-  padding:0;
-  margin:0;
-  opacity:0;
-}
-input[type="radio"][id="red"]:checked + label {
-  background:#ff4466;
-}
-input[type="radio"][id="red"]:checked ~ .blue, input[type="radio"][id="red"]:checked ~ .green {
-  width:0;
-  height:0;
-  padding:0;
-  margin:0;
-  opacity:0;
-}
-input[type="radio"][id="green"]:checked + label {
-  background:#66dd99;
-}
-input[type="radio"][id="green"]:checked ~ .blue, input[type="radio"][id="green"]:checked ~ .red {
-  width:0;
-  height:0;
-  padding:0;
-  margin:0;
-  opacity:0;
-}
-
-.tile {
-  width:23%;
-  height:100px;
-  float:left;
+.selected-semester,.selected-studyprogram {
   transition:all 0.1s;
-  margin:0.5%;
-  padding:0.5%;
-}
-.green {
-  background:#66dd99;
-}
-.blue {
-  background:#6666ff;
-}
-.red {
-  background:#ff4466;
-}
+  }
 
-.shown {
-  transition:all 0.1s;
-}
-
-.hidden {
+  .hidden {
   visibility:collapse;
   width:0;
   height:0;
   padding:0;
   margin:0;
   opacity:0;
-}
+  }
 
-input[type="radio"][id="blue"]:checked + label {
-  background:#6666ff;
-}
+  .studyprogram {
+      width: 50%;
+      display: inline-block;
+  }
 
+  .studyprogram.btn {
+      display: inline-block;
+      width: 20%;
+  }
 
-input[type="checkbox"]:checked + label {
-  background:#66dd99;
-}
+  #studyprogram_btn_clear {
+      width: 25%
+  }
+
+  #studyprogram_input {
+      padding: 3px;
+      margin: 3px;
+  }
+  .parent {
+  position: relative;
+  width: 100%;
+
+  }
+  .left-align, .right-align {
+  position: absolute;
+  margin: auto;
+  top: 3px;
+
+  }
+  .left-align {
+  left: 0;
+  margin-left: 3px;
+  }
+  .right-align {
+  right: 0;
+  margin-right: 3px;
+  }
+
+  .autocomplete {
+  /*the container must be positioned relative:*/
+  position: relative;
+  display: inline-block;
+  }
+  input {
+  border: 1px solid transparent;
+  background-color: #f1f1f1;
+  }
+
+  .autocomplete-items {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+  }
+  .autocomplete-items div {
+  padding: 5px;
+  cursor: pointer;
+  background-color: #fff; 
+  border-bottom: 1px solid #d4d4d4; 
+  }
+  .autocomplete-items div:hover {
+  /*when hovering an item:*/
+  background-color: #e9e9e9; 
+  }
+  .autocomplete-active {
+  /*when navigating through the items using the arrow keys:*/
+  background-color: DodgerBlue !important; 
+  color: #ffffff; 
+  }
