@@ -9,10 +9,10 @@ span.semester {
     display: inline-block;
     width: 2.5em;
 }
-.searchterm {
-    /* color: #a3adb7; */
-    /* float: right; */
-}
+/* .searchterm {
+    color: #a3adb7;
+    float: right;
+} */
 div.count {
     width: 2em;
     background: lightgrey;
@@ -61,4 +61,16 @@ div.count {
 /* When moving the mouse over the close button */
 .closebtn:hover {
   color: black;
+}
+
+/* table.sortable>thead>tr>td:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
+    content: " \25B4\25BE" 
+} */
+
+/* Sortable tables */
+table.sortable thead {
+    background-color:#eee;
+    color:#666666;
+    font-weight: bold;
+    cursor: hand;
 }
