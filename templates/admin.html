@@ -11,7 +11,7 @@
     <body>
         {% include 'includes/filter-selectors.html' %}
         <div class="mod mod-text skin-text-basics"> <!-- add this outer div to match UZH styling -->
-            <div id="anchor-admin-2" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
+            <div id="anchor-admin" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
                 <h3>Angezeigte Elemente (Whitelist) <div class="count" id="count_whitelist"></div></h3>
                 <div id="whitelist" style="padding: 0">
                     <div class="loading"><h3 class="loading ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
@@ -88,14 +88,27 @@
                     url: apiUrl+'update',
                     method : 'GET',
                     beforeSend: function () {
-                        // $(":input").prop("disabled", true);
-                        $('#anchor-admin-2').before('<div id="loading"><h2>Module werden aktualisiert</h2><p>Bitte haben Sie Geduld, dies kann je nach Anzahl der Module bis zu einer Minute dauern</p></div>')
+                        $('#anchor-admin').before(`
+                        <div id="modules-updating" class="alert alert-blue">
+                        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                            <h3>Module werden aktualisiert</h3><p>Bitte haben Sie Geduld, dies kann je nach Anzahl der Module bis zu einer Minute dauern</p>
+                        </div>
+                        `)
                     },
                     error : function (err) {
-                        alert('Die Module konnten nicht aktualisiert werden')
+                        console.log(err)
+                        $('#modules-updating').removeClass('alert-blue').addClass('alert-red')
+                        $('#modules-updating').find($('h3')).text('Die Module konnten nicht aktualisiert werden.')
+                        $('#modules-updating').find($('p')).text('Bitte versuchen Sie es erneut, in dem Sie die Seite neu laden.')
+                    },
+                    success : function() {
+                        // populate whitelist
+                        populate_whitelist()
+                        // populate blacklist
+                        populate_blacklist()
                     },
                     complete: function () {
-                        $('#loading').hide()
+                        $('#modules-updating').hide()
                     }
                 })
             });
@@ -106,7 +119,6 @@
 
                 // populate whitelist
                 populate_whitelist()
-
                 // populate blacklist
                 populate_blacklist()
 
@@ -117,7 +129,6 @@
 
                 // make accordion
                 $('#anchor-admin').accordion({collapsible:true,heightStyle:'content'})
-                $('#anchor-admin-2').accordion({collapsible:true,heightStyle:'content'})
                 ShowSelectedModules();
             });
         </script>

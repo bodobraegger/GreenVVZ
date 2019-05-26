@@ -30,3 +30,35 @@ div.count {
     display: none;
     overflow: hidden;
 }
+
+/* The alert message box */
+.alert {
+    padding: 5px;
+    padding-left: 20px;
+    color: white;
+    margin-bottom: 15px;
+    border-radius: 5px;
+} 
+.alert-red {
+    background-color: #f44336;
+} 
+.alert-blue {
+    background-color: #2196F3;
+} 
+.alert-yellow {
+    background-color: #f4f136;
+} 
+/* The close button */
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+/* When moving the mouse over the close button */
+.closebtn:hover {
+  color: black;
+}
