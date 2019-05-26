@@ -239,7 +239,7 @@ async function populate_whitelist(){
             console.log('Whitelist konnte nicht abgerufen werden: '+err)
         },
         complete : function() {
-            $('#whitelist').find($('thead')).find($('td')).removeClass().first().trigger('click');
+            $('#whitelist').find($('thead')).find($('td')).removeClass('sorttable_sorted sorttable_sorted_reverse').first().trigger('click');
             $('#whitelist').find('div.loading').toggle();
         }
 
@@ -264,7 +264,7 @@ async function populate_blacklist(){
             console.log('Blacklist konnte nicht abgerufen werden: '+err)
         },
         complete : function() {
-            $('#blacklist').find($('thead')).find($('td')).removeClass().first().trigger('click');
+            $('#blacklist').find($('thead')).find($('td')).removeClass('sorttable_sorted sorttable_sorted_reverse').first().trigger('click');
             $('#blacklist').find('div.loading').toggle();
         }
     })
@@ -288,7 +288,7 @@ async function populate_suggestions(){
             console.log('Suchvorschläge konnten nicht abgerufen werden: '+err)
         },
         complete : function() {
-            $('#suggestions').find($('thead')).find($('td')).removeClass().first().trigger('click');
+            $('#suggestions').find($('thead')).find($('td')).removeClass('sorttable_sorted sorttable_sorted_reverse').first().trigger('click');
             $('#suggestions').find('div.loading').toggle();
         }
 
