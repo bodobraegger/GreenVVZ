@@ -63,10 +63,6 @@ div.count {
   color: black;
 }
 
-/* table.sortable>thead>tr>td:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
-    content: " \25B4\25BE" 
-} */
-
 /* Sortable tables */
 table.sortable thead {
     background-color:#eee;
@@ -74,3 +70,12 @@ table.sortable thead {
     font-weight: bold;
     cursor: hand;
 }
+
+.sorttable_nosort { 
+    cursor: default;
+}
+
+
+/* table.sortable>thead> td:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
+    content: " \25B4\25BE" 
+} */
