@@ -49,13 +49,13 @@ def hello_world():
     return jsonify(hell0='world'), 200
 
 # Front End Testing
-@app.route('/front')
+@app.route('/admin')
 @cross_origin()
 @require_appkey
 def front():
     secret_key = app.config['SECRET_KEY']
     # for filter-selectors.html
-    return render_template('front.html', **{
+    return render_template('admin.html', **{
         'secret_key': secret_key,
         'sessions': helpers.get_current_sessions(),
     })
@@ -137,35 +137,6 @@ def public():
 @cross_origin()
 def info():
     return 'This is a small scale API to access and manipulate data about Sustainability-related Modules at the University of Zurich'
-
-
-# serve public js-file
-@app.route('/js/public')
-@cross_origin()
-def get_public_js():
-    return app.send_static_file('public.js')
-
-
-# serve admin js-file
-@app.route('/js/admin', methods=['GET'])
-@cross_origin()
-def get_admin_js():
-    return app.send_static_file('admin.js')
-
-
-# serve jquery-ui css-file
-@app.route('/css/jqueryui', methods=['GET'])
-@cross_origin()
-def get_jquery_css():
-    return app.send_static_file('jquery-ui.min.css')
-
-
-# serve jquery-ui js-file
-@app.route('/js/jqueryui', methods=['GET'])
-@cross_origin()
-def get_jquery_js():
-    return app.send_static_file('jquery-ui.min.js')
-
 
 # update all modules
 @app.route('/update')

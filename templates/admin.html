@@ -24,8 +24,8 @@
                             </thead>
                             <tbody id="whitelist_body">
                                 <tr>
-                                    <td colspan="3"><input type="number" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%"></td>
-                                    <td><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
+                                    <td colspan="2"><input type="number" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%"></td>
+                                    <td colspan="2"><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -89,37 +89,36 @@
                     method : 'GET',
                     beforeSend: function () {
                         // $(":input").prop("disabled", true);
-                        $('#anchor-admin').before('<div id="loading"><h2>Module werden aktualisiert</h2><p>Bitte haben Sie Geduld, dies kann je nach Anzahl der Module bis zu einer Minute dauern</p></div>')
-                    },
-                    success : function (data) {
-                        // populate searchterms
-                        populate_searchterms()
-
-                        // populate whitelist
-                        populate_whitelist()
-
-                        // populate blacklist
-                        populate_blacklist()
-
-                        // populate suggestions
-                        populate_suggestions()
-
-                        populate_studyprograms()
-
-                        // make accordion
-                        $('#anchor-admin').accordion({collapsible:true,heightStyle:'content'})
+                        $('#anchor-admin-2').before('<div id="loading"><h2>Module werden aktualisiert</h2><p>Bitte haben Sie Geduld, dies kann je nach Anzahl der Module bis zu einer Minute dauern</p></div>')
                     },
                     error : function (err) {
                         alert('Die Module konnten nicht aktualisiert werden')
                     },
                     complete: function () {
-                        $(":input").prop("disabled", false);
                         $('#loading').hide()
                     }
-
                 })
+            });
+            
+            $(document).ready(function () {
+                // populate searchterms
+                populate_searchterms()
 
-                
+                // populate whitelist
+                populate_whitelist()
+
+                // populate blacklist
+                populate_blacklist()
+
+                // populate suggestions
+                populate_suggestions()
+
+                populate_studyprograms()
+
+                // make accordion
+                $('#anchor-admin').accordion({collapsible:true,heightStyle:'content'})
+                $('#anchor-admin-2').accordion({collapsible:true,heightStyle:'content'})
+                ShowSelectedModules();
             });
         </script>
     </body>
