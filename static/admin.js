@@ -224,7 +224,15 @@ async function populate_whitelist(){
                 // verarbeite daten
                 add_to_whitelist(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].searchterm)
             }
-            whitelist.prepend('<tr><td colspan="3"><input type="text" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%"></td><td><button name="submit_whitelist" style="display: block; width: 100%" type="button" onclick="save_module()">Modul hinzufügen</button></td></tr>')
+            whitelist.prepend(`
+            <tr>
+              <td colspan="2">
+                <input type="text" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%">
+              </td>
+              <td colspan="2">
+                <button name="submit_whitelist" style="display: block; width: 100%" type="button" onclick="save_module()">Modul hinzufügen</button>
+              </td>
+            </tr>`)
             ShowSelectedModules();
         },
         error : function (err) {
@@ -330,8 +338,3 @@ function convert_session_to_string(session, year){
         return 'undefiniert'
     }
 }
-
-$(document).ready(function () {
-    $('#anchor-admin-2').accordion({collapsible:true,heightStyle:'content'})
-    ShowSelectedModules();
-});

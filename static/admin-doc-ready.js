@@ -31,6 +31,7 @@ $(document).ready(function () {
 
             // make accordion
             $('#anchor-admin').accordion({collapsible:true,heightStyle:'content'})
+            $('#anchor-admin-2').accordion({collapsible:true,heightStyle:'content'})
         },
         error : function (err) {
             alert('Die Module konnten nicht aktualisiert werden')

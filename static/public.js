@@ -32,9 +32,6 @@ $(document).ready(function () {
             }
             table.append(body)
             root.append(table)
-            // get newewst saved studyprograms for modules
-            populate_studyprograms();
-            // only show current selected semester
             ShowSelectedModules();
         },
         error : function (err) {

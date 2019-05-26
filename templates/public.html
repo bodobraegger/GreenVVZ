@@ -6,10 +6,18 @@
         <script type="text/javascript" src="static/external/jquery/jquery-3.3.1.min.js"></script>
         <script type="text/javascript" src="static/jquery-ui.min.js"></script>
         <script type="text/javascript" src="static/additional/iframeResizer.contentWindow.min.js"></script>
+        <script type="text/javascript" src="static/admin.js"></script>
         <script type="text/javascript" src="static/public.js"></script>
     </head>
     <body>
         {% include 'includes/filter-selectors.html' %}
         <div id="anchor-public" class="mod mod-text skin-text-basics"></div>
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+                populate_studyprograms();
+                ShowSelectedModules();
+            });
+        </script>
     </body>
 </html>
