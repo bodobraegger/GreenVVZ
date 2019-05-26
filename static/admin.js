@@ -178,10 +178,19 @@ function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whit
         ${whitelisted==1 ? 'disabled' : ''}>Anzeigen</button>`
     var verbergen_button=`<button name="Verbergen" onclick="post_module_to_db(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, whitelisted=0, '${searchterm}')"
         ${whitelisted==0 ? 'disabled' : ''}>Verbergen</button>`
-    if(whitelisted==1) sug_status='Angezeigt';
-    else if(whitelisted==0) sug_status='Verborgen';
-    else sug_status='Neu';
-    var whitelist_status_td = `<td class="whitelist_status whitelisted_${whitelisted}">${sug_status}</td>`
+    if(whitelisted==1) {
+        sug_status='Angezeigt';
+        sort_key=2;
+    }
+    else if(whitelisted==0) {
+        sug_status='Verborgen';
+        sort_key=3
+    }
+    else {
+        sug_status='Neu';
+        sort_key=1
+    }
+    var whitelist_status_td = `<td class="whitelist_status whitelisted_${whitelisted}" sorttable_customkey="${sort_key}">${sug_status}</td>`
 
     var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm)}
             <td>${anzeigen_button}${verbergen_button}</td>
