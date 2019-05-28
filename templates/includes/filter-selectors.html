@@ -27,6 +27,7 @@
         $('select#semester_selector').change(function() {
             ClearStudyProgramFilter();
             ShowSelectedModules();
+            populate_studyprograms();
         });
         {% if studyprograms is not none %}   
             studyprograms = {{studyprograms | safe}}
