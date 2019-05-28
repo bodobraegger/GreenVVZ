@@ -564,7 +564,17 @@ def get_studyprograms():
     studyprograms={}
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
-    cursor.execute("SELECT DISTINCT s.* FROM studyprogram AS s INNER JOIN module_studyprogram AS m_s INNER JOIN module AS m WHERE m.id = m_s.module_id AND s.id = m_s.studyprogram_id AND m.whitelisted = 1;")
+    req_data = request.get_json()
+    # Select all studyprograms for modules on the whitelist
+    qry_p1 = """
+    SELECT DISTINCT s.* 
+        FROM studyprogram AS s 
+        INNER JOIN module_studyprogram AS m_s 
+        INNER JOIN module AS m 
+    WHERE m.id = m_s.module_id AND s.id = m_s.studyprogram_id AND m.whitelisted = 1"""
+    # If a specific semester is selected currently, only show for modules in that semester
+    qry_suffix = "AND m.PiqYear = {PiqYear} AND m.PiqSession = {PiqSession};".format(**req_data) if req_data['PiqSession'] != "all_semesters" else ";"
+    cursor.execute(qry_p1+qry_suffix)
     for row in cursor:
         for column, value in row.items():
             if type(value) is bytearray:

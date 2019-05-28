@@ -64,7 +64,7 @@ async function save_searchterm(){
 }
 async function save_module(){
     var SmObjId = $('#whitelist_text').val()
-    if($('option:selected') == 'all') {
+    if($('option:selected') == 'all_years all_semesters') {
         var PiqSession = $('#filter_selectors').find('optgroup').find('option').val().split(' ')[0]
         var PiqSession = $('#filter_selectors').find('optgroup').find('option').val().split(' ')[1]
     }
@@ -305,20 +305,28 @@ async function populate_suggestions(){
 }
 
 async function populate_studyprograms() {
+    var PiqYear = $('option:selected').val().split(' ')[0];
+    var PiqSession = $('option:selected').val().split(' ')[1];
     await $.ajax({
         url: apiUrl+'/studyprograms',
         method : 'GET',
-        beforeSend: function () { $('#suggestions').find('div.loading').toggle(); },
+        data: {
+            'PiqYear': PiqYear,
+            'PiqSession': PiqSession,
+        },
+        beforeSend: function () { $('#studyprogram_input').attr("placeholder", "Lade Studienprogramme...").prop('disabled', true); },
         success : function (data) {
             studyprograms = data;
             studyprogram_textlist = Object.keys(studyprograms).map(function(key){
                 return studyprograms[key];
             });
             studyprogram_ids = Object.keys(studyprograms)
-
         },
         error : function (err) {
             console.log('/studyprograms konnten nicht abgerufen werden: '+err)
+        },
+        complete : function() {
+            $('#studyprogram_input').attr("placeholder", "Studienprogramm").prop('disabled', false);
         },
     })
     await $.ajax({

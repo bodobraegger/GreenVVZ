@@ -10,7 +10,7 @@
 
     <div id="filter_selectors" class="right-align">
         <select name="semester" id="semester_selector">
-            <option value="all" id="all_semesters">Alle Semester</option>>
+            <option value="all_years all_semesters" id="all_semesters">Alle Semester</option>>
             {% for sesh in sessions %}
             <option value="{{sesh['year']}} {{sesh['session']}}" id="{{sesh['year']}} {{sesh['session']}}" {% if loop.index == 2 %} selected {% endif %}>
                 {% if sesh['session'] == 3 %} Herbstsemester {{sesh['year']}} 
@@ -25,6 +25,7 @@
     <script type="text/javascript" src="static/additional/autocomplete.js"></script>
     <script type="text/javascript">
         $('select#semester_selector').change(function() {
+            ClearStudyProgramFilter();
             ShowSelectedModules();
         });
         {% if studyprograms is not none %}   

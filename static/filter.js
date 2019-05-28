@@ -1,7 +1,7 @@
 function FlagSelectedSemester() {
     var year_semester = $("option:selected").val();
     // if all semesters are selected, look for year_semester tags containing a space (all do)
-    if($("option:selected").val() == 'all') year_semester=" ";
+    if($("option:selected").val() == 'all_years all_semesters') year_semester=" ";
     $('[data-semester]').removeClass('selected-semester');
     $(`[data-semester*="${year_semester}"]`).addClass('selected-semester');
     return;
