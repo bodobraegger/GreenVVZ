@@ -564,8 +564,6 @@ def get_studyprograms():
     studyprograms={}
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
-    req_data = request.get_json()
-    print(req_data)
     # Select all studyprograms for modules on the whitelist
     qry_p1 = """
     SELECT DISTINCT s.* 
@@ -574,7 +572,7 @@ def get_studyprograms():
         INNER JOIN module AS m 
     WHERE m.id = m_s.module_id AND s.id = m_s.studyprogram_id AND m.whitelisted = 1"""
     # If a specific semester is selected currently, only show for modules in that semester
-    qry_suffix = "AND m.PiqYear = {} AND m.PiqSession = {};".format(req_data['PiqYear'], req_data['PiqSession']) if req_data['PiqSession'] != "all_semesters" else ";"
+    qry_suffix = "AND m.PiqYear = {} AND m.PiqSession = {};".format(request.args.get('PiqYear'), request.args.get('PiqSession')) if request.args.get('PiqSession', 'all_semesters') != "all_semesters" else ";"
     cursor.execute(qry_p1+qry_suffix)
     for row in cursor:
         for column, value in row.items():

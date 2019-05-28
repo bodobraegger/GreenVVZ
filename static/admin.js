@@ -1,5 +1,5 @@
 var baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
-var apiUrl = 'https://greenvvz.ifi.uzh.ch/'
+var apiUrl = 'https://greenvvz.ifi.uzh.ch'
 // var apiUrl = 'http://127.0.0.1:8080/'
 var secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data('api-key')
 
@@ -310,10 +310,10 @@ async function populate_studyprograms() {
     await $.ajax({
         url: apiUrl+'/studyprograms',
         method : 'GET',
-        data: JSON.stringify({
+        data: {
             'PiqYear': PiqYear,
             'PiqSession': PiqSession,
-        }),
+        },
         beforeSend: function () { $('#studyprogram_input').attr("placeholder", "Lade Studienprogramme...").prop('disabled', true); },
         success : function (data) {
             studyprograms = data;
@@ -332,7 +332,6 @@ async function populate_studyprograms() {
     await $.ajax({
         url: apiUrl+'/studyprograms_modules',
         method : 'GET',
-        beforeSend: function () { $('#suggestions').find('div.loading').toggle(); },
         success : function (data) {
             studyprogramid_moduleids = data;
         },
