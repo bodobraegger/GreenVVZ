@@ -9,6 +9,7 @@ function FlagSelectedSemester() {
 function FlagSelectedStudyprogram() {
     var studyprogram_index = studyprogram_textlist.indexOf(document.getElementById("studyprogram_input").value);
     if(studyprogram_index == -1) {
+        $('#studyprogram_btn_clear').prop('disabled', true);
         document.getElementById("studyprogram_input").value ? console.log("invalid input: " + document.getElementById("studyprogram_input").value) : "";
         $('#whitelist_body').find($(`[data-semester]`)).addClass('selected-studyprogram');
         return;
@@ -22,6 +23,7 @@ function FlagSelectedStudyprogram() {
         $(`#module_${module_ids[i]}`).addClass('selected-studyprogram');
     }
     $(modules_to_unflag).removeClass('selected-studyprogram');
+    $('#studyprogram_btn_clear').prop('disabled', false);
     return;
 }
 function ShowSelectedModules() {
