@@ -74,12 +74,12 @@ async function save_module(){
     }
     await $.ajax({
         url: `${apiUrl}/modules/?key=${secret_key}`,
-        data: {
+        data: JSON.stringify({
             'PiqYear': PiqYear,
             'PiqSession': PiqSession,
             'SmObjId': SmObjId,
             'whitelisted': 1,
-        },
+        }),
         method : 'POST',
         success : function (data) {
             add_to_whitelist(data.SmObjId, data.PiqYear, data.PiqSession, data.title, data.searchterm)
@@ -310,10 +310,10 @@ async function populate_studyprograms() {
     await $.ajax({
         url: apiUrl+'/studyprograms',
         method : 'GET',
-        data: {
+        data: JSON.stringify({
             'PiqYear': PiqYear,
             'PiqSession': PiqSession,
-        },
+        }),
         beforeSend: function () { $('#studyprogram_input').attr("placeholder", "Lade Studienprogramme...").prop('disabled', true); },
         success : function (data) {
             studyprograms = data;
