@@ -1,65 +1,65 @@
 .selected-semester,.selected-studyprogram {
   transition:all 0.1s;
-  }
+}
 
-  .hidden {
-  visibility:collapse;
+.hidden {
+  visibility: collapse;
   width:0;
   height:0;
   padding:0;
   margin:0;
   opacity:0;
-  }
+}
 
-  .studyprogram {
-      width: 50%;
-      display: inline-block;
-  }
+.studyprogram {
+  width: 50%;
+  display: inline-block;
+}
 
-  .studyprogram.btn {
-      display: inline-block;
-      width: 20%;
-  }
+.studyprogram.btn {
+  display: inline-block;
+  width: 20%;
+}
 
-  #studyprogram_btn_clear {
-      width: 25%
-  }
+#studyprogram_btn_clear {
+  width: 25%
+}
 
-  #studyprogram_input {
-      padding: 3px;
-      margin: 3px;
-  }
-  .parent {
+#studyprogram_input {
+  padding: 3px;
+  margin: 3px;
+}
+.parent {
   position: relative;
   width: 100%;
 
-  }
-  .left-align, .right-align {
+}
+.left-align, .right-align {
   position: absolute;
   margin: auto;
   top: 3px;
 
-  }
-  .left-align {
+}
+.left-align {
   left: 0;
   margin-left: 3px;
-  }
-  .right-align {
+}
+.right-align {
   right: 0;
   margin-right: 3px;
-  }
+}
 
-  .autocomplete {
+.autocomplete {
   /*the container must be positioned relative:*/
   position: relative;
   display: inline-block;
-  }
+}
   input {
   border: 1px solid transparent;
   background-color: #f1f1f1;
-  }
+}
 
-  .autocomplete-items {
+.autocomplete-items {
   position: absolute;
   border: 1px solid #d4d4d4;
   border-bottom: none;
@@ -69,19 +69,19 @@
   top: 100%;
   left: 0;
   right: 0;
-  }
-  .autocomplete-items div {
+}
+.autocomplete-items div {
   padding: 5px;
   cursor: pointer;
   background-color: #fff; 
   border-bottom: 1px solid #d4d4d4; 
-  }
-  .autocomplete-items div:hover {
+}
+.autocomplete-items div:hover {
   /*when hovering an item:*/
   background-color: #e9e9e9; 
-  }
-  .autocomplete-active {
+}
+.autocomplete-active {
   /*when navigating through the items using the arrow keys:*/
   background-color: DodgerBlue !important; 
   color: #ffffff; 
-  }
+}
