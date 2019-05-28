@@ -85,7 +85,7 @@
             $(document).ready(function () {
                 // update modules
                 $.ajax({
-                    url: apiUrl+'update',
+                    url: apiUrl+'/update',
                     method : 'GET',
                     beforeSend: function () {
                         $('#anchor-admin').before(`
@@ -103,13 +103,11 @@
                     },
                     success : function() {
                         // populate whitelist
-                        populate_whitelist()
+                        populate_whitelist();
                         // populate blacklist
-                        populate_blacklist()
+                        populate_blacklist();
+                        $('#modules-updating').hide();
                     },
-                    complete: function () {
-                        $('#modules-updating').hide()
-                    }
                 })
             });
             
