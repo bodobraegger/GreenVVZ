@@ -22,7 +22,7 @@
     <div class="spacer" style="height: 3em">
     <!--hwat-->
     <script type="text/javascript" src="static/filter.js"></script>
-    <script type="text/javascript" src="static/additional/autocomplete.js"></script>
+    <!-- <script type="text/javascript" src="static/additional/autocomplete.js"></script> -->
     <script type="text/javascript">
         $('select#semester_selector').change(function() {
             ClearStudyProgramFilter();
@@ -36,7 +36,50 @@
         {% if studyprogramid_moduleids is not none %}   
             studyprogramid_moduleids = {{studyprogramid_moduleids | safe}}
         {% endif %}
-        autocomplete(document.getElementById("studyprogram_input"), studyprogram_textlist);
+        $('#studyprogram_input').autocomplete({
+            source: studyprogram_textlist,
+            minLength: 0,
+        }).focus(function() {
+            $(this).autocomplete('search', $(this).val())
+        });
+        function autocomplete_noresults() {
+            var sp_suggestions_container = document.getElementById('studyprogram_inputautocomplete-list');
+            if(sp_suggestions_container) {
+                var n_sp_suggestions = sp_suggestions_container.childElementCount;
+                if (n_sp_suggestions===0) {
+                    no_modules_item = document.createElement("DIV");
+                    no_modules_item.innerHTML = "Keine Studienprogramme für Module dieses Semesters gefunden.";
+                    sp_suggestions_container.appendChild(no_modules_item);
+                }
+            }
+        }
+        $('#studyprogram_input').on('input',function(e){
+            autocomplete_noresults();
+        });
+        function monkeyPatchAutocomplete() {
+            $.ui.autocomplete.prototype._renderItem = function (ul, item) {
+
+                // Escape any regex syntax inside this.term
+                var cleanTerm = this.term.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+                // Build pipe separated string of terms to highlight
+                var keywords = $.trim(cleanTerm).replace('  ', ' ').split(' ').join('|');
+
+                // Get the new label text to use with matched terms wrapped
+                // in a span tag with a class to do the highlighting
+                var re = new RegExp("(" + keywords + ")", "gi");
+                var output = item.label.replace(re,  
+                    '<span class="ui-menu-item-highlight">$1</span>');
+
+                return $("<li>")
+                    .append($("<a>").html(output))
+                    .appendTo(ul);
+            };
+        };
+
+        $(function () {
+        monkeyPatchAutocomplete();
+        });
     </script>
     <link rel="stylesheet" href="static/filter.css">
 </div>

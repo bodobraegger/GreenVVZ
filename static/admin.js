@@ -340,7 +340,14 @@ async function populate_studyprograms() {
         },
     })
     // update the autocomplete list
-    autocomplete(document.getElementById("studyprogram_input"), studyprogram_textlist);
+    // autocomplete(document.getElementById("studyprogram_input"), studyprogram_textlist);
+    $('#studyprogram_input').autocomplete({
+        source: studyprogram_textlist,
+        minLength: 0,
+        delay: 0,
+    }).focus(function() {
+        $(this).autocomplete('search', $(this).val());
+    });
 }
 
 function convert_session_to_string(session, year){

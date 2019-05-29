@@ -3,7 +3,7 @@
         <link rel="stylesheet" href="static/general.css">
         <link rel="stylesheet" href="static/uzh/app.css">
         <link rel="stylesheet" href="static/jquery-ui.min.css">
-        <script type="text/javascript" src="static/external/jquery/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="static/external/jquery/jquery.min.js"></script>
         <script type="text/javascript" src="static/jquery-ui.min.js"></script>
         <script type="text/javascript" src="static/additional/iframeResizer.contentWindow.min.js"></script>
         <script type="text/javascript" src="static/additional/sorttable.js"></script>
@@ -80,9 +80,9 @@
             </div>
         </div> <!-- END outer div to match UZH styling -->
         <script type="text/javascript" src="static/admin.js"></script> 
-         
+
         <script type="text/javascript">
-            $(document).ready(function () {
+            function updateModules() {
                 // update modules
                 $.ajax({
                     url: apiUrl+'/update',
@@ -107,9 +107,10 @@
                         // populate blacklist
                         populate_blacklist();
                         $('#modules-updating').hide();
+                        setCookie("updated_recently", true, 1);
                     },
                 })
-            });
+            }
             
             $(document).ready(function () {
                 // populate searchterms
@@ -127,7 +128,44 @@
 
                 // make accordion
                 $('#anchor-admin').accordion({collapsible:true,heightStyle:'content'})
+
+                // check if modules updated recently, do so if necesary
+                checkUpdatedCookie();
+
             });
+
+
+            function setCookie(cname, cvalue, exdays) {
+                var d = new Date();
+                d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+                var expires = "expires="+d.toUTCString();
+                document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+            }
+
+            function getCookie(cname) {
+                var name = cname + "=";
+                var ca = document.cookie.split(';');
+                for(var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                    }
+                    if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                    }
+                }
+                return "";
+            }
+
+            function checkUpdatedCookie() {
+                var update_status = getCookie("updated_recently");
+                if (update_status != "") {
+                    return;
+                } else {
+                    updateModules();
+                }
+            }
         </script>
+
     </body>
 </html>
