@@ -572,8 +572,8 @@ def get_studyprograms():
         INNER JOIN module AS m 
     WHERE m.id = m_s.module_id AND s.id = m_s.studyprogram_id AND m.whitelisted = 1"""
     # If a specific semester is selected currently, only show for modules in that semester
-    qry_suffix = " AND m.PiqYear = {} AND m.PiqSession = {};".format(request.args.get('PiqYear'), request.args.get('PiqSession')) if request.args.get('PiqSession', 'all_semesters') != "all_semesters" else ";"
-    cursor.execute(qry_p1+qry_suffix)
+    qry_p2 = " AND m.PiqYear = {} AND m.PiqSession = {}".format(request.args.get('PiqYear'), request.args.get('PiqSession')) if request.args.get('PiqSession', 'all_semesters') != "all_semesters" else ""
+    cursor.execute(qry_p1+qry_p2+" ORDER BY s.CgHighText, s.CgHighCategory;")
     for row in cursor:
         for column, value in row.items():
             if type(value) is bytearray:
