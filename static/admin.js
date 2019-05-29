@@ -361,3 +361,64 @@ function convert_session_to_string(session, year){
         return 'undefiniert'
     }
 }
+
+function updateModules() {
+    // update modules
+    $.ajax({
+        url: apiUrl+'/update',
+        method : 'GET',
+        beforeSend: function () {
+            $('#anchor-admin').before(`
+            <div id="modules-updating" class="alert alert-blue">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <h3>Module werden aktualisiert</h3><p>Bitte haben Sie Geduld, dies kann je nach Anzahl der Module bis zu einer Minute dauern</p>
+            </div>
+            `)
+        },
+        error : function (err) {
+            console.log(err)
+            $('#modules-updating').removeClass('alert-blue').addClass('alert-red')
+            $('#modules-updating').find($('h3')).text('Die Module konnten nicht aktualisiert werden.')
+            $('#modules-updating').find($('p')).text('Bitte versuchen Sie es erneut, in dem Sie die Seite neu laden.')
+        },
+        success : function() {
+            // populate whitelist
+            populate_whitelist();
+            // populate blacklist
+            populate_blacklist();
+            $('#modules-updating').hide();
+            setCookie("updated_recently", true, 1);
+        },
+    })
+}
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function checkUpdatedCookie() {
+    var update_status = getCookie("updated_recently");
+    if (update_status != "") {
+        return;
+    } else {
+        updateModules();
+    }
+}
