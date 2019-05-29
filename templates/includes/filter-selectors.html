@@ -57,6 +57,7 @@
             autocomplete_noresults();
         });
         function monkeyPatchAutocomplete() {
+            // hack: override autocomplete _renderItem to highlight matching part
             $.ui.autocomplete.prototype._renderItem = function (ul, item) {
 
                 // Escape any regex syntax inside this.term
@@ -74,6 +75,13 @@
                 return $("<li>")
                     .append($("<a>").html(output))
                     .appendTo(ul);
+            };
+            // hack: override autocomplete search function compare starts of options ("^")
+            $.ui.autocomplete.filter = function (array, term) {
+                var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(term), "i");
+                return $.grep(array, function (value) {
+                    return matcher.test(value.label || value.value || value);
+                });
             };
         };
 
