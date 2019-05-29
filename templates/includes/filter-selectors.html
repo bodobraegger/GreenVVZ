@@ -42,52 +42,6 @@
         }).focus(function() {
             $(this).autocomplete('search', $(this).val())
         });
-        function autocomplete_noresults() {
-            var sp_suggestions_container = document.getElementById('studyprogram_inputautocomplete-list');
-            if(sp_suggestions_container) {
-                var n_sp_suggestions = sp_suggestions_container.childElementCount;
-                if (n_sp_suggestions===0) {
-                    no_modules_item = document.createElement("DIV");
-                    no_modules_item.innerHTML = "Keine Studienprogramme für Module dieses Semesters gefunden.";
-                    sp_suggestions_container.appendChild(no_modules_item);
-                }
-            }
-        }
-        $('#studyprogram_input').on('input',function(e){
-            autocomplete_noresults();
-        });
-        function monkeyPatchAutocomplete() {
-            // hack: override autocomplete _renderItem to highlight matching part
-            $.ui.autocomplete.prototype._renderItem = function (ul, item) {
-
-                // Escape any regex syntax inside this.term
-                var cleanTerm = this.term.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-
-                // Build pipe separated string of terms to highlight
-                var keywords = $.trim(cleanTerm).replace('  ', ' ').split(' ').join('|');
-
-                // Get the new label text to use with matched terms wrapped
-                // in a span tag with a class to do the highlighting
-                var re = new RegExp("(" + keywords + ")", "gi");
-                var output = item.label.replace(re,  
-                    '<span class="ui-menu-item-highlight">$1</span>');
-
-                return $("<li>")
-                    .append($("<a>").html(output))
-                    .appendTo(ul);
-            };
-            // hack: override autocomplete search function compare starts of options ("^")
-            $.ui.autocomplete.filter = function (array, term) {
-                var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(term), "i");
-                return $.grep(array, function (value) {
-                    return matcher.test(value.label || value.value || value);
-                });
-            };
-        };
-
-        $(function () {
-        monkeyPatchAutocomplete();
-        });
     </script>
     <link rel="stylesheet" href="static/filter.css">
 </div>
