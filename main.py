@@ -581,11 +581,11 @@ def get_studyprograms():
                 row[column] = value.decode('utf-8')
         studyprograms[row['id']] = "{CgHighText}: {CgHighCategory}".format(**row)
     cnx.close()
-    return app.response_class({
+    return app.response_class(
         response=json.dumps(studyprogams),
         status=200,
         mimetype='application/json'
-    })
+    )
 
 @app.route('/studyprograms_modules', methods=['GET'])
 @cross_origin()
