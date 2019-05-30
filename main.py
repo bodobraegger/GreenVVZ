@@ -582,7 +582,7 @@ def get_studyprograms():
         studyprograms[row['id']] = "{CgHighText}: {CgHighCategory}".format(**row)
     cnx.close()
     return app.response_class(
-        response=json.dumps(studyprogams),
+        response=json.dumps(studyprograms),
         status=200,
         mimetype='application/json'
     )
