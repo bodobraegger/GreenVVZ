@@ -36,7 +36,10 @@
         {% if studyprogramid_moduleids is not none %}   
             studyprogramid_moduleids = {{studyprogramid_moduleids | safe}}
         {% endif %}
-        $('#studyprogram_input').autocomplete({
+
+        $('#studyprogram_input').on("change keyup autocompleteselect", function() {
+            ShowSelectedModules();
+        }).autocomplete({
             source: studyprogram_textlist,
             minLength: 0,
         }).focus(function() {
