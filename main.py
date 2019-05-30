@@ -11,9 +11,9 @@ from itertools import groupby
 from dateutil.relativedelta import relativedelta
 from collections import OrderedDict
 
-from flask import Flask, jsonify, request, abort, render_template
+from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
-import json
+import json as json_builtin
 
 import models
 import updateModules
@@ -583,7 +583,7 @@ def get_studyprograms():
         studyprograms[row['id']] = "{CgHighText}: {CgHighCategory}".format(**row)
     cnx.close()
     return app.response_class(
-        response=json.dumps(studyprograms),
+        response=json_builtin.dumps(studyprograms),
         status=200,
         mimetype='application/json'
     )
