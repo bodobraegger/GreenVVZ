@@ -11,8 +11,9 @@ from itertools import groupby
 from dateutil.relativedelta import relativedelta
 from collections import OrderedDict
 
-from flask import Flask, json, jsonify, request, abort, render_template
+from flask import Flask, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
+import json
 
 import models
 import updateModules
