@@ -29,13 +29,6 @@
             ShowSelectedModules();
             populate_studyprograms();
         });
-        {% if studyprograms is not none %}   
-            studyprograms = {{studyprograms | safe}}
-        {% endif %}
-        studyprogramid_moduleids = {}
-        {% if studyprogramid_moduleids is not none %}   
-            studyprogramid_moduleids = {{studyprogramid_moduleids | safe}}
-        {% endif %}
 
         $('#studyprogram_input').on("change keyup autocompleteselect", function() {
             ShowSelectedModules();

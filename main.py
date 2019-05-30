@@ -9,11 +9,9 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from itertools import groupby
 from dateutil.relativedelta import relativedelta
-from collections import OrderedDict
 
 from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
-import json as json_builtin
 
 import models
 import updateModules
@@ -563,7 +561,8 @@ def search_upwards():
 @app.route('/studyprograms', methods=['GET'])
 @cross_origin()
 def get_studyprograms():
-    studyprograms=OrderedDict()
+    studyprogram_idlist = []
+    studyprogram_textlist = []
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
     # Select all studyprograms for modules on the whitelist
@@ -580,13 +579,10 @@ def get_studyprograms():
         for column, value in row.items():
             if type(value) is bytearray:
                 row[column] = value.decode('utf-8')
-        studyprograms[row['id']] = "{CgHighText}: {CgHighCategory}".format(**row)
+        studyprogram_idlist.append(row['id'])
+        studyprogram_textlist.append("{CgHighText}: {CgHighCategory}".format(**row))
     cnx.close()
-    return app.response_class(
-        response=json_builtin.dumps(studyprograms),
-        status=200,
-        mimetype='application/json'
-    )
+    return jsonify([studyprogram_idlist, studyprogram_textlist])
 
 @app.route('/studyprograms_modules', methods=['GET'])
 @cross_origin()

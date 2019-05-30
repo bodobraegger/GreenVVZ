@@ -316,11 +316,8 @@ async function populate_studyprograms() {
         },
         beforeSend: function () { $('#studyprogram_input').attr("placeholder", "Lade Studienprogramme...").prop('disabled', true); },
         success : function (data) {
-            studyprograms = data;
-            studyprogram_textlist = Object.keys(studyprograms).map(function(key){
-                return studyprograms[key];
-            });
-            studyprogram_ids = Object.keys(studyprograms)
+            studyprogram_idlist = data[0]
+            studyprogram_textlist = data[1]
         },
         error : function (err) {
             console.log('/studyprograms konnten nicht abgerufen werden: '+err)
