@@ -9,6 +9,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from itertools import groupby
 from dateutil.relativedelta import relativedelta
+from collections import OrderedDict
 
 from flask import Flask, json, jsonify, request, abort, render_template
 from flask_cors import CORS, cross_origin
@@ -561,7 +562,7 @@ def search_upwards():
 @app.route('/studyprograms', methods=['GET'])
 @cross_origin()
 def get_studyprograms():
-    studyprograms={}
+    studyprograms=OrderedDict()
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
     # Select all studyprograms for modules on the whitelist
@@ -580,7 +581,11 @@ def get_studyprograms():
                 row[column] = value.decode('utf-8')
         studyprograms[row['id']] = "{CgHighText}: {CgHighCategory}".format(**row)
     cnx.close()
-    return jsonify(studyprograms)
+    return app.response_class({
+        response=json.dumps(studyprogams),
+        status=200,
+        mimetype='application/json'
+    })
 
 @app.route('/studyprograms_modules', methods=['GET'])
 @cross_origin()
