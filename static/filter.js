@@ -47,38 +47,36 @@ function ClearStudyProgramFilter() {
 studyprogram_idlist = []
 studyprogram_textlist = []
 
-
-function autocomplete_noresults() {
-    var sp_suggestions_container = document.getElementById('studyprogram_inputautocomplete-list');
-    if(sp_suggestions_container) {
-        var n_sp_suggestions = sp_suggestions_container.childElementCount;
-        if (n_sp_suggestions===0) {
-            no_modules_item = document.createElement("DIV");
-            no_modules_item.innerHTML = "Keine Studienprogramme für Module dieses Semesters gefunden.";
-            sp_suggestions_container.appendChild(no_modules_item);
-        }
-    }
-}
-$('#studyprogram_input').on('input',function(e){
-    autocomplete_noresults();
-});
-
 function monkeyPatchAutocomplete() {
     // hack: override autocomplete _renderItem to highlight matching part
     $.ui.autocomplete.prototype._renderItem = function (ul, item) {
-
         // Escape any regex syntax inside this.term
         var cleanTerm = this.term.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-
+        
         // Build pipe separated string of terms to highlight
         var keywords = $.trim(cleanTerm).replace('  ', ' ').split(' ').join('|');
-
+        
+        var re = new RegExp("(" + keywords + ")", "gi");
+        // further hack: displaying custom total message, see admin.js
+        // if more than num_sp_sugs+5 suggestions, show only 10 
+        if(item.label.includes(' ... ')) {
+            var listend = $("<li>")
+            if(keywords.length > 0) {
+                listend.html(`${item.label} weitere Studienprogramme für Module im gewählten Semester mit Filter: <b>${$.trim(cleanTerm).replace('  ', ' ')}</b>`);
+            }
+            else {
+                listend.html(`${item.label} weitere Studienprogramme für Module im gewählten Semester`);
+            }
+            return listend.attr('id', 'further_studyprograms_msg').appendTo(ul);
+        }
+        // if no suggestions pop up, show 'Keine' message
+        else if(item.label.includes(' Keine ')) {
+            return $("<li>").html(`Keine Studienprogramme für Module im gewählten Semester mit Filter: <b>${$.trim(cleanTerm).replace('  ', ' ')}</b>`).attr('id', 'further_studyprograms_msg').appendTo(ul);
+        }
         // Get the new label text to use with matched terms wrapped
         // in a span tag with a class to do the highlighting
-        var re = new RegExp("(" + keywords + ")", "gi");
         var output = item.label.replace(re,  
             '<span class="ui-menu-item-highlight">$1</span>');
-
         return $("<li>")
             .append($("<a>").html(output))
             .appendTo(ul);

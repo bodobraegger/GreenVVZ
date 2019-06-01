@@ -72,14 +72,14 @@ input {
   background-clip: padding-box;
 }
 
-.ui-menu-item {
+.ui-autocomplete .ui-menu-item {
   padding: 1px;
   cursor: pointer;
   background-color: #fff;
   border-bottom: 1px solid #d4d4d4;
 }
 
-.ui-menu-item > a.ui-corner-all {
+.ui-autocomplete .ui-menu-item > a.ui-corner-all {
   display: block;
   padding: 3px 15px;
   clear: both;
@@ -90,15 +90,27 @@ input {
   text-decoration: none;
 }
 
-.ui-menu-item .ui-state-active {
+.ui-autocomplete .ui-menu-item .ui-state-active {
   border: none;
 }
 
-.ui-menu-item-highlight {
+.ui-autocomplete .ui-menu-item >.ui-menu-item-highlight {
   font-weight: bold;
 }
 
-.ui-menu-item > .ui-state-hover, .ui-menu-item > .ui-state-active {
+.ui-autocomplete .ui-menu-item a > .ui-state-hover, .ui-autocomplete .ui-menu-item a > .ui-state-active {
   color: #ffffff;
   background-color: DodgerBlue;
+}
+
+#further_studyprograms_msg {
+  background-color: #f1f1f1;
+  cursor: default;
+  pointer-events: none;
+}
+
+#further_studyprograms_msg b{
+  all: inherit;
+  display: inline;
+  font-weight: bold;
 }

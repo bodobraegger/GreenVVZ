@@ -339,12 +339,26 @@ async function populate_studyprograms() {
     // update the autocomplete list
     // autocomplete(document.getElementById("studyprogram_input"), studyprogram_textlist);
     $('#studyprogram_input').autocomplete({
-        source: studyprogram_textlist,
+        source: function(request, response) {
+            var results = $.ui.autocomplete.filter(studyprogram_textlist, request.term);
+            var num_sp_suggestions = 10;
+            if (results.length > num_sp_suggestions+5) {
+                // will be rendered differently, see filter.js
+                var total_msg=` ... ${results.length - num_sp_suggestions}`
+                results = results.slice(0, 10)
+                results.push(total_msg)
+            }
+            if (results.length == 0) {
+                results.push(' Keine ')
+            }
+            response(results);
+        },
         minLength: 0,
         delay: 0,
     }).focus(function() {
         $(this).autocomplete('search', $(this).val());
     });
+    $('.ui-autocomplete').attr('data-iframe-height', '');
 }
 
 function convert_session_to_string(session, year){
