@@ -62,16 +62,16 @@ function monkeyPatchAutocomplete() {
         if(item.label.includes(' ... ')) {
             var listend = $("<li>")
             if(keywords.length > 0) {
-                listend.html(`${item.label} weitere Studienprogramme für Module im gewählten Semester mit Filter: <b>${$.trim(cleanTerm).replace('  ', ' ')}</b>`);
+                listend.html(`<b>${item.label}</b> weitere Studienprogramme für Module im gewählten Semester mit Filter: <b>${$.trim(cleanTerm).replace('  ', ' ')}</b>`);
             }
             else {
-                listend.html(`${item.label} weitere Studienprogramme für Module im gewählten Semester`);
+                listend.html(`<b>${item.label}</b> weitere Studienprogramme für Module im gewählten Semester`);
             }
             return listend.attr('id', 'further_studyprograms_msg').appendTo(ul);
         }
         // if no suggestions pop up, show 'Keine' message
         else if(item.label.includes(' Keine ')) {
-            return $("<li>").html(`Keine Studienprogramme für Module im gewählten Semester mit Filter: <b>${$.trim(cleanTerm).replace('  ', ' ')}</b>`).attr('id', 'further_studyprograms_msg').appendTo(ul);
+            return $("<li>").html(`<b>${item.label}</b> Studienprogramme für Module im gewählten Semester mit Filter: <b>${$.trim(cleanTerm).replace('  ', ' ')}</b>`).attr('id', 'further_studyprograms_msg').appendTo(ul);
         }
         // Get the new label text to use with matched terms wrapped
         // in a span tag with a class to do the highlighting
