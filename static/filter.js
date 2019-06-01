@@ -84,12 +84,12 @@ function monkeyPatchAutocomplete() {
             .appendTo(ul);
     };
     // hack: override autocomplete search function compare starts of options ("^")
-    $.ui.autocomplete.filter = function (array, term) {
+    /* $.ui.autocomplete.filter = function (array, term) {
         var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(term), "i");
         return $.grep(array, function (value) {
             return matcher.test(value.label || value.value || value);
         });
-    };
+    }; */
 };
 
 $(function () {
