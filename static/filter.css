@@ -90,6 +90,10 @@ input {
   text-decoration: none;
 }
 
+.ui-menu-item .ui-state-active {
+  border: none;
+}
+
 .ui-menu-item-highlight {
   font-weight: bold;
 }
