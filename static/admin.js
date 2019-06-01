@@ -234,7 +234,7 @@ async function populate_whitelist(){
                 add_to_whitelist(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].searchterm)
             }
             whitelist.prepend(`
-            <tr>
+            <tr class="static" data-row-index="0">
               <td colspan="2">
                 <input type="text" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%">
               </td>
@@ -248,7 +248,7 @@ async function populate_whitelist(){
             console.log('Whitelist konnte nicht abgerufen werden: '+err)
         },
         complete : function() {
-            $('#whitelist').find($('thead')).find($('td')).removeClass('sorttable_sorted sorttable_sorted_reverse').first().trigger('click');
+            $('#whitelist table').trigger('update');
             $('#whitelist').find('div.loading').toggle();
         }
 
@@ -273,7 +273,7 @@ async function populate_blacklist(){
             console.log('Blacklist konnte nicht abgerufen werden: '+err)
         },
         complete : function() {
-            $('#blacklist').find($('thead')).find($('td')).removeClass('sorttable_sorted sorttable_sorted_reverse').first().trigger('click');
+            $('#blacklist table').trigger('update');
             $('#blacklist').find('div.loading').toggle();
         }
     })
@@ -297,7 +297,7 @@ async function populate_suggestions(){
             console.log('Suchvorschläge konnten nicht abgerufen werden: '+err)
         },
         complete : function() {
-            $('#suggestions').find($('thead')).find($('td')).removeClass('sorttable_sorted sorttable_sorted_reverse').first().trigger('click');
+            $('#suggestions table').trigger('update');
             $('#suggestions').find('div.loading').toggle();
         }
 

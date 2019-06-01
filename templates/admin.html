@@ -1,12 +1,21 @@
 <html>
     <head>
         <link rel="stylesheet" href="static/general.css">
+        <!-- uzh styling -->
         <link rel="stylesheet" href="static/uzh/app.css">
-        <link rel="stylesheet" href="static/jquery-ui.min.css">
+        
+        <!-- jquery -->
         <script type="text/javascript" src="static/external/jquery/jquery.min.js"></script>
+        <!-- jquery.tablesorter.lib -->
+        <script type="text/javascript" src="static/external/jquery/jquery.tablesorter.lib/js/jquery.tablesorter.min.js"></script>
+        <link rel="stylesheet" href="static/external/jquery/jquery.tablesorter.lib/css/theme.default.css">
+        <script type="text/javascript" src="static/external/jquery/jquery.tablesorter.lib/js/widgets/widget-staticRow.min.js"></script>
+        <!-- jquery.ui -->
         <script type="text/javascript" src="static/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="static/jquery-ui.min.css">
+
+        <!-- iframeResizer plugin -->
         <script type="text/javascript" src="static/additional/iframeResizer.contentWindow.min.js"></script>
-        <script type="text/javascript" src="static/additional/sorttable.js"></script>
     </head>
     <body>
         {% include 'includes/filter-selectors.html' %}
@@ -15,21 +24,21 @@
                 <h3>Angezeigte Elemente (Whitelist) <div class="count" id="count_whitelist"></div></h3>
                 <div id="whitelist" style="padding: 0">
                     <div class="loading"><h3 class="loading ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
-                         <table class="sortable"> <!--class="sortable"-->
-                            <thead>
-                                <td>Name des Moduls</td>
-                                <td class="searchterm">Suchbegriff</td>
-                                <td class="semester">Semster</td>
-                                <td class="sorttable_nosort">Verbergen</td>
-                            </thead>
-                            <tbody id="whitelist_body">
-                                <tr>
-                                    <td colspan="2"><input type="number" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%"></td>
-                                    <td colspan="2"><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <table class="sortable">
+                        <thead>
+                            <td>Name des Moduls</td>
+                            <td class="searchterm">Suchbegriff</td>
+                            <td class="semester">Semster</td>
+                            <td class="sorttable_nosort">Verbergen</td>
+                        </thead>
+                        <tbody id="whitelist_body">
+                            <tr>
+                                <td colspan="2"><input type="number" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%"></td>
+                                <td colspan="2"><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <h3>Suchbegriffe</h3>
                 <div style="padding: 0">
@@ -50,7 +59,7 @@
                 <h3>Vorschläge basierend auf Suchbegriffen <div class="count" id="count_suggestions"></div></h3>
                 <div id="suggestions" style="padding: 0">
                     <div class="loading"><h3 class="loading ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
-                    <table class="sortable">
+                    <table class="sortable" data-sortlist="[[0,0]]">
                         <thead>
                             <td id="suggestions_title_th">Name des Moduls</td>
                             <td class="searchterm">Suchbegriff</td> 
@@ -66,7 +75,7 @@
                 <h3>Verborgene Elemente (Blacklist) <div class="count" id="count_blacklist"></div></h3>
                 <div id="blacklist" style="padding: 0">
                     <div class="loading"><h3 class="loading ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
-                     <table class="sortable"> <!--class="sortable"-->
+                     <table class="sortable">
                         <thead>
                             <td>Name des Moduls</td>
                             <td class="searchterm">Suchbegriff</td>
@@ -102,6 +111,20 @@
 
                 // check if modules updated recently, do so if necesary
                 checkUpdatedCookie();
+
+                $(".sortable").addClass("tablesorter").tablesorter({
+                    // keep modulnummer input in place
+                    widgets: ['staticRow'],
+                    // third click on the header will reset column to default - unsorted
+                    // sortReset   : true,
+                    // Resets the sort direction so that clicking on an unsorted column will sort in the sortInitialOrder direction.
+                    sortRestart : true,
+                    headers : {
+                    // 0 : { lockedOrder: 'asc' }, only allow sorting in one direction
+                    3: {sorter: false, parser: false} // don't sort on third header
+                    }
+
+                });
 
             });
         </script>
