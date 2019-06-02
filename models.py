@@ -9,20 +9,23 @@ class Globals():
     URI_prefix = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/"
 
 class Module:
+    """ Class to hold Module logic and data. Hardly used to full potential, could rework to use more of this."""
     # constructor
-    def __init__(self, SmObjId):
+    def __init__(self, SmObjId: int, PiqYear: int, PiqSession: int):
+        """ Construct with Primary Key: (SmObjId, PiqYear, PiqSession) """
         self.SmObjId = SmObjId
-        self.PiqSession = 0
-        self.PiqYear = 0
+        self.PiqYear = PiqYear
+        self.PiqSession = PiqSession
         self.title = ''
-        self.whitelisted=0
+        self.whitelisted=None
 
     # check if a module exists in specified year and session and return dict with SmObjId, PiqYear, PiqSession, and title
     # return None if module doesn't exist
-    def find_module_values(self, year, session):
+    def find_module_values(self) -> dict:
+        """Check if module with given SmObjId and session data exists in course catalogue, get values if it does"""
         rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmDetailsSet(SmObjId='{0}',PiqYear='{1}'," \
                "PiqSession='{2}')?$format=json".format(
-            self.SmObjId, year, session)
+            self.SmObjId, self.PiqYear, self.PiqSession)
 
         r = requests.get(rURI)
         try:
@@ -39,6 +42,7 @@ class Module:
             if module['SmObjId'] == '00000000':
                 return None
             else:
+                self.set_module(module)
                 return module
 
         except requests.exceptions.HTTPError as err:
@@ -48,33 +52,15 @@ class Module:
             print(err)
             return None
 
-    # get most recent module from odata-api, and set class-variables
-    # return false if not available
-    def update(self):
-        previous = self.find_module_values(helpers.get_session(date.today()-relativedelta(months=6))['year'], helpers.get_session(date.today()-relativedelta(months=6))['session'])
-        current = self.find_module_values(helpers.get_session(date.today())['year'], helpers.get_session(date.today())['session'])
-        next = self.find_module_values(helpers.get_session(date.today()+relativedelta(months=6))['year'], helpers.get_session(date.today()+relativedelta(months=6))['session'])
-
-        if previous:
-            self.set_module(previous)
-        if current:
-            self.set_module(current)
-        if next:
-            self.set_module(next)
-        if not (next or current or previous):
-            return False
-        else:
-            return True
-
-    # sets module to provided values
-    def set_module(self, values):
+    def set_module(self, values: dict):
+        """ sets module to provided values """
         self.SmObjId = values['SmObjId']
         self.PiqSession = values['PiqSession']
         self.PiqYear = values['PiqYear']
         self.title = values['title']
 
-    # returns dict of this module's variables if module exits, else None
-    def get_module(self):
+    def get_module(self) -> dict:
+        """ Get this module's variables if module exits, else None """
         if self.PiqSession != 0:
             return {
                 'SmObjId': self.SmObjId,

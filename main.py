@@ -131,8 +131,8 @@ def add_module(): # required: SmObjId, PiqYear, PiqSession, whitelisted, searcht
     PiqSession = req_data['PiqSession']
     whitelisted = int(req_data['whitelisted'])
     searchterm = req_data['searchterm']
-    m = models.Module(SmObjId)
-    module_values = m.find_module_values(PiqYear, PiqSession)
+    m = models.Module(SmObjId, PiqYear, PiqSession)
+    module_values = m.find_module_values()
     if module_values is not None:
         try:
             cnx = mysql.connector.connect(**db_config)
