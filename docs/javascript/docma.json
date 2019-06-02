@@ -1,0 +1,25 @@
+{
+    "src": [{
+        "admin.js_public.js": [
+            "../../../static/admin.js",
+            "../../../static/public.js"
+        ],
+        "filter.js": "../../../static/filter.js"
+    }],
+    "app": {
+        "routing": "path",
+        "entrance": "api:admin.js_public.js",
+        "base": "/javascript/"
+        //docma serve --base /
+    },
+    // "src": [
+    //     "../../../static/admin.js"
+    // ],
+    // "src": [
+    //     "../../../static/public.js"
+    // ],
+    // "src": [
+    //     "../../../static/filter.js"
+    // ],
+    "dest": "./output"
+}
