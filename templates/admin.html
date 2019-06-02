@@ -1,21 +1,22 @@
 <html>
     <head>
-        <link rel="stylesheet" href="static/general.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='general.css') }}">
         <!-- uzh styling -->
-        <link rel="stylesheet" href="static/uzh/app.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='uzh/app.css') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='uzh/assets/img/sprite/icon/faviconkit-uzh.ch-144.ico') }}">
         
         <!-- jquery -->
-        <script type="text/javascript" src="static/jquery-ui/external/jquery/jquery.min.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.min.js') }}"></script>
         <!-- jquery.tablesorter.lib -->
-        <script type="text/javascript" src="static/jquery-ui/external/jquery/jquery.tablesorter.lib/js/jquery.tablesorter.min.js"></script>
-        <link rel="stylesheet" href="static/jquery-ui/external/jquery/jquery.tablesorter.lib/css/theme.default.css">
-        <script type="text/javascript" src="static/jquery-ui/external/jquery/jquery.tablesorter.lib/js/widgets/widget-staticRow.min.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.tablesorter.lib/js/jquery.tablesorter.min.js') }}"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.tablesorter.lib/css/theme.default.css') }}">
+        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.tablesorter.lib/js/widgets/widget-staticRow.min.js') }}"></script>
         <!-- jquery.ui -->
-        <script type="text/javascript" src="static/jquery-ui/jquery-ui.min.js"></script>
-        <link rel="stylesheet" href="static/jquery-ui/jquery-ui.min.css">
+        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.min.css') }}">
 
         <!-- iframeResizer plugin -->
-        <script type="text/javascript" src="static/additional/iframeResizer.contentWindow.min.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='additional/iframeResizer.contentWindow.min.js') }}"></script>
     </head>
     <body>
         {% include 'includes/filter-selectors.html' %}
@@ -88,7 +89,7 @@
                 </div>
             </div>
         </div> <!-- END outer div to match UZH styling -->
-        <script type="text/javascript" src="static/admin.js"></script> 
+        <script type="text/javascript" src="{{ url_for('static', filename='admin.js') }}"></script> 
 
         <script type="text/javascript">
             

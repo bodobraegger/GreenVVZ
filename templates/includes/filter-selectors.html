@@ -21,8 +21,8 @@
     </div>
     <div class="spacer" style="height: 3em">
     <!--hwat-->
-    <script type="text/javascript" src="static/filter.js"></script>
-    <!-- <script type="text/javascript" src="static/additional/autocomplete.js"></script> -->
+    <script type="text/javascript" src="{{ url_for('static', filename='filter.js') }}"></script>
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename='additional/autocomplete.js') }}"></script> -->
     <script type="text/javascript">
         $('select#semester_selector').change(function() {
             ClearStudyProgramFilter();
@@ -43,6 +43,6 @@
             $(this).autocomplete('search', $(this).val())
         });
     </script>
-    <link rel="stylesheet" href="static/filter.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='filter.css') }}">
 </div>
 <!-- END FILTER SELECTOR INCLUDE -->

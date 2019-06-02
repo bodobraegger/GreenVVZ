@@ -1,13 +1,13 @@
 <html>
     <head>
-        <link rel="stylesheet" href="static/general.css">
-        <link rel="stylesheet" href="static/uzh/app.css">
-        <link rel="stylesheet" href="static/jquery-ui/jquery-ui.min.css">
-        <script type="text/javascript" src="static/jquery-ui/external/jquery/jquery.min.js"></script>
-        <script type="text/javascript" src="static/jquery-ui/jquery-ui.min.js"></script>
-        <script type="text/javascript" src="static/additional/iframeResizer.contentWindow.min.js"></script>
-        <script type="text/javascript" src="static/admin.js"></script>
-        <script type="text/javascript" src="static/public.js"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='general.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='uzh/app.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.min.css') }}">
+        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='additional/iframeResizer.contentWindow.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='admin.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='public.js') }}"></script>
     </head>
     <body>
         {% include 'includes/filter-selectors.html' %}
