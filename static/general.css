@@ -51,6 +51,18 @@ div.count {
 .alert-yellow {
     background-color: #f4f136;
 }
+.closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .closebtn:hover {
+    color: black;
+  }
 
 /* Sortable tables */
 table.sortable thead {
