@@ -529,13 +529,23 @@ async function updateModules() {
     })
 }
 
-// Cookie functions, so updateModules() only executed once per hour.
+/**
+ * Save a cookie which expires after exdays days.
+ * @param {String} cname    name of the cookie
+ * @param          cvalue   value of the cookie
+ * @param {Number} exdays   days until cookie expires
+ */
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     var expires = "expires="+d.toUTCString();
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
+/**
+ * Get cookie by name
+ * @param {String} cname    name of the cookie
+ * @return {String}         the value of the cookie
+ */
 function getCookie(cname) {
     var name = cname + "=";
     var ca = document.cookie.split(';');
@@ -550,6 +560,9 @@ function getCookie(cname) {
     }
     return "";
 }
+/**
+ * Check if the "updated_recently" cookie exists - if it doesn't, updateModules()
+ */
 function checkUpdatedCookie() {
     var update_status = getCookie("updated_recently");
     if (update_status != "") {
