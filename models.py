@@ -23,6 +23,7 @@ class Module:
     # return None if module doesn't exist
     def find_module_values(self) -> dict:
         """Check if module with given SmObjId and session data exists in course catalogue, get values if it does"""
+        # Details page for module
         rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmDetailsSet(SmObjId='{0}',PiqYear='{1}'," \
                "PiqSession='{2}')?$format=json".format(
             self.SmObjId, self.PiqYear, self.PiqSession)
@@ -38,7 +39,7 @@ class Module:
                 'PiqSession':   r.json()['d']['PiqSession'],
                 'PiqYear':      r.json()['d']['PiqYear'],
             }
-
+            # No module found in course catalogue
             if module['SmObjId'] == '00000000':
                 return None
             else:
