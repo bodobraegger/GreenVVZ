@@ -1,4 +1,5 @@
 # coding=utf8
+# builtin
 import os
 import mysql.connector
 from datetime import date
@@ -8,19 +9,28 @@ import time
 # from multiprocessing.pool import ThreadPool
 from concurrent.futures import ThreadPoolExecutor
 from itertools import groupby
-from dateutil.relativedelta import relativedelta
 
+# flask lib
 from flask import Flask, json, jsonify, request, abort, render_template
+# flask_cors extension for handling CORS, making corss-origin AJAX possible.
 from flask_cors import CORS, cross_origin
 
+# python-dateutil lib
+from dateutil.relativedelta import relativedelta
+
+# this codebase
 import models
 import updateModules
 import helpers
 
+# Initialize flask app
 app = Flask(__name__, static_url_path='/static')
+# for handling CORS, making corss-origin AJAX possible.
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+# get SECRET_KEY from environment
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'secret')
+# Database config from environment.
 db_config = {
     'user': os.environ.get('DB_USER', 'test'),
     'password': os.environ.get('DB_PASSWORD', 'testpw'),
@@ -29,8 +39,8 @@ db_config = {
 }
 
 
-# decorator for checking the api-key
 def require_appkey(view_function):
+    """ decorator for checking the api-key, making unauthorized requests impossible """
     @wraps(view_function)
     def decorated_function(*args, **kwargs):
         if request.args.get('key') and request.args.get('key') == app.config['SECRET_KEY']:
@@ -41,29 +51,38 @@ def require_appkey(view_function):
     return decorated_function
 
 
-# Hello World
 @app.route('/hello')
 @cross_origin()
 @require_appkey
 def hello_world():
+    """ Hello World test view """
     return jsonify(hell0='world'), 200
 
-# Front End Testing
 @app.route('/admin')
 @cross_origin()
 @require_appkey
-def front():
+def admin():
+    """ Administrator front end view """
+    # for local testing
+    studyprograms = {0: "Theologie: Vollstudienfach 120"}
+    studyprogramid_moduleids = {0: [2]}
     secret_key = app.config['SECRET_KEY']
-    # for filter-selectors.html
+
     return render_template('admin.html', **{
         'secret_key': secret_key,
+        # for filter-selectors.html include
         'sessions': helpers.get_current_sessions(),
+            # optional, for local testing:
+        'studyprogramid_moduleids': studyprogramid_moduleids,
+        'studyprograms': studyprograms,
     })
 
 @app.route('/public')
 @cross_origin()
 @require_appkey
 def public():
+    """ Public front end view """
+    # for local testing
     studyprograms = {0: "Theologie: Vollstudienfach 120"}
     studyprogramid_moduleids = {0: [2]}
     secret_key = app.config['SECRET_KEY']
@@ -78,35 +97,28 @@ def public():
         'secret_key': secret_key,
         # for filter-selectors.html
         'sessions': helpers.get_current_sessions(),
+            # optional, for local testing:
         'studyprogramid_moduleids': studyprogramid_moduleids,
         'studyprograms': studyprograms,
     })
 
-
-
-# Information about the API
 @app.route('/')
 @cross_origin()
 def info():
+    """ Information about the API """
     return 'This is a small scale API to access and manipulate data about Sustainability-related Modules at the University of Zurich'
 
-# update all modules
 @app.route('/update')
 @cross_origin()
 def update():
+    """ Update saved modules to match their course catalogue counterparts, be there any changes """
     if updateModules.update_modules():
         return 'modules updated', 200
     else:
         return 'error', 400
 
-
-# get whitelist
-@app.route('/modules/whitelist', methods=['GET'])
-@cross_origin()
-def get_whitelist():
-    return get_modules(whitelisted=1)
-
-def get_modules(whitelisted):
+def get_modules(whitelisted: bool):
+    """ Get modules saved in the database, either blacklisted or whitelisted, as JSON response """
     modules = []
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
@@ -121,20 +133,30 @@ def get_modules(whitelisted):
     cnx.close()
     return jsonify(modules)
 
+@app.route('/modules/whitelist', methods=['GET'])
+@cross_origin()
+def get_whitelist():
+    return get_modules(whitelisted=1)
+
 @app.route('/modules', methods=['POST'])
 @cross_origin()
 @require_appkey
-def add_module(): # required: SmObjId, PiqYear, PiqSession, whitelisted, searchterm
+def add_module():
+    """ Add module to database. required in POST request body: SmObjId, PiqYear, PiqSession, whitelisted, searchterm """
     req_data = request.get_json()
+    # get data from request body
     SmObjId = req_data['SmObjId']
     PiqYear = req_data['PiqYear']
     PiqSession = req_data['PiqSession']
     whitelisted = int(req_data['whitelisted'])
     searchterm = req_data['searchterm']
+    # check if module exists in course catalogue, use values from there...
     m = models.Module(SmObjId, PiqYear, PiqSession)
     module_values = m.find_module_values()
+    # ... if it exists, ...
     if module_values is not None:
         try:
+            # try to save into database
             cnx = mysql.connector.connect(**db_config)
             qry = "INSERT INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s, %(searchterm)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
             module_values['whitelisted'] = whitelisted
@@ -149,7 +171,7 @@ def add_module(): # required: SmObjId, PiqYear, PiqSession, whitelisted, searcht
                     module_id = row[0]
             cnx.commit()
             cursor.close()
-
+            
             # if a module is to be saved, find the corresponding studyprograms and save them too
             studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
             save_studyprograms_for_module(module_id, studyprograms)
