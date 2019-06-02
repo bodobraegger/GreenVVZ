@@ -13,6 +13,8 @@ span.semester {
     color: #a3adb7;
     float: right;
 } */
+
+/* number of displayed rows indicator */
 div.count {
     width: 2em;
     background: lightgrey;
@@ -21,6 +23,7 @@ div.count {
     text-align: center;
 }
 
+/* loading image during ajax table calls */
 .loading {
     position:absolute; 
     height:100%;
@@ -47,20 +50,6 @@ div.count {
 } 
 .alert-yellow {
     background-color: #f4f136;
-} 
-/* The close button */
-.closebtn {
-  margin-left: 15px;
-  color: white;
-  font-weight: bold;
-  float: right;
-  font-size: 22px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-/* When moving the mouse over the close button */
-.closebtn:hover {
-  color: black;
 }
 
 /* Sortable tables */
