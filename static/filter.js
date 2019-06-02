@@ -1,52 +1,89 @@
+/**
+ * Flag tablerows for modules in the semester chosen by the dropdown selector "semester".
+ * @return {jQuery()} The tablerows of modules matching the currently selected semester.
+ */
 function FlagSelectedSemester() {
     var year_semester = $("option:selected").val();
     // if all semesters are selected, look for year_semester tags containing a space (all do)
     if($("option:selected").val() == 'all_years all_semesters') year_semester=" ";
     $('[data-semester]').removeClass('selected-semester');
     $(`[data-semester*="${year_semester}"]`).addClass('selected-semester');
-    return;
+    return $('.selected-semester');
 }
+
+// initializatin of global vars for sp_idlist and sp_textlist
+studyprogram_idlist = []
+studyprogram_textlist = []
+/**
+ * Flag tablerows for modules OF THE WHITELIST ONLY contained in the studyprogram input 
+ * via #studyprogram_input.
+ * @return {jQuery()} The tablerows of modules in the whitelist matching the currently selected studyprogram.
+ */
 function FlagSelectedStudyprogram() {
+    // since /studyprograms delivers two lists, sp_idlist and sp_textlist, the autocomplete
+    // suggests an entry of the textlist. the index matches across them, so you can get the id.
     var studyprogram_index = studyprogram_textlist.indexOf(document.getElementById("studyprogram_input").value);
+    // no entry in sp_textlist found, return all modules
     if(studyprogram_index == -1) {
+        // make clear filter button inactive
         $('#studyprogram_btn_clear').prop('disabled', true);
+        // if no input was given, do nothing, else log invalid input
         document.getElementById("studyprogram_input").value ? console.log("invalid input: " + document.getElementById("studyprogram_input").value) : "";
+        // mark all module row in the whitelist as selected
         $('#whitelist_body').find($(`[data-semester]`)).addClass('selected-studyprogram');
-        return;
     }
-    studyprogram_id = studyprogram_idlist[studyprogram_index];
-    var module_ids = studyprogramid_moduleids[studyprogram_id];
-    var modules_to_unflag = $('#whitelist_body').find($(`[data-semester]`));
-    
-    for(i = 0; i < module_ids.length; i++) {
-        modules_to_unflag = modules_to_unflag.not($(`#module_${module_ids[i]}`));
-        $(`#module_${module_ids[i]}`).addClass('selected-studyprogram');
+    // else find the id of the studyprogram using the index, and find corresponding the module_ids 
+    else {
+        studyprogram_id = studyprogram_idlist[studyprogram_index];
+        var module_ids = studyprogramid_moduleids[studyprogram_id];
+        var modules_to_unflag = $('#whitelist_body').find($(`[data-semester]`));
+        // mark modules not in modules as not selected, select the ones in module_ids
+        for(i = 0; i < module_ids.length; i++) {
+            modules_to_unflag = modules_to_unflag.not($(`#module_${module_ids[i]}`));
+            $(`#module_${module_ids[i]}`).addClass('selected-studyprogram');
+        }
+        $(modules_to_unflag).removeClass('selected-studyprogram');
+        // make the clear filter button active 
+        $('#studyprogram_btn_clear').prop('disabled', false);
     }
-    $(modules_to_unflag).removeClass('selected-studyprogram');
-    $('#studyprogram_btn_clear').prop('disabled', false);
-    return;
+    return $('.selected-studyprogram');
 }
+
+/**
+ * Render items using CSS classes according to their selection status
+ * @return {jQuery()} The tablerows of modules matching the current filters.
+ */
 function ShowSelectedModules() {
+    // find modules for semester according to dropdown
     FlagSelectedSemester();
+    // find modules in whitelist for studyprogram according to input
     FlagSelectedStudyprogram();
+
+    // hide all modules, then unhide modules for the selected semester(s)
     $('[data-semester]').addClass('hidden').removeClass('shown');
     $('[data-semester].selected-semester').removeClass('hidden').addClass('shown');
-    
+    // hide all whitelist elements, unhide modules for selected studyprogram
     $('#whitelist_body').find($('[data-semester]')).addClass('hidden').removeClass('shown');
     $('#whitelist_body').find($(`[data-semester].selected-semester.selected-studyprogram`)).removeClass('hidden').addClass('shown');
     
+    // update the number badges for each table
     $('#count_whitelist').html($('#whitelist_body').find($(`.shown`)).length)
     $('#count_suggestions').html($('#suggestions_body').find($(`.shown`)).length)
     $('#count_blacklist').html($('#blacklist_body').find($(`.shown`)).length)
-    return;
+    return $('.shown');
 }
+/**
+ * Clear the studyprogram input
+ */
 function ClearStudyProgramFilter() {
     document.getElementById("studyprogram_input").value = "";
     ShowSelectedModules();
 }
-studyprogram_idlist = []
-studyprogram_textlist = []
 
+/**
+ * monkey patch into jquery autocomplete, for custom rendering and highlighting found elements,
+ * and if necessary, searching only from beginning of result (commented out)
+ */
 function monkeyPatchAutocomplete() {
     // hack: override autocomplete _renderItem to highlight matching part
     $.ui.autocomplete.prototype._renderItem = function (ul, item) {
@@ -89,7 +126,7 @@ function monkeyPatchAutocomplete() {
         });
     }; */
 };
-
+// apply the patch on script load
 $(function () {
     monkeyPatchAutocomplete();
 });
