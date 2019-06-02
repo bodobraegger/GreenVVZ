@@ -103,7 +103,7 @@
   pointer-events: none;
 }
 /* highlight matching searchterms in studyprogram results */
-.ui-autocomplete .ui-menu-item >.ui-menu-item-highlight {
+.ui-autocomplete .ui-menu-item .ui-menu-item-highlight {
   font-weight: bold;
 }
 /* highlighting the searchterms in the further / no studyprogram message */
