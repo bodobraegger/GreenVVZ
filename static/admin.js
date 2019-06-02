@@ -1,7 +1,11 @@
-var baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
-var apiUrl = 'https://greenvvz.ifi.uzh.ch'
-// var apiUrl = 'http://127.0.0.1:8080/'
-var secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data('api-key')
+// GLOBAL VARIABLES DEFINITIONS: used across public.js and filter.js
+baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
+apiUrl = 'https://greenvvz.ifi.uzh.ch'
+// apiUrl = 'http://127.0.0.1:8080/'
+secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data('api-key')
+// initializatin of global vars for sp_idlist and sp_textlist
+studyprogram_idlist = []
+studyprogram_textlist = []
 
 async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted, searchterm) {
     await $.ajax({

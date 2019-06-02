@@ -1,6 +1,5 @@
 <html>
     <head>
-        <link rel="stylesheet" href="{{ url_for('static', filename='general.css') }}">
         <!-- uzh styling -->
         <link rel="stylesheet" href="{{ url_for('static', filename='uzh/app.css') }}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='uzh/assets/img/sprite/icon/faviconkit-uzh.ch-57.ico') }}">
@@ -14,9 +13,13 @@
         <!-- jquery.ui -->
         <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
         <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.min.css') }}">
-
+        
         <!-- iframeResizer plugin -->
         <script type="text/javascript" src="{{ url_for('static', filename='additional/iframeResizer.contentWindow.min.js') }}"></script>
+        
+        <!-- custom functions and styles -->
+        <script type="text/javascript" src="{{ url_for('static', filename='admin.js') }}"></script> 
+        <link rel="stylesheet" href="{{ url_for('static', filename='general.css') }}">
     </head>
     <body>
         {% include 'includes/filter-selectors.html' %}
@@ -89,7 +92,6 @@
                 </div>
             </div>
         </div> <!-- END outer div to match UZH styling -->
-        <script type="text/javascript" src="{{ url_for('static', filename='admin.js') }}"></script> 
 
         <script type="text/javascript">
             

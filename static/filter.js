@@ -11,9 +11,6 @@ function FlagSelectedSemester() {
     return $('.selected-semester');
 }
 
-// initializatin of global vars for sp_idlist and sp_textlist
-studyprogram_idlist = []
-studyprogram_textlist = []
 /**
  * Flag tablerows for modules OF THE WHITELIST ONLY contained in the studyprogram input 
  * via #studyprogram_input.
