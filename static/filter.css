@@ -1,8 +1,11 @@
+/* mildly animate elements being shown */
 .selected-semester,.selected-studyprogram {
   transition:all 0.1s;
 }
 
+/* hide elements from page completely across all browsers */
 .hidden {
+  /* display: collapse does not remove item from safari */
   display: none;
   width:0;
   height:0;
@@ -11,33 +14,16 @@
   opacity:0;
 }
 
-.studyprogram {
-  width: 50%;
-  display: inline-block;
-}
-
-.studyprogram.btn {
-  display: inline-block;
-}
-
-#studyprogram_btn_clear {
-  width: 35%
-}
-
-#studyprogram_input {
-  padding: 3px;
-  margin: 3px;
-}
+/* fit the various sub filter elements on the page */
 .parent {
   position: relative;
   width: 100%;
-
 }
 .left-align, .right-align {
   position: absolute;
   margin: auto;
   top: 3px;
-
+  
 }
 .left-align {
   left: 0;
@@ -48,11 +34,26 @@
   margin-right: 3px;
 }
 
-input {
-  border: 1px solid transparent;
-  background-color: #f1f1f1;
+/* elements in the studyprogram filter */
+  input {
+    border: 1px solid transparent;
+    background-color: #f1f1f1;
+  }
+.studyprogram {
+  width: 50%;
+  display: inline-block;
 }
-
+.studyprogram.btn {
+  display: inline-block;
+}
+#studyprogram_btn_clear {
+  width: 35%
+}
+#studyprogram_input {
+  padding: 3px;
+  margin: 3px;
+}
+/* the jquery-ui autocomplete feature, restyled minimally invasive */
 .ui-autocomplete {
   position: absolute;
   top: 100%;
@@ -71,14 +72,12 @@ input {
   -moz-background-clip: padding;
   background-clip: padding-box;
 }
-
 .ui-autocomplete .ui-menu-item {
   padding: 1px;
   cursor: pointer;
   background-color: #fff;
   border-bottom: 1px solid #d4d4d4;
 }
-
 .ui-autocomplete .ui-menu-item > a.ui-corner-all {
   display: block;
   padding: 3px 15px;
@@ -89,26 +88,25 @@ input {
   white-space: nowrap;
   text-decoration: none;
 }
-
 .ui-autocomplete .ui-menu-item .ui-state-active {
   border: none;
 }
-
-.ui-autocomplete .ui-menu-item >.ui-menu-item-highlight {
-  font-weight: bold;
-}
-
+/* mark hover / arrow key selection */
 .ui-autocomplete .ui-menu-item a > .ui-state-hover, .ui-autocomplete .ui-menu-item a > .ui-state-active {
   color: #ffffff;
   background-color: DodgerBlue;
 }
-
+/* message to signify X further studyprograms found */
 #further_studyprograms_msg {
   background-color: #f1f1f1;
   cursor: default;
   pointer-events: none;
 }
-
+/* highlight matching searchterms in studyprogram results */
+.ui-autocomplete .ui-menu-item >.ui-menu-item-highlight {
+  font-weight: bold;
+}
+/* highlighting the searchterms in the further / no studyprogram message */
 #further_studyprograms_msg b{
   all: inherit;
   display: inline;
