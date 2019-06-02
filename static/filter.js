@@ -1,3 +1,4 @@
+import * as admin from './admin.js'
 /**
  * Flag tablerows for modules in the semester chosen by the dropdown selector "semester".
  * @return {jQuery()} The tablerows of modules matching the currently selected semester.
@@ -19,7 +20,7 @@ function FlagSelectedSemester() {
 function FlagSelectedStudyprogram() {
     // since /studyprograms delivers two lists, sp_idlist and sp_textlist, the autocomplete
     // suggests an entry of the textlist. the index matches across them, so you can get the id.
-    var studyprogram_index = studyprogram_textlist.indexOf(document.getElementById("studyprogram_input").value);
+    var studyprogram_index = admin.studyprogram_textlist.indexOf(document.getElementById("studyprogram_input").value);
     // no entry in sp_textlist found, return all modules
     if(studyprogram_index == -1) {
         // make clear filter button inactive
@@ -31,11 +32,11 @@ function FlagSelectedStudyprogram() {
     }
     // else find the id of the studyprogram using the index, and find corresponding the module_ids 
     else {
-        studyprogram_id = studyprogram_idlist[studyprogram_index];
-        var module_ids = studyprogramid_moduleids[studyprogram_id];
+        var studyprogram_id = admin.studyprogram_idlist[studyprogram_index];
+        var module_ids = admin.studyprogramid_moduleids[studyprogram_id];
         var modules_to_unflag = $('#whitelist_body').find($(`[data-semester]`));
         // mark modules not in modules as not selected, select the ones in module_ids
-        for(i = 0; i < module_ids.length; i++) {
+        for(let i = 0; i < module_ids.length; i++) {
             modules_to_unflag = modules_to_unflag.not($(`#module_${module_ids[i]}`));
             $(`#module_${module_ids[i]}`).addClass('selected-studyprogram');
         }
@@ -50,7 +51,7 @@ function FlagSelectedStudyprogram() {
  * Render items using CSS classes according to their selection status
  * @return {jQuery()} The tablerows of modules matching the current filters.
  */
-function ShowSelectedModules() {
+export function ShowSelectedModules() {
     // find modules for semester according to dropdown
     FlagSelectedSemester();
     // find modules in whitelist for studyprogram according to input
@@ -72,10 +73,12 @@ function ShowSelectedModules() {
 /**
  * Clear the studyprogram input
  */
-function ClearStudyProgramFilter() {
+export function ClearStudyProgramFilter() {
     document.getElementById("studyprogram_input").value = "";
     ShowSelectedModules();
 }
+// make the button execute this
+$("#studyprogram_btn_clear").on("click", ClearStudyProgramFilter);
 
 /**
  * monkey patch into jquery autocomplete, for custom rendering and highlighting found elements,
@@ -126,4 +129,23 @@ function monkeyPatchAutocomplete() {
 // apply the patch on script load
 $(function () {
     monkeyPatchAutocomplete();
+});
+
+$('select#semester_selector').change(function() {
+    ClearStudyProgramFilter();
+    ShowSelectedModules();
+    admin.populate_studyprograms();
+});
+
+$('#studyprogram_input').on("change keyup autocompleteselect", function() {
+    ShowSelectedModules();
+}).autocomplete({
+    source: admin.studyprogram_textlist,
+    minLength: 0,
+    select: function (event, ui) {
+        $(this).val(ui.item.label);
+        ShowSelectedModules();
+    },
+}).focus(function() {
+    $(this).autocomplete('search', $(this).val())
 });

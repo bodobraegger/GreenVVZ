@@ -5,20 +5,20 @@
         <link rel="shortcut icon" href="{{ url_for('static', filename='uzh/assets/img/sprite/icon/faviconkit-uzh.ch-57.ico') }}">
         
         <!-- jquery -->
-        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.min.js') }}"></script>
         <!-- jquery.tablesorter.lib -->
-        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.tablesorter.lib/js/jquery.tablesorter.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.tablesorter.lib/js/jquery.tablesorter.min.js') }}"></script>
         <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.tablesorter.lib/css/theme.default.css') }}">
-        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.tablesorter.lib/js/widgets/widget-staticRow.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.tablesorter.lib/js/widgets/widget-staticRow.min.js') }}"></script>
         <!-- jquery.ui -->
-        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
         <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.min.css') }}">
         
         <!-- iframeResizer plugin -->
-        <script type="text/javascript" src="{{ url_for('static', filename='additional/iframeResizer.contentWindow.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='additional/iframeResizer.contentWindow.min.js') }}"></script>
         
         <!-- custom functions and styles -->
-        <script type="text/javascript" src="{{ url_for('static', filename='admin.js') }}"></script> 
+        <script type="module" src="{{ url_for('static', filename='admin.js') }}"></script> 
         <link rel="stylesheet" href="{{ url_for('static', filename='general.css') }}">
     </head>
     <body>
@@ -93,30 +93,31 @@
             </div>
         </div> <!-- END outer div to match UZH styling -->
 
-        <script type="text/javascript">
+        <script type="module">
+            import * as admin from './static/admin.js'
             
             $(document).ready(function () {
                 // update secret_key
-                secret_key = "{{secret_key}}";
+                admin.set_secret_key("{{secret_key}}");
 
                 // populate searchterms
-                populate_searchterms()
+                admin.populate_searchterms()
 
                 // populate whitelist
-                populate_whitelist()
+                admin.populate_whitelist()
                 // populate blacklist
-                populate_blacklist()
+                admin.populate_blacklist()
 
                 // populate suggestions
-                populate_suggestions()
+                admin.populate_suggestions()
 
-                populate_studyprograms()
+                admin.populate_studyprograms()
 
                 // make accordion
                 $('#anchor-admin').accordion({collapsible:true,heightStyle:'content'})
 
                 // check if modules updated recently, do so if necesary
-                checkUpdatedCookie();
+                admin.checkUpdatedCookie();
 
                 $(".sortable").addClass("tablesorter").tablesorter({
                     // keep modulnummer input in place

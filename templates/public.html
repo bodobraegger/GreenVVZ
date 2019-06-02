@@ -1,13 +1,13 @@
 <html>
     <head>
         <!-- jquery -->
-        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.min.js') }}"></script>
         <!-- jquery-ui -->
-        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
         <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.min.css') }}">
         
         <!-- iframeResizer -->
-        <script type="text/javascript" src="{{ url_for('static', filename='additional/iframeResizer.contentWindow.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='additional/iframeResizer.contentWindow.min.js') }}"></script>
         
         <!-- uzh styling -->
         <link rel="stylesheet" href="{{ url_for('static', filename='uzh/app.css') }}">
@@ -15,19 +15,20 @@
         
         <!-- custom functions and styles -->
         <link rel="stylesheet" href="{{ url_for('static', filename='general.css') }}">
-        <script type="text/javascript" src="{{ url_for('static', filename='admin.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='public.js') }}"></script>
+        <script type="module" src="{{ url_for('static', filename='admin.js') }}"></script>
+        <script type="module" src="{{ url_for('static', filename='public.js') }}"></script>
     </head>
     <body>
         {% include 'includes/filter-selectors.html' %}
 
 
         <div id="anchor-public" class="mod mod-text skin-text-basics"></div>
-
-        <script type="text/javascript">
-            $(document).ready(function () {
-                populate_studyprograms();
-            });
+        
+        <script type="module">
+            import {ClearStudyProgramFilter} from './static/filter.js'
+            function ClearStudyProgramFilter2() {
+                ClearStudyProgramFilter();
+            }
         </script>
     </body>
 </html>
