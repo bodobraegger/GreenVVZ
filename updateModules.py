@@ -12,7 +12,8 @@ db_config = {
     'database': os.environ.get('DB_NAME', 'testdb'),
 }
 
-def update_modules():
+def update_modules() -> bool:
+    """ For each saved module, check if it still exists and/or changed, match in DB"""
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True, buffered=True)
     qry = ("SELECT SmObjId, PiqYear, PiqSession FROM module")
