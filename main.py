@@ -171,7 +171,7 @@ def add_module():
                     module_id = row[0]
             cnx.commit()
             cursor.close()
-            
+
             # if a module is to be saved, find the corresponding studyprograms and save them too
             studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
             save_studyprograms_for_module(module_id, studyprograms)
@@ -182,7 +182,8 @@ def add_module():
     else:
         return 'No module found', 404
 
-def save_studyprograms_for_module(module_id, studyprograms):
+def save_studyprograms_for_module(module_id: int, studyprograms: list):
+    """ Save studyprogams for module in database, establish relationship"""
     print('deleting studyprogams', studyprograms, 'for module', module_id)
     cnx = mysql.connector.connect(**db_config)
     studyprogram_id = 0
@@ -195,25 +196,27 @@ def save_studyprograms_for_module(module_id, studyprograms):
         }
         cursor.execute(qry1, val1)
         studyprogram_id = cursor.lastrowid
+        # if the study_program == 0, the insert failed (likely, because the studyprogram already exists)
         if studyprogram_id == 0:
+            # thus, you can find the studyprogam using the values, and grab the id.
             cursor.execute("SELECT id FROM studyprogram WHERE CgHighText = %(CgHighText)s AND CgHighCategory = %(CgHighCategory)s", val1)
             for row in cursor:
                 print("studyprogram_id = cursor.lastrowid did not work", row)
                 studyprogram_id = row[0]
         cnx.commit()
 
+        # insert entry in designated database, to match Many-To-Many relationship Modules-To-Studyprograms
         qry2 = "INSERT IGNORE INTO module_studyprogram (module_id, studyprogram_id) VALUES (%(module_id)s, %(studyprogram_id)s)"
         val2 = {
             'module_id': module_id,
             'studyprogram_id': studyprogram_id,
         }
-        print(val2)
         cursor.execute(qry2, val2)
         cnx.commit()
         cursor.close()
 
-# delete studyprograms for module if there are no other modules with that SP.
 def delete_studyprograms_for_module(module_id):
+    """ delete studyprograms for module if there are no other modules with that SP. """
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(buffered=True)
     # delete all studyprograms associated with that module...
