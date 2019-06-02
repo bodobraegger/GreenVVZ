@@ -3,11 +3,13 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 import re
 
-# returns a dictionary containing the values 'year' and 'session' as ref_date (default is today)
-# ref_date the date to compare to the target_date, which is feb of the ref year by default
-def get_session(ref_date=date.today(), target_date=None):
-# SPRING: PREV YEAR 004
-# FALL:   SAME YEAR 003
+def get_session(ref_date = date.today(), target_date = None) -> dict:
+    """
+    returns a dictionary containing the values 'year' and 'session' as of ref_date (default is today)
+    ref_date to compare to the target_date, which is feb of the ref year by default
+        SPRING: PREV YEAR 004
+        FALL:   SAME YEAR 003
+    """
     # if no target_date given, simply use ref_date year and 1. feb
     target_date = target_date if target_date != None else date(ref_date.year, 2, 1)
     if ref_date < target_date:
@@ -17,7 +19,8 @@ def get_session(ref_date=date.today(), target_date=None):
     else:
         return {'year': ref_date.year, 'session': 3}
 
-def get_current_sessions(num_prev_semesters=4):
+def get_current_sessions(num_prev_semesters: int = 4) -> list:
+    """ Get next, current, and last num_prev_semesters sessions """
     sessions = [ # next session (6 months from now)
         get_session(date.today()+relativedelta(months=6)), 
         get_session(date.today())
@@ -27,6 +30,6 @@ def get_current_sessions(num_prev_semesters=4):
         sessions.append(get_session(date.today()-relativedelta(months=months)))
     return sessions
 
-# returns current year as int
-def current_year():
+def current_year() -> int:
+    """ returns current year as int """
     return date.today().year
