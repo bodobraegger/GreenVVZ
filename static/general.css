@@ -5,6 +5,9 @@ button {
 td {
     font-size: 80%;
 }
+thead td.semester {
+    min-width: 4.6em;
+}
 span.semester {
     display: inline-block;
     width: 2.5em;
