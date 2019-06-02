@@ -556,25 +556,5 @@ def get_studyprograms_modules():
         return "Error: {}".format(err), 500
     return jsonify(studyprogramid_moduleids)
 
-@app.route('/modules_studyprogramstag', methods=['GET'])
-@cross_origin()
-def get_modules_studyprogramstag():
-    moduleid_studyprogramids = {}
-    try: 
-        cnx = mysql.connector.connect(**db_config)
-        cursor = cnx.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM module_studyprogram;")
-        for row in cursor:
-            for column, value in row.items():
-                if type(value) is bytearray:
-                    row[column] = value.decode('utf-8')
-            if moduleid_studyprogramids.get(row['module_id']) is None:
-                moduleid_studyprogramids[row['module_id']] = ""
-            moduleid_studyprogramids[row['module_id']] += str(row['studyprogram_id']) + " "
-        cnx.close()
-    except mysql.connector.Error as err:
-        return "Error: {}".format(err), 500
-    return jsonify(moduleid_studyprogramids)
-
 if __name__ == "__main__":
     app.run()
