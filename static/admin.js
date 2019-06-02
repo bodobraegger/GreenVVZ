@@ -10,7 +10,12 @@ studyprogram_textlist = []
 /**
  * Flag tablerows for modules OF THE WHITELIST ONLY contained in the studyprogram input 
  * via #studyprogram_input.
- * @return {jQuery()} The tablerows of modules in the whitelist matching the currently selected studyprogram.
+ * @param {Number} [module_id]  numerical part of the module CSS selector id.
+ * @param {Number} SmObjId      course catalogue id.
+ * @param {Number} PiqYear      course catalogue year.
+ * @param {Number} PiqSession   course catalogue year.
+ * @param {Boolean} whitelisted  whitelist status of the module to save.
+ * @param {String} searchterm   searchterm which found the module in the course catalogue
  */
 async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted, searchterm) {
     await $.ajax({
@@ -25,6 +30,7 @@ async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitel
             'searchterm': searchterm,
         }),
         success : function (data) {
+            // if module_id not supplied, it was added using save_module()
             if(module_id) flag_in_suggestions(module_id, whitelisted);
             populate_whitelist();
             populate_blacklist();
@@ -36,7 +42,13 @@ async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitel
     })
 }
 
-async function update_whitelist_status(module_id, whitelisted, SmObjId, PiqYear, PiqSession) {
+/**
+ * Flag tablerows for modules OF THE WHITELIST ONLY contained in the studyprogram input 
+ * via #studyprogram_input.
+ * @param {Number} module_id    numerical part of the module CSS selector id, matches the DB id for saved modules.
+ * @param {Boolean} whitelisted  whitelist status of the module to save.
+ */
+async function update_whitelist_status(module_id, whitelisted) {
     await $.ajax({
         url: `${apiUrl}/modules/${module_id}?whitelisted=${whitelisted}&key=${secret_key}`,
         method : 'PUT',
@@ -53,6 +65,9 @@ async function update_whitelist_status(module_id, whitelisted, SmObjId, PiqYear,
     })
 }
 
+/**
+ * Save searchterm from input into the DB.
+ */
 async function save_searchterm(){
     var term = $('#searchterm_text').val()
     await $.ajax({
@@ -71,16 +86,10 @@ async function save_searchterm(){
 
     })
 }
-async function save_module(){
-    var SmObjId = $('#whitelist_text').val()
-    if($('option:selected').val() == 'all_years all_semesters') {
-        alert('Alle Semester ausgewählt. Das modul wird im jetzigen Semester gespeichert.')
-        $(`option[value="${$('.current_semester').val()}"]`).prop('selected', true);
-    }
-    var PiqYear = $('option:selected').val().split(' ')[0];
-    var PiqSession = $('option:selected').val().split(' ')[1];
-    await post_module_to_db(null, SmObjId, PiqYear, PiqSession, 1, "Manuell Hinzugefügt");
-}
+/**
+ * Delete searchterm from the DB.
+ * @param {Number} id DB id for searchterm to delete
+ */
 async function delete_searchterm(id){
     await $.ajax({
         url: apiUrl+'/searchterms/'+id+'?key='+secret_key,
@@ -94,6 +103,36 @@ async function delete_searchterm(id){
         }
     })
 }
+/**
+ * Remove searchterm from the DOM.
+ * @param {Number} id numerical part of CSS selector id for searchterm to delete, matches DB id.
+ */
+function remove_from_searchterms(id){
+    var term = $('#searchterms_body').find('#'+id)
+    term.remove()
+}
+
+/**
+ * Save module from SmObjId input into the DB, using the selected semester or current if all selected.
+ */
+async function save_module(){
+    // get SmObjId input
+    var SmObjId = $('#whitelist_text').val()
+    // If all semesters selected, select current one, then go ahead.
+    if($('option:selected').val() == 'all_years all_semesters') {
+        alert('Alle Semester ausgewählt. Das modul wird im jetzigen Semester gespeichert.')
+        $(`option[value="${$('.current_semester').val()}"]`).prop('selected', true);
+    }
+    // get year and semester data
+    var PiqYear = $('option:selected').val().split(' ')[0];
+    var PiqSession = $('option:selected').val().split(' ')[1];
+    // post to db with module_id=null, and searchterm = "Manuell Hinzugefügt"
+    await post_module_to_db(null, SmObjId, PiqYear, PiqSession, whitelisted=1, "Manuell Hinzugefügt");
+}
+/**
+ * Delete module from the DB.
+ * @param {Number} module_id DB id for module to delete
+ */
 async function delete_blacklisted_module(module_id){
     await $.ajax({
         url: `${apiUrl}/modules/${module_id}?key=${secret_key}`,
@@ -111,47 +150,85 @@ async function delete_blacklisted_module(module_id){
     })
 }
 
+/**
+ * Remove module from the DOM.
+ * @param {Number} module_id the numerical part of the CSS selector, matches DB id.
+ */
 function remove_module(module_id){
     document.getElementById(`module_${module_id}`).remove()
 }
+
+/**
+ * Flag module as whitelisted or blacklisted in the suggestions, changing Status and (de)activates corresponding buttons.
+ * @param {Number} module_id the numerical part of the CSS selector
+ * @param {Boolean} whitelisted the whitelist status
+ */
 function flag_in_suggestions(module_id, whitelisted){
     var tr_module = document.getElementById(`module_${module_id}`);
 
     if(whitelisted==1) {
         tr_module.querySelector('button[name="Anzeigen"]').disabled = true;
         tr_module.querySelector('button[name="Verbergen"]').disabled = false;
-        tr_module.children[4].innerHTML = "Angezeigt";
+        tr_module.children[4].innerHTML = "Angezeigt"; // status
     }
     else if(whitelisted==0) {
         tr_module.querySelector('button[name="Anzeigen"]').disabled = false;
         tr_module.querySelector('button[name="Verbergen"]').disabled = true;
-        tr_module.children[4].innerHTML = "Verborgen";
+        tr_module.children[4].innerHTML = "Verborgen"; // status
     }
     else {
         tr_module.querySelector('button[name="Anzeigen"]').disabled = false;
         tr_module.querySelector('button[name="Verbergen"]').disabled = false;
-        tr_module.children[4].innerHTML = "Neu";
+        tr_module.children[4].innerHTML = "Neu"; // status
     }
 }
-function remove_from_searchterms(id){
-    var term = $('#searchterms_body').find('#'+id)
-    term.remove()
-}
 
+/**
+ * Generate generalizable part of table row for a given module - what differs are buttons and suffixes.
+ * @param {Number} [module_id]  numerical part of the module CSS selector id, mismatches DB id if in suggestions
+ * @param {Number} SmObjId      course catalogue id
+ * @param {Number} PiqYear      course catalogue year
+ * @param {Number} PiqSession   course catalogue year
+ * @param {String} title        module title
+ * @param {String} searchterm   searchterm which found the module in the course catalogue
+ * @return {String} String matching an opened tr DOM element, with td elements inside
+ */
 function write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm){
+    // courses.uzh.ch url
     var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId;
+    // write id for tr, as well as data-SmObjId and data-semester, descriptive class="shown" by default.
     return `<tr id="module_${module_id}" data-SmObjId="${SmObjId}" data-semester="${PiqYear} ${PiqSession}" class="shown">
         <td><a target="_blank" href="${url}">${title}</a></td>
         <td class="searchterm">${searchterm}</td>
         <td>${convert_session_to_string(PiqSession, PiqYear)}</td>
         `
 }
+
+/**
+ * Write table row for module in whitelist, append to whitelist table
+ * @param {Number} [module_id]  numerical part of the module CSS selector id, matches DB id
+ * @param {Number} SmObjId      course catalogue id
+ * @param {Number} PiqYear      course catalogue year
+ * @param {Number} PiqSession   course catalogue year
+ * @param {String} title        module title
+ * @param {String} searchterm   searchterm which found the module in the course catalogue
+ */
 function add_to_whitelist(module_id, SmObjId, PiqYear, PiqSession, title, searchterm){
     var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm)}
         <td><button name="Anzeigen" onclick="update_whitelist_status(${module_id}, 0)">Verbergen</button></td>
     </tr>`)
     $('#whitelist_body').append(module);
 }
+
+/**
+ * Write table row for module in blacklist, append to blacklist table
+ * @param {Number} [module_id]  numerical part of the module CSS selector id, matches DB id
+ * @param {Number} SmObjId      course catalogue id
+ * @param {Number} PiqYear      course catalogue year
+ * @param {Number} PiqSession   course catalogue year
+ * @param {String} title        module title
+ * @param {String} searchterm   searchterm which found the module in the course catalogue
+ */
 function add_to_blacklist(module_id, SmObjId, PiqYear, PiqSession, title, searchterm){
     var anzeigen_button = `<button name="Anzeigen" onclick="update_whitelist_status(${module_id}, 1)">Anzeigen</button>`
     var   delete_button = `<button name="Löschen" onclick="delete_blacklisted_module(${module_id})">Löschen</button>`
@@ -160,24 +237,33 @@ function add_to_blacklist(module_id, SmObjId, PiqYear, PiqSession, title, search
         </tr>`)
     $('#blacklist_body').append(module);
 }
+
+/**
+ * Write table row for module in suggestions, append to suggestions table
+ * @param {Number} [module_id]  numerical part of the module CSS selector id, matches DB id
+ * @param {Number} SmObjId      course catalogue id
+ * @param {Number} PiqYear      course catalogue year
+ * @param {Number} PiqSession   course catalogue year
+ * @param {String} title        module title
+ * @param {Boolean} whitelisted whitelisted the whitelist status
+ * @param {String} searchterm   searchterm which found the module in the course catalogue
+ */
 function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm){
+    // write both anzeigen and verbergen button, disabled depending on if module is white- or blacklisted or neither.
     var anzeigen_button=`<button name="Anzeigen" onclick="post_module_to_db(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, whitelisted=1, '${searchterm}')"
         ${whitelisted==1 ? 'disabled' : ''}>Anzeigen</button>`
     var verbergen_button=`<button name="Verbergen" onclick="post_module_to_db(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, whitelisted=0, '${searchterm}')"
         ${whitelisted==0 ? 'disabled' : ''}>Verbergen</button>`
     if(whitelisted==1) {
         sug_status='Angezeigt';
-        sort_key=2;
     }
     else if(whitelisted==0) {
         sug_status='Verborgen';
-        sort_key=3
     }
     else {
         sug_status='Neu';
-        sort_key=1
     }
-    var whitelist_status_td = `<td class="whitelist_status whitelisted_${whitelisted}" sorttable_customkey="${sort_key}">${sug_status}</td>`
+    var whitelist_status_td = `<td class="whitelist_status whitelisted_${whitelisted}">${sug_status}</td>`
 
     var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm)}
             <td>${anzeigen_button}${verbergen_button}</td>
@@ -186,11 +272,21 @@ function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whit
     $('#suggestions_body').append(module)
 }
 
+/**
+ * Write table row for searchterm and add to DOM.
+ * @param {Number} module_id    numerical part of the searchterm CSS selector id, matches DB id
+ * @param {String} term         searchterm value
+ */
 function add_to_searchterms(id, term){
     var searchterm = $('<tr id="'+id+'"><td>'+term+'</td><td><button onclick="delete_searchterm('+id+')">Entfernen</button></td></tr>')
     $('#searchterms_body').append(searchterm)
 }
 
+
+
+/**
+ * Request searchterms from server, add them to DOM.
+ */
 async function populate_searchterms(){
     var searchterms = $('#searchterms_body')
     await $.ajax({
@@ -208,18 +304,23 @@ async function populate_searchterms(){
 
 }
 
+/**
+ * Request whitelisted modules from server, add them to DOM.
+ */
 async function populate_whitelist(){
     var whitelist = $('#whitelist_body')
     await $.ajax({
         url: apiUrl+'/modules/whitelist',
-        method : 'GET',
+        method : 'GET',             // show loading screen
         beforeSend: function () { $('#whitelist').find('div.loading').toggle(); },
         success : function (data) {
+            // remove all tr from body
             whitelist.empty()
             for (var row in data) {
-                // verarbeite daten
+                // for each module in data, add a row
                 add_to_whitelist(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].searchterm)
             }
+            // prepend manual input to table body, with fixed index for tablesorter
             whitelist.prepend(`
             <tr class="static" data-row-index="0">
               <td colspan="2">
@@ -229,13 +330,16 @@ async function populate_whitelist(){
                 <button name="submit_whitelist" style="display: block; width: 100%" type="button" onclick="save_module()">Modul hinzufügen</button>
               </td>
             </tr>`)
+            // hide modules not in current filter scope
             ShowSelectedModules();
         },
         error : function (err) {
             console.log('Whitelist konnte nicht abgerufen werden: '+err)
         },
         complete : function() {
+            // tell tablesorter to update sorting 
             $('#whitelist table').trigger('update');
+            // hide loading screen
             $('#whitelist').find('div.loading').toggle();
         }
 
@@ -243,29 +347,40 @@ async function populate_whitelist(){
 
 }
 
+/**
+ * Request blacklisted modules from server, add them to DOM.
+ */
 async function populate_blacklist(){
     var blacklist = $('#blacklist_body');
     await $.ajax({
         url: apiUrl+'/modules/blacklist',
-        method : 'GET',
+        method : 'GET',             // show loading screen
         beforeSend: function () { $('#blacklist').find('div.loading').toggle(); },
         success : function (data) {
+            // remove all tr from body
             blacklist.empty()
             for (var row in data) {
+                // for each module in data, add a row
                 add_to_blacklist(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].searchterm)
             }
+            // hide modules not in current filter scope
             ShowSelectedModules();
         },
         error : function (err) {
             console.log('Blacklist konnte nicht abgerufen werden: '+err)
         },
         complete : function() {
+            // tell tablesorter to update sorting 
             $('#blacklist table').trigger('update');
+            // hide loading screen
             $('#blacklist').find('div.loading').toggle();
         }
     })
 }
 
+/**
+ * Request found modules from server, add them to DOM.
+ */
 async function populate_suggestions(){
     var suggestions = $('#suggestions_body')
     await $.ajax({
@@ -273,36 +388,46 @@ async function populate_suggestions(){
         method : 'GET',
         beforeSend: function () { $('#suggestions').find('div.loading').toggle(); },
         success : function (data) {
+            // remove all tr from body
             suggestions.empty()
-            console.log(data)
             for (var row in data) {
+                // for each module in data, add a row
                 add_to_suggestions(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].whitelisted, data[row].searchterm)
             }
+            // hide modules not in current filter scope
             ShowSelectedModules();
         },
         error : function (err) {
             console.log('Suchvorschläge konnten nicht abgerufen werden: '+err)
         },
         complete : function() {
+            // tell tablesorter to update sorting 
             $('#suggestions table').trigger('update');
+            // hide loading screen
             $('#suggestions').find('div.loading').toggle();
         }
 
     })
 }
 
+/**
+ * Request studyprograms for selected semester from server, as well as studyprogamid_moduleids list, add them to global JS scope.
+ */
 async function populate_studyprograms() {
+    // get selected semester
     var PiqYear = $('option:selected').val().split(' ')[0];
     var PiqSession = $('option:selected').val().split(' ')[1];
+    // get studyprograms id list and text list 
     await $.ajax({
         url: apiUrl+'/studyprograms',
         method : 'GET',
         data: {
             'PiqYear': PiqYear,
             'PiqSession': PiqSession,
-        },
+        },                                                  // loading designator, disable button
         beforeSend: function () { $('#studyprogram_input').attr("placeholder", "Lade Studienprogramme...").prop('disabled', true); },
         success : function (data) {
+            // data is two lists, one for ids, one for texts, with matching indexing.
             studyprogram_idlist = data[0]
             studyprogram_textlist = data[1]
         },
@@ -310,9 +435,12 @@ async function populate_studyprograms() {
             console.log('/studyprograms konnten nicht abgerufen werden: '+err)
         },
         complete : function() {
+            // overwrite loading designator, enable button
             $('#studyprogram_input').attr("placeholder", "Studienprogramm").prop('disabled', false);
         },
     })
+
+    // get studyprogram_id : [module_ids] dictionary
     await $.ajax({
         url: apiUrl+'/studyprograms_modules',
         method : 'GET',
@@ -324,8 +452,8 @@ async function populate_studyprograms() {
         },
     })
     // update the autocomplete list
-    // autocomplete(document.getElementById("studyprogram_input"), studyprogram_textlist);
     $('#studyprogram_input').autocomplete({
+        // HACK custom filter function for no or too many results
         source: function(request, response) {
             var results = $.ui.autocomplete.filter(studyprogram_textlist, request.term);
             var num_sp_suggestions = 10;
@@ -343,11 +471,19 @@ async function populate_studyprograms() {
         minLength: 0,
         delay: 0,
     }).focus(function() {
+        // show all entries on focus
         $(this).autocomplete('search', $(this).val());
     });
+    // for iFrameResizer
     $('.ui-autocomplete').attr('data-iframe-height', '');
 }
 
+/**
+ * Convert session to human readable span element as string.
+ * @param  {Number} session session code, either 3, 4, 003, 004.
+ * @param  {Number} year    module year data.
+ * @return {String} A span containing the humanreadable semester and year.
+ */
 function convert_session_to_string(session, year){
     if (session == 3){
         return `<span style="display: none;">${year % 100 || ''}</span><span class="semester">HS </span>${year % 100 || ''}`
@@ -360,12 +496,15 @@ function convert_session_to_string(session, year){
     }
 }
 
-function updateModules() {
-    // update modules
-    $.ajax({
+/**
+ * Execute update function in backend, update names or remove modules which no longer exist in their semester.
+ */
+async function updateModules() {
+    await $.ajax({
         url: apiUrl+'/update',
         method : 'GET',
         beforeSend: function () {
+            // generate and add alert box to DOM
             $('#anchor-admin').before(`
             <div id="modules-updating" class="alert alert-blue">
             <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
@@ -375,28 +514,28 @@ function updateModules() {
         },
         error : function (err) {
             console.log(err)
+            // make alert box red and error
             $('#modules-updating').removeClass('alert-blue').addClass('alert-red')
             $('#modules-updating').find($('h3')).text('Die Module konnten nicht aktualisiert werden.')
             $('#modules-updating').find($('p')).text('Bitte versuchen Sie es erneut, in dem Sie die Seite neu laden.')
         },
         success : function() {
-            // populate whitelist
             populate_whitelist();
-            // populate blacklist
             populate_blacklist();
+            // hide alert box, set cookie for an hour
             $('#modules-updating').hide();
             setCookie("updated_recently", true, 1);
         },
     })
 }
 
+// Cookie functions, so updateModules() only executed once per hour.
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     var expires = "expires="+d.toUTCString();
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
-
 function getCookie(cname) {
     var name = cname + "=";
     var ca = document.cookie.split(';');
@@ -411,7 +550,6 @@ function getCookie(cname) {
     }
     return "";
 }
-
 function checkUpdatedCookie() {
     var update_status = getCookie("updated_recently");
     if (update_status != "") {
