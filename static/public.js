@@ -43,7 +43,7 @@ $(document).ready(function () {
     })
 });
 /**
- * Convert session to human readable span element as string.
+ * Convert session to human readable span element as string. DIFFERENT FROM admin.js
  * @param  {Number} session The session code, either 3, 4, 003, 004.
  * @param  {Number} year the module year data.
  * @return {String} A span containing the humanreadable semester and year.
