@@ -94,7 +94,7 @@ def info():
 @app.route('/update')
 @cross_origin()
 def update():
-    if updateModules.update_db():
+    if updateModules.update_modules():
         return 'modules updated', 200
     else:
         return 'error', 400

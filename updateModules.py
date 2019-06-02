@@ -12,11 +12,6 @@ db_config = {
     'database': os.environ.get('DB_NAME', 'testdb'),
 }
 
-
-def update_db():
-    return update_modules() # and update_blacklist()
-
-
 def update_modules():
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True, buffered=True)
