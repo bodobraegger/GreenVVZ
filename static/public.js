@@ -43,7 +43,7 @@ $(document).ready(function () {
     })
 });
 /**
- * Flag tablerows for modules in the semester chosen by the dropdown selector "semester".
+ * Convert session to human readable span element as string.
  * @param  {Number} session The session code, either 3, 4, 003, 004.
  * @param  {Number} year the module year data.
  * @return {String} A span containing the humanreadable semester and year.
