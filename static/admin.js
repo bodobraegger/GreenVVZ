@@ -7,6 +7,11 @@ secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data('ap
 studyprogram_idlist = []
 studyprogram_textlist = []
 
+/**
+ * Flag tablerows for modules OF THE WHITELIST ONLY contained in the studyprogram input 
+ * via #studyprogram_input.
+ * @return {jQuery()} The tablerows of modules in the whitelist matching the currently selected studyprogram.
+ */
 async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted, searchterm) {
     await $.ajax({
         contentType: 'application/json',
@@ -20,13 +25,13 @@ async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitel
             'searchterm': searchterm,
         }),
         success : function (data) {
-            flag_in_suggestions(module_id, whitelisted)
+            if(module_id) flag_in_suggestions(module_id, whitelisted);
             populate_whitelist();
             populate_blacklist();
             populate_studyprograms();
         },
         error : function (err) {
-            alert(`Das Modul konnte nicht als ${whitelisted ? 'whitelisted' : 'blacklisted'} gespeichert hinzugefügt werden`)
+            alert(`Das Modul konnte nicht als ${whitelisted ? 'whitelisted' : 'blacklisted'} gespeichert werden`)
         }
     })
 }
@@ -68,35 +73,13 @@ async function save_searchterm(){
 }
 async function save_module(){
     var SmObjId = $('#whitelist_text').val()
-    if($('option:selected') == 'all_years all_semesters') {
-        var PiqSession = $('#filter_selectors').find('optgroup').find('option').val().split(' ')[0]
-        var PiqSession = $('#filter_selectors').find('optgroup').find('option').val().split(' ')[1]
+    if($('option:selected').val() == 'all_years all_semesters') {
+        alert('Alle Semester ausgewählt. Das modul wird im jetzigen Semester gespeichert.')
+        $(`option[value="${$('.current_semester').val()}"]`).prop('selected', true);
     }
-    else {
-        var PiqYear = $('option:selected').val().split(' ')[0];
-        var PiqSession = $('option:selected').val().split(' ')[1];
-    }
-    await $.ajax({
-        url: `${apiUrl}/modules/?key=${secret_key}`,
-        data: JSON.stringify({
-            'PiqYear': PiqYear,
-            'PiqSession': PiqSession,
-            'SmObjId': SmObjId,
-            'whitelisted': 1,
-        }),
-        method : 'POST',
-        success : function (data) {
-            add_to_whitelist(data.SmObjId, data.PiqYear, data.PiqSession, data.title, data.searchterm)
-            $('#whitelist_text').val('')
-            populate_blacklist();
-            populate_suggestions();
-            populate_studyprograms();
-        },
-        error : function (err) {
-            alert('Das Modul konnte nicht gespeichert werden')
-        }
-
-    })
+    var PiqYear = $('option:selected').val().split(' ')[0];
+    var PiqSession = $('option:selected').val().split(' ')[1];
+    await post_module_to_db(null, SmObjId, PiqYear, PiqSession, 1, "Manuell Hinzugefügt");
 }
 async function delete_searchterm(id){
     await $.ajax({
