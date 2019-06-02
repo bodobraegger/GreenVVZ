@@ -218,14 +218,14 @@ def save_studyprograms_for_module(module_id: int, studyprograms: list):
 @app.route('/modules/<int:module_id>', methods=['PUT'])
 @cross_origin()
 @require_appkey
-def flag_module(module_id):
+def flag_module(module_id: int):
+    """ Flag saved module as whitelisted or blacklisted, depending on request.args.get('whitelisted')"""
     whitelisted = int(request.args.get('whitelisted'))
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True, buffered=True)
     # flag module as either black or whitelisted.
     try:
         cursor.execute("UPDATE module SET whitelisted = {} WHERE id = {}".format(whitelisted, module_id))
-
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 409
 
@@ -238,18 +238,16 @@ def flag_module(module_id):
         return 'Blacklisted Module with Id {}'.format(module_id), 200
     
 
-# get blacklist
 @app.route('/modules/blacklist', methods=['GET'])
 @cross_origin()
 def get_blacklist():
     return get_modules(whitelisted=0)
 
-# remove module from database
 @app.route('/modules/<int:module_id>', methods=['DELETE'])
 @cross_origin()
 @require_appkey
-def remove_blacklist(module_id):
-    # remove module
+def remove_module(module_id: int):
+    """ remove module from database by id """
     try:
         cnx = mysql.connector.connect(**db_config)
         val = {'module_id': module_id}
@@ -264,17 +262,17 @@ def remove_blacklist(module_id):
     cnx.close()
     return 'Deleted module', 200
 
-
-# get all search terms
 @app.route('/searchterms', methods=['GET'])
 @cross_origin()
 def get_searchterms():
+    """ get all search terms from DB """
     terms = []
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True)
     qry = (
         "SELECT id, term FROM searchterm ORDER BY term ASC")
     cursor.execute(qry)
+    # decode encoded strings to make them human readable
     for row in cursor.fetchall():
         for column, value in row.items():
             if type(value) is bytearray:
@@ -288,11 +286,11 @@ def get_searchterms():
 @cross_origin()
 @require_appkey
 def add_searchterm():
+    """ Add searchterm to DB, term is supplied in form data """
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor()
     data = request.form
     term = data['term']
-    # term  =  'test'
     qry = "INSERT INTO searchterm (term) VALUES (%(term)s)"
     try:
         cursor.execute(qry, data)
@@ -305,11 +303,11 @@ def add_searchterm():
         return "Error: {}".format(err), 400
 
 
-# remove search term
 @app.route('/searchterms/<int:searchterm_id>', methods=['DELETE'])
 @cross_origin()
 @require_appkey
-def remove_searchterm(searchterm_id):
+def remove_searchterm(searchterm_id: int):
+    """ remove searchterm from DB via id """
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor()
     qry = "DELETE FROM searchterm WHERE id = %(searchterm_id)s"
@@ -323,12 +321,13 @@ def remove_searchterm(searchterm_id):
         return "Error: {}".format(err), 404
 
 
-# get modules based on search terms, excluding those on white- and blacklist
 @app.route('/search', methods=['GET'])
 @cross_origin()
 def search():
+    """ get modules based on search terms, marking those already on white- and blacklist """
+    # record time for this very slow operation
     start_time = time.perf_counter()
-    # get searchterms
+    # get searchterms, and biggest module id
     terms = []
     id_not_currently_in_use = 999
     try:
@@ -340,6 +339,7 @@ def search():
         cursor.close()
         cursor = cnx.cursor()
         cursor.execute("SELECT MAX(id) FROM module")
+        # to make sure that all modules have unique CSS ids, make smallest suggestion_module_id = max(module_id)+999
         id_not_currently_in_use = cursor.fetchone()[0] + 999
 
     except Exception as e:
@@ -364,7 +364,9 @@ def search():
                     'searchterm': searchterm,
                 })
 
+    # also search for modules associated with courses for same search
     modules += json.loads(search_upwards().get_data())
+
     elapsed_time = time.perf_counter() - start_time
     # print("elapsed: getting modules", elapsed_time)
     
@@ -382,7 +384,8 @@ def search():
     return jsonify(modules_no_duplicates)
 
 
-def check_which_saved(modules):
+def check_which_saved(modules: list):
+    """ Check which modules are saved, and mark them as either white- or blacklisted accordingly """
     try:
         # flag elements that are already in database
         saved_modules = {}
@@ -403,61 +406,12 @@ def check_which_saved(modules):
         print(e)
     return modules
 
-
-"""
-Request detail page for course object, add Module subobjects(dicts) as list to given course object 
-"""
-def find_modules_for_course(course):
-    course['Modules'] = []
-    rURI = models.Globals.URI_prefix+"EDetailsSet(EObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links&$format=json".format(
-        course.get('EObjId'), course.get('PiqYear'), course.get('PiqSession')) #named params with **dict
-
-    r = requests.get(rURI)
-
-    # select each result of the 'Modules' subelement
-    for module in r.json()['d']['Modules']['results']:
-        course['Modules'].append({
-            'SmObjId':    int(module['SmObjId']),
-            'title':          module['SmText'],
-            'PiqYear':    int(module['PiqYear']),
-            'PiqSession': int(module['PiqSession']),
-            'searchterm': course['searchterm'],
-        })
-    course['Modules'] = list({frozenset(item.items()) : item for item in course['Modules']}.values())
-    return course['Modules']
-
-"""
-Request detail page for module object, add Studyprogrm subobjects(dicts) as list to given module obj
-"""
-def find_studyprograms_for_module(SmObjId, PiqYear, PiqSession):
-    # SmDetailsSet(SmObjId='50934872',PiqYear='2018',PiqSession='004')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods
-    rURI = models.Globals.URI_prefix+"SmDetailsSet(SmObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods&$format=json".format(
-        SmObjId, PiqYear, PiqSession)
-    module_values = {"Partof": []}
-    r = requests.get(rURI)
-
-    for studyprogram in r.json()['d']['Partof']['results']:
-        module_values['Partof'].append({
-            'CgHighText':     studyprogram['CgHighText'],
-            'CgHighCategory': studyprogram['CgHighCategory'],
-        })
-    module_values['Partof'] = list({frozenset(item.items()) : item for item in module_values['Partof']}.values())
-    return module_values['Partof']
-
-"""
-Wrapper function to be able to parallelize finding studyprograms for modules
-"""
-def wrap_execute_for_modules_in_course(course):
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        return executor.map(find_studyprograms_for_module, course['Modules'])
-    # return ThreadPool(len(course['Modules'])).imap_unordered(find_studyprograms_for_module, course['Modules'])
-
-"""
-Find course matches, then find containing modules, containing study programs
-"""
 @app.route('/search_upwards', methods=['GET'])
 @cross_origin()
 def search_upwards():
+    """
+        Find course matches, then find containing modules, # and containing study programs
+    """
     start_time = time.perf_counter()
     # get searchterms
     terms = []
@@ -487,16 +441,14 @@ def search_upwards():
                     'PiqSession': int(course['PiqSession']),
                     'searchterm': searchterm,
                 })
-        # remove duplicates
-        # courses = list({frozenset(item.items()) : item for item in courses}.values())
-
         
-        # takes about 6 seconds for the two dev terms
+        # parallel execution: takes about 6 seconds for the two dev terms
         with ThreadPoolExecutor(max_workers=len(courses)+5) as executor:
             executor.map(find_modules_for_course, courses)
+            # uncomment this to find studyprograms in one go
             # executor.map(wrap_execute_for_modules_in_course, courses)
 
-        # takes >20 seconds for the two dev terms.        
+        # sequential execution: takes >20 seconds for the two dev terms.        
         # for course in courses:
         #     find_modules_for_course(course)
             
@@ -505,16 +457,62 @@ def search_upwards():
             # print(course)
     for course in courses:
         modules += course['Modules']
-    modules = list({frozenset(item.items()):item for item in modules}.values())
+
     elapsed_time = time.perf_counter() - start_time
-    modules = check_which_saved(modules)
     # print("elapsed: getting courses->modules->studyprograms", elapsed_time)
     return jsonify(modules)
 
+def find_modules_for_course(course: dict):
+    """
+    Request detail page for course object, add Module subobjects(dicts) as list to given course object 
+    """
+    course['Modules'] = []
+    rURI = models.Globals.URI_prefix+"EDetailsSet(EObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links&$format=json".format(
+        course.get('EObjId'), course.get('PiqYear'), course.get('PiqSession')) #named params with **dict
+
+    r = requests.get(rURI)
+
+    # select each result of the 'Modules' subelement
+    for module in r.json()['d']['Modules']['results']:
+        course['Modules'].append({
+            'SmObjId':    int(module['SmObjId']),
+            'title':          module['SmText'],
+            'PiqYear':    int(module['PiqYear']),
+            'PiqSession': int(module['PiqSession']),
+            'searchterm': course['searchterm'],
+        })
+    course['Modules'] = list({frozenset(item.items()) : item for item in course['Modules']}.values())
+    return course['Modules']
+
+def find_studyprograms_for_module(SmObjId: int, PiqYear: int, PiqSession: int) -> list:
+    """
+    Request detail page for module object, add Studyprogrm subobjects(dicts) as list to given module obj
+    """
+    rURI = models.Globals.URI_prefix+"SmDetailsSet(SmObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods&$format=json".format(
+        SmObjId, PiqYear, PiqSession)
+    module_values = {"Partof": []}
+    r = requests.get(rURI)
+
+    for studyprogram in r.json()['d']['Partof']['results']:
+        module_values['Partof'].append({
+            'CgHighText':     studyprogram['CgHighText'],
+            'CgHighCategory': studyprogram['CgHighCategory'],
+        })
+    module_values['Partof'] = list({frozenset(item.items()) : item for item in module_values['Partof']}.values())
+    return module_values['Partof']
+
+def wrap_execute_for_modules_in_course(course):
+    """
+    Wrapper function to be able to parallelize finding studyprograms for modules
+    """
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        return executor.map(find_studyprograms_for_module, course['Modules'])
+    # return ThreadPool(len(course['Modules'])).imap_unordered(find_studyprograms_for_module, course['Modules'])
 
 @app.route('/studyprograms', methods=['GET'])
 @cross_origin()
 def get_studyprograms():
+    """ Get distinct studyprograms associated with modules in the whitelist """
     studyprogram_idlist = []
     studyprogram_textlist = []
     cnx = mysql.connector.connect(**db_config)
@@ -541,6 +539,7 @@ def get_studyprograms():
 @app.route('/studyprograms_modules', methods=['GET'])
 @cross_origin()
 def get_studyprograms_modules():
+    """ Get Module-Studyprogramids assocations as a dictionary """
     studyprogramid_moduleids = {}
     try: 
         cnx = mysql.connector.connect(**db_config)
