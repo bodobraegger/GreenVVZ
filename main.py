@@ -60,54 +60,6 @@ def front():
         'sessions': helpers.get_current_sessions(),
     })
 
-# Front End Dev Page
-@app.route('/front_dev')
-@cross_origin()
-@require_appkey
-def front_dev():
-    baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
-    whitelist = []
-    blacklist = []
-    searchterms = []
-    found_modules= []
-    studyprograms = {0: "Theologie: Vollstudienfach 120"}
-    studyprogramid_moduleids = {0: [2]}
-    secret_key = app.config['SECRET_KEY']
-
-    try:
-        whitelist = json.loads(get_whitelist().get_data())
-        blacklist = json.loads(get_blacklist().get_data())
-        searchterms = json.loads(get_searchterms().get_data())
-        found_modules = json.loads(search().get_data())
-        studyprograms = get_studyprograms().get_data(as_text=True)
-        studyprogramid_moduleids = get_studyprograms_modules().get_data(as_text=True)
-    except mysql.connector.errors.InterfaceError as e:
-        print(e, "\n!!!only works on server!!!")
-        test = {
-            'PiqSession': 3,
-            'PiqYear': 2018,
-            'SmObjId': 50904112,
-            'title': "ayy",
-            'whitelisted': 1,
-        }
-        whitelist.append(test)
-        blacklist.append(test)
-        found_modules.append(test)
-        searchterms.append({"id": 1, "term": "wut"})
-
-    return render_template('front_dev.html', **{
-        'whitelist': whitelist,
-        'blacklist': blacklist,
-        'searchterms': searchterms,
-        'baseUrlVvzUzh': baseUrlVvzUzh,
-        'secret_key': secret_key,
-        'found_modules': found_modules,
-        # for filter-selectors.html
-        'sessions': helpers.get_current_sessions(),
-        'studyprogramid_moduleids': studyprogramid_moduleids,
-        'studyprograms': studyprograms,
-    })
-
 @app.route('/public')
 @cross_origin()
 @require_appkey
