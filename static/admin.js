@@ -1,17 +1,11 @@
-import {ShowSelectedModules} from './filter.js';
 // GLOBAL VARIABLES DEFINITIONS: used across public.js and filter.js
-export var baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
-export var apiUrl = 'https://greenvvz.ifi.uzh.ch'
+baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
+apiUrl = 'https://greenvvz.ifi.uzh.ch'
 // apiUrl = 'http://127.0.0.1:8080/'
-export var secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data('api-key')
-export function set_secret_key(secret_key) {
-    secret_key = secret_key;
-}
+secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data('api-key')
 // initializatin of global vars for sp_idlist and sp_textlist
-export var studyprogram_idlist = []
-export var studyprogram_textlist = []
-export var studyprogramid_moduleids = {}
-
+studyprogram_idlist = []
+studyprogram_textlist = []
 
 /**
  * Flag tablerows for modules OF THE WHITELIST ONLY contained in the studyprogram input 
@@ -260,7 +254,6 @@ function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whit
         ${whitelisted==1 ? 'disabled' : ''}>Anzeigen</button>`
     var verbergen_button=`<button name="Verbergen" onclick="post_module_to_db(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, whitelisted=0, '${searchterm}')"
         ${whitelisted==0 ? 'disabled' : ''}>Verbergen</button>`
-    let sug_status;
     if(whitelisted==1) {
         sug_status='Angezeigt';
     }
@@ -294,7 +287,7 @@ function add_to_searchterms(id, term){
 /**
  * Request searchterms from server, add them to DOM.
  */
-export async function populate_searchterms(){
+async function populate_searchterms(){
     var searchterms = $('#searchterms_body')
     await $.ajax({
         url: apiUrl+'/searchterms',
@@ -314,7 +307,7 @@ export async function populate_searchterms(){
 /**
  * Request whitelisted modules from server, add them to DOM.
  */
-export async function populate_whitelist(){
+async function populate_whitelist(){
     var whitelist = $('#whitelist_body')
     await $.ajax({
         url: apiUrl+'/modules/whitelist',
@@ -357,7 +350,7 @@ export async function populate_whitelist(){
 /**
  * Request blacklisted modules from server, add them to DOM.
  */
-export async function populate_blacklist(){
+async function populate_blacklist(){
     var blacklist = $('#blacklist_body');
     await $.ajax({
         url: apiUrl+'/modules/blacklist',
@@ -388,7 +381,7 @@ export async function populate_blacklist(){
 /**
  * Request found modules from server, add them to DOM.
  */
-export async function populate_suggestions(){
+async function populate_suggestions(){
     var suggestions = $('#suggestions_body')
     await $.ajax({
         url: apiUrl+'/search',
@@ -420,7 +413,7 @@ export async function populate_suggestions(){
 /**
  * Request studyprograms for selected semester from server, as well as studyprogamid_moduleids list, add them to global JS scope.
  */
-export async function populate_studyprograms() {
+async function populate_studyprograms() {
     // get selected semester
     var PiqYear = $('option:selected').val().split(' ')[0];
     var PiqSession = $('option:selected').val().split(' ')[1];
@@ -491,7 +484,7 @@ export async function populate_studyprograms() {
  * @param  {Number} year    module year data.
  * @return {String} A span containing the humanreadable semester and year.
  */
-export function convert_session_to_string(session, year){
+function convert_session_to_string(session, year){
     if (session == 3){
         return `<span style="display: none;">${year % 100 || ''}</span><span class="semester">HS </span>${year % 100 || ''}`
     }
@@ -570,7 +563,7 @@ function getCookie(cname) {
 /**
  * Check if the "updated_recently" cookie exists - if it doesn't, updateModules()
  */
-export function checkUpdatedCookie() {
+function checkUpdatedCookie() {
     var update_status = getCookie("updated_recently");
     if (update_status != "") {
         return;

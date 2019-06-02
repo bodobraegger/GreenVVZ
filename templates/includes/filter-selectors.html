@@ -1,13 +1,10 @@
 <!-- FILTER SELECTOR INCLUDE -->
 <div id="filter_selectors_wrapper" class="parent">
-    <!-- Load filter.js in include to keep it include-only -->
-    <script type="module" src="{{ url_for('static', filename='filter.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='filter.css') }}">
     <div class="left-align">
         <div class="autocomplete" style="width:400px;">
             <input  class="studyprogram" id="studyprogram_input" type="text" name="studyprogram" placeholder="Studienprogramm">
             <!-- <button class="studyprogram btn" id="studyprogram_btn" onclick="ShowSelectedModules()">Filtern</button> -->
-            <button class="studyprogram btn" id="studyprogram_btn_clear">Filter löschen</button>
+            <button class="studyprogram btn" id="studyprogram_btn_clear" onclick="ClearStudyProgramFilter()">Filter löschen</button>
         </div>
     </div>
 
@@ -23,5 +20,29 @@
         </select>
     </div>
     <div class="spacer" style="height: 3em">
+    <!-- Load filter.js in include to keep it include-only -->
+    <script type="text/javascript" src="{{ url_for('static', filename='filter.js') }}"></script>
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename='additional/autocomplete.js') }}"></script> -->
+    <script type="text/javascript">
+        $('select#semester_selector').change(function() {
+            ClearStudyProgramFilter();
+            ShowSelectedModules();
+            populate_studyprograms();
+        });
+
+        $('#studyprogram_input').on("change keyup autocompleteselect", function() {
+            ShowSelectedModules();
+        }).autocomplete({
+            source: studyprogram_textlist,
+            minLength: 0,
+            select: function (event, ui) {
+				$(this).val(ui.item.label);
+				ShowSelectedModules();
+			},
+        }).focus(function() {
+            $(this).autocomplete('search', $(this).val())
+        });
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='filter.css') }}">
 </div>
 <!-- END FILTER SELECTOR INCLUDE -->
