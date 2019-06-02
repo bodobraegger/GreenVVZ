@@ -215,29 +215,6 @@ def save_studyprograms_for_module(module_id: int, studyprograms: list):
         cnx.commit()
         cursor.close()
 
-def delete_studyprograms_for_module(module_id):
-    """ delete studyprograms for module if there are no other modules with that SP. """
-    cnx = mysql.connector.connect(**db_config)
-    cursor = cnx.cursor(buffered=True)
-    # delete all studyprograms associated with that module...
-    cursor.execute("SELECT studyprogram_id FROM module_studyprogram WHERE module_id = {};".format(module_id))
-    studyprogram_ids=set()
-    for row in cursor:
-        studyprogram_ids.add(row[0])
-    print('deleting studyprogams', studyprogram_ids, 'for module', module_id)
-    for sp_id in studyprogram_ids:
-        module_ids=set()
-        cursor.execute("SELECT module_id FROM module_studyprogram WHERE studyprogram_id = {};".format(sp_id))
-        for row in cursor:
-            module_ids.add(row[0]) 
-        # ... but only if they are not associated with any other module
-        if len(module_ids) == 1:
-            cursor.execute("DELETE FROM studyprogram WHERE id = {};".format(sp_id))
-    cnx.commit()
-    cursor.close()
-    cnx.close()
-            
-
 @app.route('/modules/<int:module_id>', methods=['PUT'])
 @cross_origin()
 @require_appkey
