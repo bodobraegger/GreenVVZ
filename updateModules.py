@@ -20,8 +20,8 @@ def update_modules() -> bool:
     cursor.execute(qry)
     for row in cursor:
         cursor2 = cnx.cursor()
-        mod = models.Module(row['SmObjId'])
-        current_values = mod.find_module_values(row['PiqYear'], row['PiqSession'])
+        mod = models.Module(row['SmObjId'], row['PiqYear'], row['PiqSession'])
+        current_values = mod.find_module_values()
         if current_values is not None:
             qry2 = "UPDATE module SET title=%(title)s WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s;"
             val = current_values
