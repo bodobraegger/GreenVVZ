@@ -274,7 +274,7 @@ function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whit
 
 /**
  * Write table row for searchterm and add to DOM.
- * @param {Number} module_id    numerical part of the searchterm CSS selector id, matches DB id
+ * @param {Number} id           numerical part of the searchterm CSS selector id, matches DB id
  * @param {String} term         searchterm value
  */
 function add_to_searchterms(id, term){
