@@ -29,4 +29,8 @@ venv*
 build
 .vscode
 documentation/ebay.py
+docs/npm*
+docs/naturaldocs
+docs/source
+docs/build
 Bachelorarbeit_Lukas_Graessle.pdf
