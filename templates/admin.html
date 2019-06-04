@@ -35,11 +35,17 @@
                             <td class="semester">Semster</td>
                             <td class="sorttable_nosort">Verbergen</td>
                         </thead>
+                        <tbody>
+                            <tr class="static" data-row-index="0">
+                                <td colspan="2">
+                                  <input type="number" max="99999999" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 100%">
+                                </td>
+                                <td colspan="2">
+                                  <button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button>
+                                </td>
+                              </tr>
+                        </tbody>
                         <tbody id="whitelist_body">
-                            <tr>
-                                <td colspan="2"><input type="number" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%"></td>
-                                <td colspan="2"><button name="submit_whitelist" type="button" onclick="save_module()">Modul hinzufügen</button></td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -130,6 +136,20 @@
                     3: {sorter: false, parser: false} // don't sort on third header
                     }
 
+                });
+                
+                // disable non number input
+                $('input[type=number][max]:not([max=""])').on('keypress keyup blur input', function(ev) {
+                    // prevent non number input
+                    if ((event.which < 48 || event.which > 57)) {
+                        event.preventDefault();
+                    }
+                    var maxlength = $(this).attr('max').length;
+                    var value = $(this).val();
+                    if (value && value.length >= maxlength) {
+                        value = value.substr(0, maxlength)
+                        $(this).val(value.replace(/[^\d].+/, ""));
+                    }
                 });
 
             });

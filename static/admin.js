@@ -320,16 +320,6 @@ async function populate_whitelist(){
                 // for each module in data, add a row
                 add_to_whitelist(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].searchterm)
             }
-            // prepend manual input to table body, with fixed index for tablesorter
-            whitelist.prepend(`
-            <tr class="static" data-row-index="0">
-              <td colspan="2">
-                <input type="text" id="whitelist_text" spellcheck="false" placeholder="Modulnummer (8-Stellige Zahl in der URL zum Modul)" style="width: 90%">
-              </td>
-              <td colspan="2">
-                <button name="submit_whitelist" style="display: block; width: 100%" type="button" onclick="save_module()">Modul hinzufügen</button>
-              </td>
-            </tr>`)
             // hide modules not in current filter scope
             ShowSelectedModules();
         },
