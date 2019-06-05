@@ -31,14 +31,14 @@ To set up a server hosting this tool, which will be required to implement and te
  3. Set up this project to be served:     
      - First of all, get a copy of this project on the server: `git clone https://github.com/bbodo/greenvvz.git`, to clone this repository into the folder `greenvvz`. Then `cd greenvvz` to navigate to the project directory.
      - With the virtualenv activated, use `pip install -r requirements.txt` to install all necessary packages to host the server.
-     - Once you have have a database user example: `dbuser` with password `dbuserpassword`, set up a database named `dbname`, and decided on a unique secret key `secret`, only known to you, and not saved in the repository, proceed to the next step.
+     - Once you have have a database user example: `dbuser` with password `dbuserpassword`, set up a database named `dbname`, and decided on a unique secret key `yoursecretkey`, only known to you, and not saved in the repository, proceed to the next step.
      - add the following lines to the `venv_greenvvz/bin/activate_this.py` file, to make sure the server has the necessary information:
      ```python
         os.environ["FLASK_ENV"]="development" # Comment line out for production! 
         os.environ["DB_USER"]="dbuser"
         os.environ["DB_PASSWORD"]="dbuserpassword"
         os.environ["DB_NAME"]="dbname"
-        os.environ["SECRET_KEY"]="secret"
+        os.environ["SECRET_KEY"]="yoursecretkey"
      ```
  4. Set up the HTTP server to serve files using the Web Server Gateway Interface (WSGI) in your user/www directory. For this example, let's say your username is `USER`. 
     - Put the application.wsgi file there, with the following contents(_the helpful techs at UZH did this for me_):
@@ -53,6 +53,7 @@ To set up a server hosting this tool, which will be required to implement and te
       from main import app as application
       ```
 5. After this, you should be good to go! Check out if your server is running at https://yourserver.ifi.uzh.ch! If you run into errors, make sure to check out the logs you set up in step 4, or UZH kindly set up for you.
+
 
 ## Developer's Guide for a local setup
 1. Make sure you have git and python >= 3.5 installed.
@@ -70,5 +71,39 @@ To set up a server hosting this tool, which will be required to implement and te
    os.environ["SECRET_KEY"]="secret"
 ```
 5. Once this is done, you are good to go! Use `flask run` to use your local server on localhost:5000!
+
+## Guide to set up a working instance on Magnolia:
+6. Now, to host your server on an UZH page in Magnolia, do the following:
+    - Create a page `greenvvz-admin` for the administrator view. I recommend Inhaltsseite 1-Spaltig.
+        - In the Content subsection, add an HTML element with the following contents:
+            ```HTML
+            <iframe id="greenvvz-admin-iframe" class="mod mod-iframe" src="https://yourserver.ifi.uzh.ch/admin?key=yoursecretkey" style="width: 100%; min-height: 1000px;" scrolling="no" frameborder="0">Ihr Browser unterstützt iframes leider nicht.</iframe>
+
+            <script type="text/javascript" src="https://yourserver.ifi.uzh.ch/static/additional/iframeResizer.min.js"></script>
+
+            <script>
+              iFrameResize({
+              log: false, 
+              // heightCalculationMethod: 'max',
+              }, 
+              '#greenvvz-admin-iframe')
+            </script>
+
+            ```
+    - Create a page `greenvvz-public` for the public view
+        - In the Content subsection, add an HTML element with the following contents:
+            ```HTML
+            <iframe id="greenvvz-public-iframe" class="mod mod-iframe" src="https://yourserver.ifi.uzh.ch/public?key=yoursecretkey" style="width: 100%; min-height: 1000px;" scrolling="no" frameborder="0">Ihr Browser unterstützt iframes leider nicht.</iframe>
+
+            <script type="text/javascript" src="https://yourserver.ifi.uzh.ch/static/additional/iframeResizer.min.js"></script>
+
+            <script>
+              iFrameResize({
+              log: false, 
+              // heightCalculationMethod: 'max',
+              }, 
+              '#greenvvz-public-iframe')
+            </script>
+            ```
 
     
