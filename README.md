@@ -6,7 +6,7 @@ Built for the Informatics and Sustainability Research group at the Department of
 
 This project consists of two main parts: a flask back end, interfacing with the UZH course catalogue, as well as a flask / Jinja2 / jQuery frontend, interfacing with the flask back end.
 
-A foreword for the following guides: Trial and error, as long as you are not running a productive server, are a great tool to learn how software works. This guide might not be complete, and the technology you run it on might not be the exact same, but it should help you figure out the necessary steps to get it running.
+A foreword for the following guides: Trial and error, as long as you are not running a productive server, are a great tool to learn how software works. This guide might not be complete, and the technology you run it on might not be the exact same, but it should help you figure out the necessary steps to get it running. **Should anything need changes, please create a pull request!**
 
 ## Developer's Guide for hosting the project 
 #### (This is needed to test any database functionality. Best bring this guide to your UZH technician, he will be able to guide you where this guide might fail.)
