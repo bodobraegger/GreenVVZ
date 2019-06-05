@@ -68,7 +68,7 @@ To set up a server hosting this tool, which will be required to implement and te
    os.environ["DB_USER"]="dbuser"
    os.environ["DB_PASSWORD"]="dbuserpassword"
    os.environ["DB_NAME"]="dbname"
-   os.environ["SECRET_KEY"]="secret"
+   os.environ["SECRET_KEY"]="yoursecretkey"
 ```
 5. Once this is done, you are good to go! Use `flask run` to use your local server on localhost:5000!
 
