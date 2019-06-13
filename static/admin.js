@@ -301,7 +301,6 @@ async function populate_searchterms(){
             for (var row in data){
                 add_to_searchterms(data[row].id, data[row].term)
             }
-            searchterms.prepend('<tr><td><input type="text" id="searchterm_text" spellcheck="true" placeholder="Suchbegriff für Titel, Beschrieb oder Kürzel" style="width: 90%"></td><td><button name="submit_searchterm" style="display: block; width: 100%" type="button" onclick="save_searchterm()">Suchbegriff speichern</button></td></tr>')
         }
     })
 

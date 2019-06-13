@@ -57,11 +57,17 @@
                             <td>Begriff</td>
                             <td>Entfernen</td>
                         </thead>
-                        <tbody id="searchterms_body">
+                        <tbody class="static">
                             <tr>
-                                <td><input type="text" pattern="\S+" id="searchterm_text" spellcheck="true" placeholder="Suchbegriff für Titel, Beschrieb oder Kürzel" style="width: 90%"></td>
-                                <td><button name="submit_searchterm" type="button" onclick="save_searchterm()">Suchbegriff speichern</button></td>
+                                <td>
+                                    <input type="text" pattern="\S+" id="searchterm_text" spellcheck="true" placeholder="Suchbegriff für Titel, Beschrieb oder Kürzel" style="width: 90%">
+                                </td>
+                                <td>
+                                    <button name="submit_searchterm" style="display: block; width: 100%" type="button" onclick="save_searchterm()">Suchbegriff speichern</button>
+                                </td>
                             </tr>
+                        </tbody>
+                        <tbody id="searchterms_body">
                         </tbody>
                     </table>
                 </div>
@@ -138,7 +144,7 @@
 
                 });
                 
-                // disable non number input
+                // disable non number input for manual module add
                 $('input[type=number][max]:not([max=""])').on('keypress keyup blur input', function(ev) {
                     // prevent non number input
                     if ((event.which < 48 || event.which > 57)) {
@@ -150,6 +156,15 @@
                         value = value.substr(0, maxlength)
                         $(this).val(value.replace(/[^\d].+/, ""));
                     }
+                });
+
+                // remove leading whitespace, and replace double whitespace with single.
+                $('input[type=text]').on('input', function(ev) {
+                    $(this).val(
+                        $(this).val()
+                            .replace(/^\s+/g, '') // remove leading whitespace
+                            .replace( /\s\s+/g, ' ' ) // remove double whitespace
+                    );
                 });
 
             });
