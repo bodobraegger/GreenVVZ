@@ -69,7 +69,11 @@ async function update_whitelist_status(module_id, whitelisted) {
  * Save searchterm from input into the DB.
  */
 async function save_searchterm(){
-    var term = $('#searchterm_text').val()
+    var term = $('#searchterm_text').val().trim()
+    if(term == '') {
+        alert('Eingabe fehlt');
+        return;
+    }
     await $.ajax({
         url :  apiUrl+'/searchterms?key='+secret_key,
         method : 'POST',
