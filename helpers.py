@@ -19,8 +19,8 @@ def get_session(ref_date = date.today(), target_date = None) -> dict:
     else:
         return {'year': ref_date.year, 'session': 3}
 
-def get_current_sessions(num_prev_semesters: int = 4) -> list:
-    """ Get next, current, and last num_prev_semesters sessions """
+def get_current_sessions(num_prev_semesters: int = 6) -> list:
+    """ Get next, current, and last num_prev_semesters sessions: DEFINE DEFAULT HERE, OTHERWISE ADAPT updateModules.py"""
     sessions = [ # next session (6 months from now)
         get_session(date.today()+relativedelta(months=6)), 
         get_session(date.today())

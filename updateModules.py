@@ -13,11 +13,13 @@ db_config = {
 }
 
 def update_modules() -> bool:
-    """ For each saved module, check if it still exists and/or changed, match in DB"""
+    """ For each saved module, check if it still exists and/or changed, match in DB, delete too old ones"""
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True, buffered=True)
-    qry = ("SELECT SmObjId, PiqYear, PiqSession FROM module")
-    cursor.execute(qry)
+    # delete modules of semester no longer relevant (as defined by the default num_prev_semesters+1, or len(helpers.get_current_sessions())-2 +1
+    no_longer_relevant_session = helpers.get_current_sessions(len(helpers.get_current_sessions())-1)[-1]
+    cursor.execute("DELETE FROM module WHERE PiqYear = %(year)s AND PiqSession = %(session)s", no_longer_relevant_session)
+    cursor.execute("SELECT SmObjId, PiqYear, PiqSession FROM module")
     for row in cursor:
         cursor2 = cnx.cursor()
         mod = models.Module(row['SmObjId'], row['PiqYear'], row['PiqSession'])
