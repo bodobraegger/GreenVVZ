@@ -1,21 +1,45 @@
 /* REQUIRES admin.js TO BE LOADED BEFOREHAND, FOR apiUrl, baseUrlVvzUzh and ShowSelectedModules() */
 $(document).ready(function () {
-    var root = $('#anchor-public')
+    lang=getUrlParam('lang');
     // if a data-lang tag exists
-    if(root.data("lang") === 'en'){
+    if(lang == 'en'){
+        // global abbreviation to make convert_to_session able to access
+        spring_sem_abbr = 'SS';
+        spring_sem = 'Spring Semester'
+        fall_sem_abbr = 'FS'
+        fall_sem = 'Fall Semester'
         var langTitle = 'UZH Modules related to sustainability';
         var langName = 'Name of the Module';
-        var langSemester = '(FS = Spring Semester, HS=Fall Semester)'
     } else {
+        spring_sem_abbr = 'FS';
+        spring_sem = 'Frühjahrssemester'
+        fall_sem_abbr = 'HS'
+        fall_sem = 'Herbstsemester'
         var langTitle = 'Module der UZH mit Nachhaltigkeitsbezug';
         var langName = 'Name des Moduls';
-        var langSemester = '(FS = Frühjahressemester, HS = Herbstsemester)'
     }
+    var langSemester = `${spring_sem_abbr} = ${spring_sem}, ${fall_sem_abbr} = ${fall_sem})`
     // load the whitelist elements into the page, using the anchor-public div
     $.ajax({
         // apiUrl is defined in admin.js
         url : apiUrl+"/modules/whitelist",
         method : 'GET',
+        beforeSend : function() {
+            // change the semester selector language
+            if(lang=="en"){
+                $('#studyprogram_input').attr('placeholder', 'Study program');
+                $('#all_semesters').html('All semesters');
+                $('#studyprogram_btn_clear').html('Delete filter')
+                $('#semester_selector option').each(function() {
+                    if($(this).attr('value').split(' ')[1].includes('3')) {
+                        $(this).html(`${fall_sem} ${$(this).attr('value').split(' ')[0]}`)
+                    }
+                    else if($(this).attr('value').split(' ')[1].includes('4')) {
+                        $(this).html(`${spring_sem} ${$(this).attr('value').split(' ')[0]}`)
+                    }
+                })
+            }
+        },
         success : function (data) {
             // create a table, 
             var table = $("<table></table>")
@@ -33,7 +57,7 @@ $(document).ready(function () {
                 body.append(module)
             }
             table.append(body)
-            root.append(table)
+            $('#anchor-public').append(table)
             // show the modules for current semester - defined in admin.js
             ShowSelectedModules();
         },
@@ -50,12 +74,17 @@ $(document).ready(function () {
  */
 function convert_session_to_string(session, year){
     if (session == 3){
-        return `<span class="semester">HS </span>${year % 100 || ''}`
+        return `<span class="semester">${fall_sem_abbr} </span>${year % 100 || ''}`
     }
     if (session == 4){
-        return `<span class="semester">FS </span>${(year+1) % 100 || ''}`
+        return `<span class="semester">${spring_sem_abbr} </span>${(year+1) % 100 || ''}`
     }
     else{
         return 'undefiniert'
     }
+}
+
+function getUrlParam(name){
+	var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+	return results[1] || 0;
 }

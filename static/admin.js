@@ -410,6 +410,7 @@ async function populate_studyprograms() {
     // get selected semester
     var PiqYear = $('option:selected').val().split(' ')[0];
     var PiqSession = $('option:selected').val().split(' ')[1];
+    var previous_placeholder = $('#studyprogram_input').attr("placeholder")
     // get studyprograms id list and text list 
     await $.ajax({
         url: apiUrl+'/studyprograms',
@@ -417,8 +418,10 @@ async function populate_studyprograms() {
         data: {
             'PiqYear': PiqYear,
             'PiqSession': PiqSession,
-        },                                                  // loading designator, disable button
-        beforeSend: function () { $('#studyprogram_input').attr("placeholder", "Lade Studienprogramme...").prop('disabled', true); },
+        },
+        beforeSend: function () { 
+            // loading designator, disable button
+            $('#studyprogram_input').attr("placeholder", "Lade Studienprogramme...").prop('disabled', true); },
         success : function (data) {
             // data is two lists, one for ids, one for texts, with matching indexing.
             studyprogram_idlist = data[0]
@@ -429,7 +432,7 @@ async function populate_studyprograms() {
         },
         complete : function() {
             // overwrite loading designator, enable button
-            $('#studyprogram_input').attr("placeholder", "Studienprogramm").prop('disabled', false);
+            $('#studyprogram_input').attr("placeholder", previous_placeholder).prop('disabled', false);
         },
     })
 
