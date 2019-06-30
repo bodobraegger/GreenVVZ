@@ -10,6 +10,7 @@ $(document).ready(function () {
         fall_sem = 'Fall Semester'
         var langTitle = 'Sustainability-related UZH modules';
         var langName = 'Name of the module';
+        monkeyPatchAutocomplete();
     } else {
         spring_sem_abbr = 'FS';
         spring_sem = 'Frühjahrssemester'

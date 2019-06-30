@@ -82,6 +82,18 @@ function ClearStudyProgramFilter() {
  * and if necessary, searching only from beginning of result (commented out)
  */
 function monkeyPatchAutocomplete() {
+    if(lang=="en") {
+        var more_weitere = "more"
+        var further_modules_msg = "study programs for modules in the chosen semester"
+        var mit_with = "with"
+        var keine_no = "No"
+    }
+    else {
+        var more_weitere = "weitere"
+        var further_modules_msg = "Studienprogramme für Module im gewählten Semester"
+        var mit_with = "mit"
+        var keine_no = "Keine"
+    }
     // hack: override autocomplete _renderItem to highlight matching part
     $.ui.autocomplete.prototype._renderItem = function (ul, item) {
         // Escape any regex syntax inside this.term
@@ -96,16 +108,16 @@ function monkeyPatchAutocomplete() {
         if(item.label.includes(' ... ')) {
             var listend = $("<li>")
             if(keywords.length > 0) {
-                listend.html(`<b>${item.label}</b> weitere Studienprogramme für Module im gewählten Semester mit Filter: <b>${$.trim(cleanTerm).replace('  ', ' ')}</b>`);
+                listend.html(`<b>${item.label}</b> ${more_weitere} ${further_modules_msg} ${mit_with} Filter: <b>${$.trim(cleanTerm).replace('  ', ' ')}</b>`);
             }
             else {
-                listend.html(`<b>${item.label}</b> weitere Studienprogramme für Module im gewählten Semester`);
+                listend.html(`<b>${item.label}</b> ${more_weitere} ${further_modules_msg}`);
             }
             return listend.attr('id', 'further_studyprograms_msg').appendTo(ul);
         }
         // if no suggestions pop up, show 'Keine' message
         else if(item.label.includes(' Keine ')) {
-            return $("<li>").html(`<b>${item.label}</b> Studienprogramme für Module im gewählten Semester mit Filter: <b>${$.trim(cleanTerm).replace('  ', ' ')}</b>`).attr('id', 'further_studyprograms_msg').appendTo(ul);
+            return $("<li>").html(`<b>${keine_no}</b> ${further_modules_msg.slice(0)} ${mit_with} Filter: <b>${$.trim(cleanTerm).replace('  ', ' ')}</b>`).attr('id', 'further_studyprograms_msg').appendTo(ul);
         }
         // Get the new label text to use with matched terms wrapped
         // in a span tag with a class to do the highlighting
