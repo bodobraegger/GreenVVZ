@@ -8,8 +8,8 @@ $(document).ready(function () {
         spring_sem = 'Spring Semester'
         fall_sem_abbr = 'FS'
         fall_sem = 'Fall Semester'
-        var langTitle = 'UZH Modules related to sustainability';
-        var langName = 'Name of the Module';
+        var langTitle = 'Sustainability-related UZH modules';
+        var langName = 'Name of the module';
     } else {
         spring_sem_abbr = 'FS';
         spring_sem = 'Frühjahrssemester'
