@@ -86,5 +86,7 @@ function convert_session_to_string(session, year){
 
 function getUrlParam(name){
 	var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-	return results[1] || 0;
+	if(results) {
+        return results[1]
+    }
 }
