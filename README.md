@@ -4,21 +4,21 @@ GreenVVZ: A web application to  facilitate storage and display of modules relate
 
 Built for the Informatics and Sustainability Research group at the Department of Informatics of the University of Zurich, under supervision of Prof. Dr. Lorenz Hilty.
 
-This project consists of two main parts: a flask back end, interfacing with the UZH course catalogue, as well as a flask / Jinja2 / jQuery frontend, interfacing with the flask back end.
+This project consists of two main parts: a flask back end, interfacing with the UZH course catalogue, as well as a flask / Jinja2 / jQuery front end, interfacing with the flask back end.
 
 A foreword for the following guides: Trial and error, as long as you are not running a productive server, are a great tool to learn how software works. This guide might not be complete, and the technology you run it on might not be the exact same, but it should help you figure out the necessary steps to get it running. **Should anything need changes, please create a pull request!**
 
 ## Developer's Guide for hosting the project 
 #### (This is needed to test any database functionality. Best bring this guide to your UZH technician, he will be able to guide you where this guide might fail.)
-To set up a server hosting this tool, which will be required to implement and test signifcant changes, follow these steps:
+To set up a server hosting this tool, which will be required to implement and test significant changes, follow these steps:
 
-1. Request a Virtual Private Server (VPS) at the Department of Informatics (or set up your own). Root priviledges are not required, with exception of priviledges to (re)start certain services. More to that later. Make sure the VPS comes with the following software installed:
-    - A linux distribution. _UZH uses Debian_.
+1. Request a Virtual Private Server (VPS) at the Department of Informatics (or set up your own). Root privileges are not required, with exception of privileges to (re)start certain services. More to that later. Make sure the VPS comes with the following software installed:
+    - A Linux distribution. _UZH uses Debian_.
         - A user / production folder with read/write privileges.
         - read / write privileges to the config folders of systemd/systemctl.
         - open ports, at least port 80, 8080, 443 and 8443. 
     - Git.
-    - A MySQL variant. _UZH uses MariaDB_. Also a MariaDB account which can create a database, tables, and read/write to it. Standard procedure is one DB user / application. _UZH supplied the accounts for me_.
+    - A MySQL variant. _UZH uses MariaDB_. Also, a MariaDB account which can create a database, tables, and read/write to it. Standard procedure is one DB user / application. _UZH supplied the accounts for me_.
     - Python >= 3.5.
         - pip, venv.
     - An HTTP server. _UZH uses Apache_. Make sure to request privileges to run `sudo systemctl restart apache2`.
