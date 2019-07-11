@@ -10,7 +10,11 @@ thead td.semester {
 }
 span.semester {
     display: inline-block;
-    width: 2.5em;
+    width: 1.7em;
+}
+#semester_header {
+    white-space: nowrap;
+    width: 110px;
 }
 /* .searchterm {
     color: #a3adb7;
