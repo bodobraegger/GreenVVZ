@@ -453,12 +453,13 @@ async function populate_studyprograms() {
         source: function(request, response) {
             var results = $.ui.autocomplete.filter(studyprogram_textlist, request.term);
             var num_sp_suggestions = 10;
-            if (results.length > num_sp_suggestions+5) {
-                // will be rendered differently, see filter.js
-                var total_msg=` ... ${results.length - num_sp_suggestions}`
-                results = results.slice(0, 10)
-                results.push(total_msg)
-            }
+            /* Use this to limit total results instead of scrollbar */
+            // if (results.length > num_sp_suggestions+5) {
+            //     // will be rendered differently, see filter.js
+            //     var total_msg=` ... ${results.length - num_sp_suggestions}`
+            //     results = results.slice(0, 10)
+            //     results.push(total_msg)
+            // }
             if (results.length == 0) {
                 results.push(' Keine ')
             }
