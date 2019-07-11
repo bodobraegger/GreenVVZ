@@ -19,7 +19,8 @@ $(document).ready(function () {
         var langTitle = 'Module der UZH mit Nachhaltigkeitsbezug';
         var langName = 'Name des Moduls';
     }
-    var langSemester = `${spring_sem_abbr} = ${spring_sem}, ${fall_sem_abbr} = ${fall_sem})`
+    var langSemester = `${spring_sem_abbr}: ${spring_sem}<br>
+                        ${fall_sem_abbr}: ${fall_sem}`
     // load the whitelist elements into the page, using the anchor-public div
     $.ajax({
         // apiUrl is defined in admin.js
@@ -46,7 +47,14 @@ $(document).ready(function () {
             var table = $("<table></table>")
             table.append('<thead><th colspan="2"><strong>'+langTitle+'</strong></th></thead>')
             var body = $('<tbody id="whitelist_body"></tbody>')
-            body.append('<tr><td><strong>'+langName+'</strong></td><td><strong>Semester</strong><br><p>'+langSemester+'</p></td></tr>')
+            body.append(`
+            <tr>
+                <td><strong>${langName}</strong></td>
+                <td id="semester_header">
+                    <p><strong>Semester</strong></p>
+                    <p>${langSemester}</p>
+                </td>
+            </tr>`)
             // append the modules as rows with proper id, data-SmObjId, data-semester, and a link to the vvz
             for (var row in data){
                 // baseUrlVvzUzh is defined in admin.js
