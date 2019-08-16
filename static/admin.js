@@ -608,14 +608,13 @@ function checkUpdatedCookie() {
 /**
  * Edit the searchterm text on click (is in first td per row)
  */
-$( "#searchterms_body" ).on( "click", "td.searchterm", function() {
+$(document).on( "click", "#searchterms_body td.searchterm", function() {
     $(this).attr("contentEditable", true);
-    console.log("welp");
+    $(this).attr("data-initial", $(this).text());
 });
-$( "#searchterms_body" ).on( "blur", "td.searchterm", function() {
+$(document).on( "blur", "#searchterms_body td.searchterm", function() {
     $(this).attr("contentEditable", false);
-    console.log($(this).parent().attr('id'));
-    
-    update_searchterm($(this).parent().attr('id'));
-    console.log("exit")
+    if($(this).text() == $(this).attr("data-initial")) {
+        update_searchterm($(this).parent().attr('id'));
+    }
 });
