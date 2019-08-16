@@ -91,6 +91,40 @@ async function save_searchterm(){
     })
 }
 /**
+ * Update searchterm from input to the DB.
+ */
+async function update_searchterm(id){
+    var term = $('#searchterms_body').find(`#${id} td.searchterm`).text()
+    if(term == '') {
+        delete_searchterm(id);
+        return;
+    }
+    await $.ajax({
+        url :  `${apiUrl}/searchterms/${id}?key=${secret_key}`,
+        method : 'PUT',
+        dataType : 'json',
+        data : {'term':term},
+        success : function (data) {
+            populate_searchterms()
+            populate_suggestions()
+        },
+        error : function (err) {
+            alert('Der Suchbegriff konnte nicht gespeichert werden')
+        }
+
+    })
+}
+/**
+ * Edit searchterm in the DOM, then update it in DB.
+ * @param {Number} id numerical part of CSS selector id for searchterm to delete, matches DB id.
+ */
+function remove_from_searchterms(id){
+    var term = $('#searchterms_body').find(`#${id}`)
+    term.remove()
+}
+
+
+/**
  * Delete searchterm from the DB.
  * @param {Number} id DB id for searchterm to delete
  */
@@ -282,7 +316,7 @@ function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whit
  * @param {String} term         searchterm value
  */
 function add_to_searchterms(id, term){
-    var searchterm = $('<tr id="'+id+'"><td>'+term+'</td><td><button onclick="delete_searchterm('+id+')">Entfernen</button></td></tr>')
+    var searchterm = $('<tr id="'+id+'"><td class="searchterm">'+term+'</td><td><button onclick="delete_searchterm('+id+')">Entfernen</button></td></tr>')
     $('#searchterms_body').append(searchterm)
 }
 
@@ -568,3 +602,20 @@ function checkUpdatedCookie() {
         updateModules();
     }
 }
+
+/* ######################## JQUERY EVENT HANDLERS ########################### */
+
+/**
+ * Edit the searchterm text on click (is in first td per row)
+ */
+$( "#searchterms_body" ).on( "click", "td.searchterm", function() {
+    $(this).attr("contentEditable", true);
+    console.log("welp");
+});
+$( "#searchterms_body" ).on( "blur", "td.searchterm", function() {
+    $(this).attr("contentEditable", false);
+    console.log($(this).parent().attr('id'));
+    
+    update_searchterm($(this).parent().attr('id'));
+    console.log("exit")
+});

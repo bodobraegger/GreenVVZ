@@ -302,6 +302,25 @@ def add_searchterm():
         cnx.close()
         return "Error: {}".format(err), 400
 
+@app.route('/searchterms/<int:searchterm_id>', methods=['PUT'])
+@cross_origin()
+@require_appkey
+def update_searchterm(searchterm_id: int):
+    """ Update searchterm in DB, term is supplied in form data """
+    cnx = mysql.connector.connect(**db_config)
+    cursor = cnx.cursor()
+    data = request.form
+    term = data['term']
+    qry = "UPDATE searchterm SET term = %(term)s WHERE id = %(searchterm_id)s"
+    try:
+        cursor.execute(qry, data)
+        id = cursor.lastrowid
+        cnx.commit()
+        cnx.close()
+        return jsonify({'id': id, 'term': term}), 200
+    except mysql.connector.Error as err:
+        cnx.close()
+        return "Error: {}".format(err), 400
 
 @app.route('/searchterms/<int:searchterm_id>', methods=['DELETE'])
 @cross_origin()
