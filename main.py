@@ -318,7 +318,7 @@ def update_searchterm(searchterm_id: int):
         cnx.commit()
         cnx.close()
         return jsonify({'id': id, 'term': term}), 200
-    except mysql.connector.Error as err:
+    except Exception as err:
         cnx.close()
         return "Error: {}".format(err), 400
 
