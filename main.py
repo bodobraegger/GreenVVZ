@@ -472,7 +472,7 @@ def search_upwards():
             else:
                 modFilter = "substringof('{0}',Seark)".format(searchterm)        
 
-            rURI = models.Globals.URI_prefix+"/SmSearchSet?$skip=0&$top=9999&$orderby=EStext asc&$filter=({0}) and PiqYear eq '{1}' and PiqSession eq '{2}'&$inlinecount=allpages&$format=json".format(
+            rURI = models.Globals.URI_prefix+"/ESearchSet?$skip=0&$top=9999&$orderby=EStext asc&$filter=({0}) and PiqYear eq '{1}' and PiqSession eq '{2}'&$inlinecount=allpages&$format=json".format(
                 modFilter, str(session['year']).zfill(3), str(session['session']).zfill(3))
             
             try:
