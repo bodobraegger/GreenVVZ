@@ -378,8 +378,14 @@ def search():
     modules = []
     for session in helpers.get_current_sessions():
         for searchterm in terms:
-            rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmSearchSet?$skip=0&$top=9999&$orderby=SmStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages&$format=json".format(
-                searchterm, str(session['year']).zfill(3), str(session['session']).zfill(3))
+            if "&" in searchterm:
+                searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
+                modFilter = ' or '.join(searchterms)
+            else:
+                modFilter = "substringof('{0}',Seark)".format(searchterm)
+
+            rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmSearchSet?$skip=0&$top=9999&$orderby=SmStext asc&$filter=({0}) and PiqYear eq '{1}' and PiqSession eq '{2}'&$inlinecount=allpages&$format=json".format(
+                modFilter, str(session['year']).zfill(3), str(session['session']).zfill(3))
 
             r = requests.get(rURI)
 
