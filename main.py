@@ -51,12 +51,21 @@ def require_appkey(view_function):
     return decorated_function
 
 
-@app.route('/hello')
+@app.route('/echo', methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'])
 @cross_origin()
 @require_appkey
 def hello_world():
-    """ Hello World test view """
-    return jsonify(hell0='world'), 200
+    """ test echo """
+    if request.method == 'GET':
+        return "ECHO: GET\n"
+    elif request.method == 'POST':
+        return "ECHO: POST\n"
+    elif request.method == 'PATCH':
+        return "ECHO: PACTH\n"
+    elif request.method == 'PUT':
+        return "ECHO: PUT\n"
+    elif request.method == 'DELETE':
+        return "ECHO: DELETE"
 
 @app.route('/admin')
 @cross_origin()
