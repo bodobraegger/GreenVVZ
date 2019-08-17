@@ -614,7 +614,7 @@ $(document).on( "click", "#searchterms_body td.searchterm", function() {
 });
 $(document).on( "blur", "#searchterms_body td.searchterm", function() {
     $(this).attr("contentEditable", false);
-    if($(this).text() == $(this).attr("data-initial")) {
+    if($(this).text() != $(this).attr("data-initial")) {
         update_searchterm($(this).parent().attr('id'));
     }
 });
