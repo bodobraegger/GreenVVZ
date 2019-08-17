@@ -386,17 +386,19 @@ def search():
 
             rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmSearchSet?$skip=0&$top=9999&$orderby=SmStext asc&$filter=({0}) and PiqYear eq '{1}' and PiqSession eq '{2}'&$inlinecount=allpages&$format=json".format(
                 modFilter, str(session['year']).zfill(3), str(session['session']).zfill(3))
+            try:
+                r = requests.get(rURI)
 
-            r = requests.get(rURI)
-
-            for module in r.json()['d']['results']:
-                modules.append({
-                    'SmObjId':    int(module['Objid']),
-                    'title':          module['SmStext'],
-                    'PiqYear':    int(module['PiqYear']),
-                    'PiqSession': int(module['PiqSession']),
-                    'searchterm': searchterm,
-                })
+                for module in r.json()['d']['results']:
+                    modules.append({
+                        'SmObjId':    int(module['Objid']),
+                        'title':          module['SmStext'],
+                        'PiqYear':    int(module['PiqYear']),
+                        'PiqSession': int(module['PiqSession']),
+                        'searchterm': searchterm,
+                    })
+            except Exception as e:
+                return "ERROR: Processing the module request for term '{}' failed: {}".format(searchterm, e), 400
 
     # also search for modules associated with courses for same search
     modules += json.loads(search_upwards().get_data())
@@ -466,15 +468,19 @@ def search_upwards():
         for searchterm in terms:
             rURI = models.Globals.URI_prefix+"ESearchSet?$skip=0&$top=9999&$orderby=EStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages&$format=json".format(
                 searchterm, session['year'], session['session'])
-            r = requests.get(rURI)
-            for course in r.json()['d']['results']:
-                courses.append({
-                    'EObjId':     int(course['Objid']),
-                    'EStext':         course['EStext'],
-                    'PiqYear':    int(course['PiqYear']),
-                    'PiqSession': int(course['PiqSession']),
-                    'searchterm': searchterm,
-                })
+            try:
+                r = requests.get(rURI)
+                
+                for course in r.json()['d']['results']:
+                    courses.append({
+                        'EObjId':     int(course['Objid']),
+                        'EStext':         course['EStext'],
+                        'PiqYear':    int(course['PiqYear']),
+                        'PiqSession': int(course['PiqSession']),
+                        'searchterm': searchterm,
+                    })
+            except Exception as e:
+                return "ERROR: Processing the course request for term '{}' failed: {}".format(searchterm, e), 400
         
         # parallel execution: takes about 6 seconds for the two dev terms
         with ThreadPoolExecutor(max_workers=len(courses)+5) as executor:
@@ -503,19 +509,22 @@ def find_modules_for_course(course: dict):
     course['Modules'] = []
     rURI = models.Globals.URI_prefix+"EDetailsSet(EObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links&$format=json".format(
         course.get('EObjId'), course.get('PiqYear'), course.get('PiqSession')) #named params with **dict
+    try:
+        r = requests.get(rURI)
 
-    r = requests.get(rURI)
-
-    # select each result of the 'Modules' subelement
-    for module in r.json()['d']['Modules']['results']:
-        course['Modules'].append({
-            'SmObjId':    int(module['SmObjId']),
-            'title':          module['SmText'],
-            'PiqYear':    int(module['PiqYear']),
-            'PiqSession': int(module['PiqSession']),
-            'searchterm': course['searchterm'],
-        })
-    course['Modules'] = list({frozenset(item.items()) : item for item in course['Modules']}.values())
+        # select each result of the 'Modules' subelement
+        for module in r.json()['d']['Modules']['results']:
+            course['Modules'].append({
+                'SmObjId':    int(module['SmObjId']),
+                'title':          module['SmText'],
+                'PiqYear':    int(module['PiqYear']),
+                'PiqSession': int(module['PiqSession']),
+                'searchterm': course['searchterm'],
+            })
+        course['Modules'] = list({frozenset(item.items()) : item for item in course['Modules']}.values())
+    except Exception as e:
+        return "ERROR: Processing the module request for course '{}' failed: {}".format(course['EStext'], e)
+    
     return course['Modules']
 
 def find_studyprograms_for_module(SmObjId: int, PiqYear: int, PiqSession: int) -> list:
@@ -525,14 +534,18 @@ def find_studyprograms_for_module(SmObjId: int, PiqYear: int, PiqSession: int) -
     rURI = models.Globals.URI_prefix+"SmDetailsSet(SmObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods&$format=json".format(
         SmObjId, PiqYear, PiqSession)
     module_values = {"Partof": []}
-    r = requests.get(rURI)
+    try: 
+        r = requests.get(rURI)
 
-    for studyprogram in r.json()['d']['Partof']['results']:
-        module_values['Partof'].append({
-            'CgHighText':     studyprogram['CgHighText'],
-            'CgHighCategory': studyprogram['CgHighCategory'],
-        })
-    module_values['Partof'] = list({frozenset(item.items()) : item for item in module_values['Partof']}.values())
+        for studyprogram in r.json()['d']['Partof']['results']:
+            module_values['Partof'].append({
+                'CgHighText':     studyprogram['CgHighText'],
+                'CgHighCategory': studyprogram['CgHighCategory'],
+            })
+        module_values['Partof'] = list({frozenset(item.items()) : item for item in module_values['Partof']}.values())
+    except Exception as e:
+        return "ERROR: Processing the studyprogram request for module '{}' failed: {}".format(SmObjId, e)
+    
     return module_values['Partof']
 
 def wrap_execute_for_modules_in_course(course):
