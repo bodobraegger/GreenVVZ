@@ -318,7 +318,7 @@ def update_searchterm(searchterm_id: int):
     """ Update searchterm in DB, term is supplied in form data """
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor()
-    data = request.values
+    data = request.form
     data['searchterm_id'] = searchterm_id
     term = data['term']
     qry = "UPDATE searchterm SET term = %(term)s WHERE id = %(searchterm_id)s"
