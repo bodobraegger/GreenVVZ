@@ -398,7 +398,7 @@ def search():
                         'searchterm': searchterm,
                     })
             except Exception as e:
-                return "ERROR: Processing the module request for term '{}' failed: {}".format(searchterm, e), 400
+                print("ERROR: Processing the module request for term '{}' failed: {}".format(searchterm, e), 400)
 
     # also search for modules associated with courses for same search
     modules += json.loads(search_upwards().get_data())
@@ -480,7 +480,7 @@ def search_upwards():
                         'searchterm': searchterm,
                     })
             except Exception as e:
-                return jsonify("ERROR: Processing the course request for term '{}' failed: {}".format(searchterm, e), 400)
+                print("ERROR: Processing the course request for term '{}' failed: {}".format(searchterm, e), 400)
         
         # parallel execution: takes about 6 seconds for the two dev terms
         with ThreadPoolExecutor(max_workers=len(courses)+5) as executor:
@@ -523,7 +523,7 @@ def find_modules_for_course(course: dict):
             })
         course['Modules'] = list({frozenset(item.items()) : item for item in course['Modules']}.values())
     except Exception as e:
-        return "ERROR: Processing the module request for course '{}' failed: {}".format(course['EStext'], e)
+        print("ERROR: Processing the module request for course '{}' failed: {}".format(course['EStext'], e))
     
     return course['Modules']
 
@@ -544,7 +544,7 @@ def find_studyprograms_for_module(SmObjId: int, PiqYear: int, PiqSession: int) -
             })
         module_values['Partof'] = list({frozenset(item.items()) : item for item in module_values['Partof']}.values())
     except Exception as e:
-        return "ERROR: Processing the studyprogram request for module '{}' failed: {}".format(SmObjId, e)
+        print("ERROR: Processing the studyprogram request for module '{}' failed: {}".format(SmObjId, e))
     
     return module_values['Partof']
 
