@@ -480,7 +480,7 @@ def search_upwards():
                         'searchterm': searchterm,
                     })
             except Exception as e:
-                return "ERROR: Processing the course request for term '{}' failed: {}".format(searchterm, e), 400
+                return jsonify("ERROR: Processing the course request for term '{}' failed: {}".format(searchterm, e), 400)
         
         # parallel execution: takes about 6 seconds for the two dev terms
         with ThreadPoolExecutor(max_workers=len(courses)+5) as executor:
