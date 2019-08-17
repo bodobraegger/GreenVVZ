@@ -384,7 +384,7 @@ def search():
             else:
                 modFilter = "substringof('{0}',Seark)".format(searchterm)
 
-            rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmSearchSet?$skip=0&$top=9999&$orderby=SmStext asc&$filter=({0}) and PiqYear eq '{1}' and PiqSession eq '{2}'&$inlinecount=allpages&$format=json".format(
+            rURI = models.Globals.URI_prefix+"/SmSearchSet?$skip=0&$top=9999&$orderby=SmStext asc&$filter=({0}) and PiqYear eq '{1}' and PiqSession eq '{2}'&$inlinecount=allpages&$format=json".format(
                 modFilter, str(session['year']).zfill(3), str(session['session']).zfill(3))
             try:
                 r = requests.get(rURI)
@@ -466,8 +466,15 @@ def search_upwards():
     modules = []
     for session in helpers.get_current_sessions():
         for searchterm in terms:
-            rURI = models.Globals.URI_prefix+"ESearchSet?$skip=0&$top=9999&$orderby=EStext%20asc&$filter=substringof('{0}',Seark)%20and%20PiqYear%20eq%20'{1}'%20and%20PiqSession%20eq%20'{2}'&$inlinecount=allpages&$format=json".format(
-                searchterm, session['year'], session['session'])
+            if "&" in searchterm:
+                searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
+                modFilter = ' or '.join(searchterms)
+            else:
+                modFilter = "substringof('{0}',Seark)".format(searchterm)        
+
+            rURI = models.Globals.URI_prefix+"/SmSearchSet?$skip=0&$top=9999&$orderby=EStext asc&$filter=({0}) and PiqYear eq '{1}' and PiqSession eq '{2}'&$inlinecount=allpages&$format=json".format(
+                modFilter, str(session['year']).zfill(3), str(session['session']).zfill(3))
+            
             try:
                 r = requests.get(rURI)
                 
@@ -507,7 +514,7 @@ def find_modules_for_course(course: dict):
     Request detail page for course object, add Module subobjects(dicts) as list to given course object 
     """
     course['Modules'] = []
-    rURI = models.Globals.URI_prefix+"EDetailsSet(EObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links&$format=json".format(
+    rURI = models.Globals.URI_prefix+"/EDetailsSet(EObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links&$format=json".format(
         course.get('EObjId'), course.get('PiqYear'), course.get('PiqSession')) #named params with **dict
     try:
         r = requests.get(rURI)
@@ -531,7 +538,7 @@ def find_studyprograms_for_module(SmObjId: int, PiqYear: int, PiqSession: int) -
     """
     Request detail page for module object, add Studyprogrm subobjects(dicts) as list to given module obj
     """
-    rURI = models.Globals.URI_prefix+"SmDetailsSet(SmObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods&$format=json".format(
+    rURI = models.Globals.URI_prefix+"/SmDetailsSet(SmObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods&$format=json".format(
         SmObjId, PiqYear, PiqSession)
     module_values = {"Partof": []}
     try: 

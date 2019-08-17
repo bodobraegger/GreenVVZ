@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 import helpers
 
 class Globals():
-    URI_prefix = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/"
+    URI_prefix = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv"
 
 class Module:
     """ Class to hold Module logic and data. Hardly used to full potential, could rework to use more of this."""
