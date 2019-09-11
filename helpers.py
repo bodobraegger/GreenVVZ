@@ -30,6 +30,12 @@ def get_current_sessions(num_prev_semesters: int = 6) -> list:
         sessions.append(get_session(date.today()-relativedelta(months=months)))
     return sessions
 
+def get_next_session(ref_year, ref_sem) -> dict:
+    semester = 4 if ref_sem == 3 else 3
+    year = ref_year if ref_sem == 3 else ref_year+1
+    return {'year': year, 'session': semester}
+
+
 def current_year() -> int:
     """ returns current year as int """
     return date.today().year
