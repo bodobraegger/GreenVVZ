@@ -20,7 +20,7 @@ def update_modules() -> bool:
     # delete modules of semester no longer relevant (as defined by the default num_prev_semesters+1, or len(helpers.get_current_sessions())-2 +1
     no_longer_relevant_session = helpers.get_current_sessions(len(helpers.get_current_sessions())-1)[-1]
     cursor.execute("DELETE FROM module WHERE PiqYear = %(year)s AND PiqSession = %(session)s", no_longer_relevant_session)
-    cursor.execute("SELECT SmObjId, PiqYear, PiqSession FROM module")
+    cursor.execute("SELECT * FROM module")
     for row in cursor:
         # current semester update
         cursor2 = cnx.cursor()
