@@ -159,9 +159,20 @@ def add_module():
     PiqSession = req_data['PiqSession']
     whitelisted = int(req_data['whitelisted'])
     searchterm = req_data['searchterm']
+
+    try_save_module = save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm)
+    # saving succeeded, create new tuple from module values dict and success code
+    if isinstance(try_save_module, dict):
+        return jsonify(try_save_module), 200
+    # saving failed, tuple of string and error code
+    elif isinstance(try_save_module, tuple): 
+        return try_save_module
+
+
+def save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm):
     # check if module exists in course catalogue, use values from there...
     m = models.Module(SmObjId, PiqYear, PiqSession)
-    module_values = m.find_module_values()
+    module_values = m.find_module_values()   
     # ... if it exists, ...
     if module_values is not None:
         try:
@@ -185,11 +196,12 @@ def add_module():
             studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
             save_studyprograms_for_module(module_id, studyprograms)
             cnx.close()
-            return jsonify(module_values), 200
+            return module_values
         except mysql.connector.Error as err:
             return "Error: {}\nfor module {}".format(err, module_id), 409
     else:
         return 'No module found', 404
+
 
 def save_studyprograms_for_module(module_id: int, studyprograms: list):
     """ Save studyprogams for module in database, establish relationship"""
