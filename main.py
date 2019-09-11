@@ -175,6 +175,8 @@ def save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm):
     module_values = m.find_module_values()   
     # ... if it exists, ...
     if module_values is not None:
+        # safety
+        module_id = 0
         try:
             # try to save into database
             cnx = mysql.connector.connect(**db_config)

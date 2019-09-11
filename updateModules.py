@@ -38,15 +38,14 @@ def update_modules() -> bool:
         except mysql.connector.Error as err:
             print("Error: {}".format(err))
             return False
-        
+        cursor2.close()
+
         # update in next semester
-        cursor2 = cnx.cursor()
         next_session = helpers.get_next_session(row['PiqYear'], row['PiqSession'])
         mod = models.Module(row['SmObjId'], next_session['year'], next_session['session'])
         next_values = mod.find_module_values()
         if next_values is not None:
             main.save_module(next_values['SmObjId'], next_values['PiqYear'], next_values['PiqSession'], row['whitelisted'],  row['searchterm'])
-        cursor2.close()
 
     cnx.commit()
     cnx.close()
