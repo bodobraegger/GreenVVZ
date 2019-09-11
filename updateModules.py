@@ -4,6 +4,7 @@ import os
 import mysql.connector
 import models
 import helpers
+import main
 
 db_config = {
     'user': os.environ.get('DB_USER', 'test'),
@@ -21,6 +22,7 @@ def update_modules() -> bool:
     cursor.execute("DELETE FROM module WHERE PiqYear = %(year)s AND PiqSession = %(session)s", no_longer_relevant_session)
     cursor.execute("SELECT SmObjId, PiqYear, PiqSession FROM module")
     for row in cursor:
+        # current semester update
         cursor2 = cnx.cursor()
         mod = models.Module(row['SmObjId'], row['PiqYear'], row['PiqSession'])
         current_values = mod.find_module_values()
@@ -36,6 +38,14 @@ def update_modules() -> bool:
         except mysql.connector.Error as err:
             print("Error: {}".format(err))
             return False
+        
+        # update in next semester
+        cursor2 = cnx.cursor()
+        next_session = helpers.get_next_session(row['PiqYear'], row['PiqSession'])
+        mod = models.Module(row['SmObjId'], next_session['year'], next_session['session'])
+        next_values = mod.find_module_values()
+        if next_values is not None:
+            main.save_module(next_values['SmObjId'], next_values['PiqYear'], next_values['PiqSession'], row['whitelisted'],  row['searchterm'])
         cursor2.close()
 
     cnx.commit()
