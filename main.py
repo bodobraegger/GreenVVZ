@@ -308,8 +308,15 @@ def get_searchterms():
             if type(value) is bytearray:
                 row[column] = value.decode('utf-8')
         terms.append(row)
-    qry = (
-        "SELECT DISTINCT searchterm AS term, searchterm_id AS id FROM module ORDER BY term ASC WHERE term NOT IN (SELECT term FROM searchterm)")
+    qry = ("""
+        SELECT DISTINCT searchterm AS term, searchterm_id AS id 
+        FROM module m 
+        WHERE searchterm NOT IN (
+            SELECT term 
+            FROM searchterm s 
+        )
+        ORDER BY searchterm ASC;"""
+    )
     cursor.execute(qry)
     for row in cursor.fetchall():
         for column, value in row.items():
