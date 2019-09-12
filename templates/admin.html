@@ -1,15 +1,15 @@
 <html>
-    <head>
-        <!-- uzh styling -->
-        <link rel="stylesheet" href="{{ url_for('static', filename='uzh/app.css') }}">
-        <link rel="shortcut icon" href="{{ url_for('static', filename='uzh/assets/img/sprite/icon/faviconkit-uzh.ch-57.ico') }}">
-        
+    <head>  
         <!-- jquery -->
         <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery-3.4.1.min.js') }}"></script>
         <!-- jquery.tablesorter.lib -->
         <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.tablesorter.lib/js/jquery.tablesorter.min.js') }}"></script>
         <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.tablesorter.lib/css/theme.default.css') }}">
-        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.tablesorter.lib/js/widgets/widget-staticRow.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.tablesorter.lib/js/jquery.tablesorter.widgets.js') }}"></script>
+        <!-- Select2 code -->
+        <link href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.6/select2.min.css" rel="stylesheet">
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.6/select2.min.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/external/jquery/jquery.tablesorter.lib/js/widgets/widget-filter-formatter-select2.js') }}"></script>
         <!-- jquery.ui -->
         <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
         <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.min.css') }}">
@@ -20,6 +20,10 @@
         <!-- custom functions and styles -->
         <script type="text/javascript" src="{{ url_for('static', filename='admin.js') }}"></script> 
         <link rel="stylesheet" href="{{ url_for('static', filename='general.css') }}">
+
+        <!-- uzh styling -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='uzh/app.css') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='uzh/assets/img/sprite/icon/faviconkit-uzh.ch-57.ico') }}">
     </head>
     <body>
         {% include 'includes/filter-selectors.html' %}
@@ -27,7 +31,7 @@
             <div id="anchor-admin" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
                 <h3>Angezeigte Elemente (Whitelist) <div class="count" id="count_whitelist"></div></h3>
                 <div id="whitelist" style="padding: 0">
-                    <div class="loading"><h3 class="loading ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
+                    <div class="loading-overlay"><h3 class="loading-overlay ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
                     <table class="sortable">
                         <thead>
                             <td>Name des Moduls</td>
@@ -72,9 +76,9 @@
                     </table>
                 </div>
 
-                <h3>Vorschläge basierend auf Suchbegriffen <div class="count" id="count_suggestions"></div></h3>
+                <h3>Vorschläge basierend auf Suchbegriffen <div class="count" id="count_suggestions"> <div class="loading"> ... </div> </div></h3>
                 <div id="suggestions" style="padding: 0">
-                    <div class="loading"><h3 class="loading ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
+                    <div class="loading-overlay"><h3 class="loading-overlay ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
                     <table class="sortable" data-sortlist="[[0,0]]">
                         <thead>
                             <td id="suggestions_title_th">Name des Moduls</td>
@@ -90,7 +94,7 @@
 
                 <h3>Verborgene Elemente (Blacklist) <div class="count" id="count_blacklist"></div></h3>
                 <div id="blacklist" style="padding: 0">
-                    <div class="loading"><h3 class="loading ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
+                    <div class="loading-overlay"><h3 class="loading-overlay ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
                      <table class="sortable">
                         <thead>
                             <td>Name des Moduls</td>
@@ -131,8 +135,6 @@
                 checkUpdatedCookie();
 
                 $(".sortable").addClass("tablesorter").tablesorter({
-                    // keep modulnummer input in place
-                    widgets: ['staticRow'],
                     // third click on the header will reset column to default - unsorted
                     // sortReset   : true,
                     // Resets the sort direction so that clicking on an unsorted column will sort in the sortInitialOrder direction.
@@ -140,6 +142,41 @@
                     headers : {
                     // 0 : { lockedOrder: 'asc' }, only allow sorting in one direction
                     3: {sorter: false, parser: false} // don't sort on third header
+                    },
+                    // keep modulnummer input in place
+                    widgets: ['staticRow', 'filter', 'stickyHeaders'],
+                    widgetOptions : {
+                        // Use the $.tablesorter.storage utility to save the most recent filters
+                        filter_saveFilters : true,
+                        // jQuery selector string of an element used to reset the filters
+                        filter_reset : 'button.reset',
+                        // add custom selector elements to the filter row
+                        filter_formatter : {
+
+                            // Alphanumeric (match)
+                            0 : function($cell, indx) {
+                            return $.tablesorter.filterFormatter.select2( $cell, indx, {
+                                match : true,         // adds "filter-match" to header
+                                cellText : 'Match: ', // Cell text
+                                width: '85%',         // adjusted width to allow for cell text
+                                value: ['abc', 'def'] // initial values
+                            });
+                            },
+
+                            // Alphanumeric (match)
+                            1 : function($cell, indx) {
+                            return $.tablesorter.filterFormatter.select2( $cell, indx, {
+                                match : true // exact match only
+                            });
+                            },
+
+                            // Alphanumeric (exact)
+                            4 : function($cell, indx) {
+                            return $.tablesorter.filterFormatter.select2( $cell, indx, {
+                                match : false // exact match only
+                            });
+                            }
+                        },
                     }
 
                 });
