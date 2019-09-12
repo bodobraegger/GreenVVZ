@@ -17,7 +17,7 @@ studyprogram_textlist = []
  * @param {Boolean} whitelisted  whitelist status of the module to save.
  * @param {String} searchterm   searchterm which found the module in the course catalogue
  */
-async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted, searchterm) {
+async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted, searchterm, searchterm_id) {
     await $.ajax({
         contentType: 'application/json',
         url: `${apiUrl}/modules?key=${secret_key}`,
@@ -28,6 +28,7 @@ async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitel
             'SmObjId': SmObjId,
             'whitelisted': whitelisted,
             'searchterm': searchterm,
+            'searchterm_id': searchterm_id,
         }),
         success : function (data) {
             // if module_id not supplied, it was added using save_module()
@@ -156,7 +157,7 @@ async function save_module(){
     var PiqYear = $('option:selected').val().split(' ')[0];
     var PiqSession = $('option:selected').val().split(' ')[1];
     // post to db with module_id=null, and searchterm = "Manuell Hinzugefügt"
-    await post_module_to_db(null, SmObjId, PiqYear, PiqSession, whitelisted=1, "Manuell Hinzugefügt");
+    await post_module_to_db(null, SmObjId, PiqYear, PiqSession, whitelisted=1, "Manuell Hinzugefügt", -999);
 }
 /**
  * Delete module from the DB.
@@ -282,12 +283,13 @@ function add_to_blacklist(module_id, SmObjId, PiqYear, PiqSession, title, search
  * @param {String} title        module title
  * @param {Boolean} whitelisted whitelisted the whitelist status
  * @param {String} searchterm   searchterm which found the module in the course catalogue
+ * @param {Number} searchterm_id searchterm which found the module in the course catalogue
  */
-function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm){
+function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id){
     // write both anzeigen and verbergen button, disabled depending on if module is white- or blacklisted or neither.
-    var anzeigen_button=`<button name="Anzeigen" onclick="post_module_to_db(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, whitelisted=1, '${searchterm}')"
+    var anzeigen_button=`<button name="Anzeigen" onclick="post_module_to_db(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, whitelisted=1, '${searchterm}', ${searchterm_id})"
         ${whitelisted==1 ? 'disabled' : ''}>Anzeigen</button>`
-    var verbergen_button=`<button name="Verbergen" onclick="post_module_to_db(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, whitelisted=0, '${searchterm}')"
+    var verbergen_button=`<button name="Verbergen" onclick="post_module_to_db(${module_id}, ${SmObjId}, ${PiqYear}, ${PiqSession}, whitelisted=0, '${searchterm}', ${searchterm_id})"
         ${whitelisted==0 ? 'disabled' : ''}>Verbergen</button>`
     if(whitelisted==1) {
         sug_status='Angezeigt';
@@ -433,7 +435,7 @@ async function populate_suggestions(){
             suggestions.empty()
             for (var row in data) {
                 // for each module in data, add a row
-                add_to_suggestions(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].whitelisted, data[row].searchterm)
+                add_to_suggestions(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].whitelisted, data[row].searchterm, data[row].searchterm_id)
             }
             // hide modules not in current filter scope
             ShowSelectedModules();
