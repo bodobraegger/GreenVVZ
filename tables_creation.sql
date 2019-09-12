@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS module (
     PiqSession INT(3) ZEROFILL NOT NULL,
     title TEXT,
     whitelisted BOOLEAN,
-    searchterm TEXT, 
+    searchterm TEXT,
+    searchterm_id INT,
     CONSTRAINT key_2 UNIQUE (SmObjId, PiqYear, PiqSession)
 );
 

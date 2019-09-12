@@ -114,15 +114,6 @@ async function update_searchterm(id){
 
     })
 }
-/**
- * Edit searchterm in the DOM, then update it in DB.
- * @param {Number} id numerical part of CSS selector id for searchterm to delete, matches DB id.
- */
-function remove_from_searchterms(id){
-    var term = $('#searchterms_body').find(`#${id}`)
-    term.remove()
-}
-
 
 /**
  * Delete searchterm from the DB.
@@ -236,7 +227,7 @@ function write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title
     var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId;
     // write id for tr, as well as data-SmObjId and data-semester, descriptive class="shown" by default.
     if(searchterm.charAt(0)=='#') {
-        var searchterm_td = `<td class="searchterm deleted">${searchterm.slice(2)}</td>`
+        var searchterm_td = `<td class="searchterm deleted">${searchterm/*.slice(2)*/}</td>`
     }
     else {
         var searchterm_td = `<td class="searchterm">${searchterm}</td>`
@@ -322,8 +313,11 @@ function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whit
  * @param {String} term         searchterm value
  */
 function add_to_searchterms(id, term){
-    var searchterm = $('<tr id="'+id+'"><td class="searchterm">'+term+'</td><td><button onclick="delete_searchterm('+id+')">Entfernen</button></td></tr>')
-    $('#searchterms_body').append(searchterm)
+    if(term.charAt(0) != '#') {
+        var searchterm = $('<tr id="'+id+'"><td class="searchterm">'+term+'</td><td><button onclick="delete_searchterm('+id+')">Entfernen</button></td></tr>')
+        $('#searchterms_body').append(searchterm)
+    }
+
 }
 
 

@@ -16,9 +16,9 @@ span.semester {
     white-space: nowrap;
     width: 110px;
 }
-.searchterm.deleted::before {
+/* .searchterm.deleted::before {
     content: "# ";
-}
+} */
 .searchterm.deleted {
     color: #a3adb7;
 }

@@ -131,7 +131,7 @@ def get_modules(whitelisted: bool):
     modules = []
     cnx = mysql.connector.connect(**db_config)
     current_searchterms = [t.get('term') for t in json.loads(get_searchterms().get_data())]
-    
+
     cursor = cnx.cursor(dictionary=True)
     qry = (
         "SELECT * FROM module as m WHERE whitelisted = {whitelisted} ORDER BY title ASC".format(whitelisted=whitelisted))
@@ -164,8 +164,9 @@ def add_module():
     PiqSession = req_data['PiqSession']
     whitelisted = int(req_data['whitelisted'])
     searchterm = req_data['searchterm']
+    searchterm_id = req_data['searchterm_id']
 
-    try_save_module = save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm)
+    try_save_module = save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm, searchterm_id)
     # saving succeeded, create new tuple from module values dict and success code
     if isinstance(try_save_module, dict):
         return jsonify(try_save_module), 200
@@ -174,7 +175,7 @@ def add_module():
         return try_save_module
 
 
-def save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm):
+def save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm, searchterm_id):
     # check if module exists in course catalogue, use values from there...
     m = models.Module(SmObjId, PiqYear, PiqSession)
     module_values = m.find_module_values()   
@@ -185,9 +186,10 @@ def save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm):
         try:
             # try to save into database
             cnx = mysql.connector.connect(**db_config)
-            qry = "INSERT INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s, %(searchterm)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
+            qry = "INSERT INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s, %(searchterm)s, %(searchterm_id)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
             module_values['whitelisted'] = whitelisted
             module_values['searchterm'] = searchterm
+            module_values['searchterm_id'] = searchterm_id
             cursor = cnx.cursor()
             cursor.execute(qry, module_values)
             module_id = cursor.lastrowid
@@ -301,6 +303,14 @@ def get_searchterms():
         "SELECT id, term FROM searchterm ORDER BY term ASC")
     cursor.execute(qry)
     # decode encoded strings to make them human readable
+    for row in cursor.fetchall():
+        for column, value in row.items():
+            if type(value) is bytearray:
+                row[column] = value.decode('utf-8')
+        terms.append(row)
+    qry = (
+        "SELECT DISTINCT searchterm AS term, searchterm_id AS id FROM module ORDER BY term ASC WHERE term NOT IN (SELECT term FROM searchterm)")
+    cursor.execute(qry)
     for row in cursor.fetchall():
         for column, value in row.items():
             if type(value) is bytearray:
