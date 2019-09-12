@@ -130,8 +130,8 @@ def get_modules(whitelisted: bool):
     """ Get modules saved in the database, either blacklisted or whitelisted, as JSON response """
     modules = []
     cnx = mysql.connector.connect(**db_config)
-    current_searchterms = json.loads(get_searchterms().get_data())
-
+    current_searchterms = [t.get('term') for t in json.loads(get_searchterms().get_data())]
+    
     cursor = cnx.cursor(dictionary=True)
     qry = (
         "SELECT * FROM module as m WHERE whitelisted = {whitelisted} ORDER BY title ASC".format(whitelisted=whitelisted))
