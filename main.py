@@ -322,6 +322,8 @@ def get_searchterms():
         for column, value in row.items():
             if type(value) is bytearray:
                 row[column] = value.decode('utf-8')
+            if column == 'term':
+                row[column] = '# ' + value
         terms.append(row)
     return jsonify(terms)
 
