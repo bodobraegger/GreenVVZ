@@ -235,9 +235,15 @@ function write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title
     // courses.uzh.ch url
     var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId;
     // write id for tr, as well as data-SmObjId and data-semester, descriptive class="shown" by default.
+    if(searchterm.charAt(0)=='#') {
+        var searchterm_td = `<td class="searchterm deleted">${searchterm.slice(2)}</td>`
+    }
+    else {
+        var searchterm_td = `<td class="searchterm">${searchterm}</td>`
+    }
     return `<tr id="module_${module_id}" data-SmObjId="${SmObjId}" data-semester="${PiqYear} ${PiqSession}" class="shown">
         <td><a target="_blank" href="${url}">${title}</a></td>
-        <td class="searchterm">${searchterm}</td>
+        ${searchterm_td}
         <td>${convert_session_to_string(PiqSession, PiqYear)}</td>
         `
 }
@@ -348,8 +354,12 @@ async function populate_whitelist(){
     var whitelist = $('#whitelist_body')
     await $.ajax({
         url: apiUrl+'/modules/whitelist',
-        method : 'GET',             // show loading screen
-        beforeSend: function () { $('#whitelist').find('div.loading').toggle(); },
+        method : 'GET',
+        beforeSend: function () { 
+            // show loading indicators
+            $('#whitelist').find('div.loading-overlay').toggle(); 
+            $('#count_whitelist').addClass('loading-count').html('<span>.</span><span>.</span><span>.</span>');
+        },
         success : function (data) {
             // remove all tr from body
             whitelist.empty()
@@ -367,7 +377,9 @@ async function populate_whitelist(){
             // tell tablesorter to update sorting 
             $('#whitelist table').trigger('update');
             // hide loading screen
-            $('#whitelist').find('div.loading').toggle();
+            $('#whitelist').find('div.loading-overlay').toggle();
+            // update number badge
+            $('#count_whitelist').removeClass('loading-count').html($('#whitelist_body').find($(`.shown`)).length)
         }
 
     })
@@ -382,7 +394,10 @@ async function populate_blacklist(){
     await $.ajax({
         url: apiUrl+'/modules/blacklist',
         method : 'GET',             // show loading screen
-        beforeSend: function () { $('#blacklist').find('div.loading').toggle(); },
+        beforeSend: function () {
+            $('#blacklist').find('div.loading-overlay').toggle(); 
+            $('#count_blacklist').addClass('loading-count').html('<span>.</span><span>.</span><span>.</span>');
+        },
         success : function (data) {
             // remove all tr from body
             blacklist.empty()
@@ -400,7 +415,9 @@ async function populate_blacklist(){
             // tell tablesorter to update sorting 
             $('#blacklist table').trigger('update');
             // hide loading screen
-            $('#blacklist').find('div.loading').toggle();
+            $('#blacklist').find('div.loading-overlay').toggle();
+            // update the number badge
+            $('#count_blacklist').removeClass('loading-count').html($('#blacklist_body').find($(`.shown`)).length)
         }
     })
 }
@@ -413,7 +430,10 @@ async function populate_suggestions(){
     await $.ajax({
         url: apiUrl+'/search',
         method : 'GET',
-        beforeSend: function () { $('#suggestions').find('div.loading').toggle(); },
+        beforeSend: function () {
+            $('#suggestions').find('div.loading-overlay').toggle();
+            $('#count_suggestions').addClass('loading-count').html('<span>.</span><span>.</span><span>.</span>');
+        },
         success : function (data) {
             // remove all tr from body
             suggestions.empty()
@@ -431,7 +451,10 @@ async function populate_suggestions(){
             // tell tablesorter to update sorting 
             $('#suggestions table').trigger('update');
             // hide loading screen
-            $('#suggestions').find('div.loading').toggle();
+            $('#suggestions').find('div.loading-overlay').toggle();
+            // update the number badge
+            $('#count_suggestions').removeClass('loading-count').html($('#suggestions_body').find($(`.shown`)).length)
+
         }
 
     })

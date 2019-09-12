@@ -64,9 +64,13 @@ function ShowSelectedModules() {
     $('#whitelist_body').find($(`[data-semester].selected-semester.selected-studyprogram`)).removeClass('hidden').addClass('shown');
     
     // update the number badges for each table
-    $('#count_whitelist').html($('#whitelist_body').find($(`.shown`)).length)
-    $('#count_suggestions').html($('#suggestions_body').find($(`.shown`)).length)
-    $('#count_blacklist').html($('#blacklist_body').find($(`.shown`)).length)
+    $('#count_whitelist:not(.loading-count)').html($('#whitelist_body').find($(`.shown`)).length)
+    $('#count_suggestions:not(.loading-count)').html($('#suggestions_body').find($(`.shown`)).length)
+    $('#count_blacklist:not(.loading-count)').html($('#blacklist_body').find($(`.shown`)).length)
+
+    $('#whitelist table').trigger('update');
+    $('#blacklist table').trigger('update');
+    $('#suggestions table').trigger('update');
     return $('.shown');
 }
 /**

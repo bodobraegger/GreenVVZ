@@ -137,11 +137,12 @@ def get_modules(whitelisted: bool):
         "SELECT * FROM module as m WHERE whitelisted = {whitelisted} ORDER BY title ASC".format(whitelisted=whitelisted))
     cursor.execute(qry)
     for module in cursor:
-        if module['searchterm'] not in current_searchterms:
-            module['searchterm'] = '# '+ module['searchterm']
         for column, value in module.items():
             if type(value) is bytearray:
                 module[column] = value.decode('utf-8')
+        if module['searchterm'] not in current_searchterms:
+            module['searchterm'] = '# '+ module['searchterm']
+
         modules.append(module)
     cnx.close()
     return jsonify(modules)
