@@ -152,18 +152,7 @@
                         filter_reset : 'button.reset',
                         // add custom selector elements to the filter row
                         filter_formatter : {
-
-                            // Alphanumeric (match)
-                            0 : function($cell, indx) {
-                            return $.tablesorter.filterFormatter.select2( $cell, indx, {
-                                match : true,         // adds "filter-match" to header
-                                cellText : 'Match: ', // Cell text
-                                width: '85%',         // adjusted width to allow for cell text
-                                value: ['abc', 'def'] // initial values
-                            });
-                            },
-
-                            // Alphanumeric (match)
+                            // Alphanumeric (exact)
                             1 : function($cell, indx) {
                             return $.tablesorter.filterFormatter.select2( $cell, indx, {
                                 match : true // exact match only
@@ -173,7 +162,7 @@
                             // Alphanumeric (exact)
                             4 : function($cell, indx) {
                             return $.tablesorter.filterFormatter.select2( $cell, indx, {
-                                match : false // exact match only
+                                match : true // exact match only
                             });
                             }
                         },
