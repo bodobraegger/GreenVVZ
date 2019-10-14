@@ -379,7 +379,7 @@ async function populate_whitelist(){
             // update number badge
             $('#count_whitelist').removeClass('loading-count').html($('#whitelist_body').find($(`.shown`)).length)
             // update filter entries & resort for tablesorter
-            retrigger_table_filter('whitelist');
+            retrigger_table_filter('whitelist', 1000);
         }
 
     })
@@ -417,7 +417,7 @@ async function populate_blacklist(){
             // update the number badge
             $('#count_blacklist').removeClass('loading-count').html($('#blacklist_body').find($(`.shown`)).length)
             // update filter entries & resort for tablesorte
-            retrigger_table_filter('blacklist');    
+            retrigger_table_filter('blacklist', 800);    
         }
     })
 }
@@ -464,14 +464,17 @@ async function populate_suggestions(){
     })
 }
 
-function retrigger_table_filter(tableName) {
+function retrigger_table_filter(tableName, delay) {
+    if(delay == undefined) {
+        delay = 300
+    }
     // tell tablesorter to resort
     $(`${tableName} table`).trigger('update');
     // hack: put something into name des moduls filter, let it load, clear, to retrigger other filters
     var sug_filter_input = $(`#${tableName}>table thead td[data-column="0"]:not(#${tableName}_title_th) input`).val('...').blur();
     setTimeout(function(){
         $(`#${tableName}>table thead td[data-column="0"]:not(#${tableName}_title_th) input`).val('').blur()
-    }, 300);
+    }, delay);
 }
 
 /**
