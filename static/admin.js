@@ -465,6 +465,7 @@ async function populate_suggestions(){
 }
 
 function retrigger_table_filter(tableName, delay) {
+    // TODO: this does nothing?
     if(delay == undefined) {
         delay = 300
     }
