@@ -433,7 +433,7 @@ def search():
                 rURI = f("{models.Globals.URI_prefix}/SmSearchSet?$skip={processed_results}&$top={next_results}&$orderby=SmStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json")
                 try:
                     r = requests.get(rURI)
-                    total_results = r.json()['d']['__count']
+                    total_results = int(r.json()['d']['__count'])
 
                     for module in r.json()['d']['results']:
                         modules.append({
@@ -530,7 +530,7 @@ def search_upwards():
                 
                 try:
                     r = requests.get(rURI)
-                    total_results = r.json()['d']['__count']
+                    total_results = int(r.json()['d']['__count'])
                     
                     for course in r.json()['d']['results']:
                         courses.append({
