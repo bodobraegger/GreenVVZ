@@ -428,7 +428,7 @@ def search():
             next_results = 100
             processed_results = 0
             total_results = next_results
-            while(processed_results < total_results)
+            while(processed_results < total_results):
                 total_results = -1
                 rURI = f("{models.Globals.URI_prefix}/SmSearchSet?$skip={processed_results}&$top={next_results}&$orderby=SmStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json")
                 try:
