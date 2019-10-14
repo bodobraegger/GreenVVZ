@@ -316,7 +316,7 @@ function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whit
  */
 function add_to_searchterms(id, term){
     if(term.charAt(0) != '#') {
-        var searchterm = $('<tr id="'+id+'"><td class="searchterm">'+term+'</td><td><button onclick="delete_searchterm('+id+')">Entfernen</button></td></tr>')
+        var searchterm = $('<tr id="'+id+'"><td class="searchterm">'+term+'</td><td><button class="searchterm_mod" onclick="delete_searchterm('+id+')">Entfernen</button></td></tr>')
         $('#searchterms_body').append(searchterm)
     }
 
@@ -336,6 +336,10 @@ async function populate_searchterms(){
             searchterms.empty()
             for (var row in data){
                 add_to_searchterms(data[row].id, data[row].term)
+            }
+            // if they should be disabled, do it again
+            if($('.searchterm_mod').prop('disabled')) {
+                $('.searchterm_mod').prop('disabled', true);
             }
         }
     })
@@ -429,6 +433,9 @@ async function populate_suggestions(){
         beforeSend: function () {
             $('#suggestions').find('div.loading-overlay').toggle();
             $('#count_suggestions').addClass('loading-count').html('<span>.</span><span>.</span><span>.</span>');
+            // disable editing searchterms, would retrigger search
+            $('.searchterm_mod').prop('disabled', true);
+
         },
         success : function (data) {
             // remove all tr from body
@@ -449,7 +456,9 @@ async function populate_suggestions(){
             // hide loading screen
             $('#suggestions').find('div.loading-overlay').toggle();
             // update the number badge
-            $('#count_suggestions').removeClass('loading-count').html($('#suggestions_body').find($(`.shown`)).length)
+            $('#count_suggestions').removeClass('loading-count').html($('#suggestions_body').find($(`.shown`)).length);
+            // enable save search term button
+            $('.searchterm_mod').prop('disabled', false);
 
         }
 
@@ -628,12 +637,14 @@ function checkUpdatedCookie() {
  * Edit the searchterm text on click (is in first td per row)
  */
 $(document).on( "click", "#searchterms_body td.searchterm", function() {
-    $(this).attr("contentEditable", true);
-    $(this).attr("data-initial", $(this).text());
+    if($('.searchterm_mod').prop('disabled') == false) {
+        $(this).attr("contentEditable", true);
+        $(this).attr("data-initial", $(this).text());
+    }
 });
 $(document).on( "blur", "#searchterms_body td.searchterm", function() {
     $(this).attr("contentEditable", false);
-    if($(this).text() != $(this).attr("data-initial")) {
-        update_searchterm($(this).parent().attr('id'));
-    }
+        if($(this).text() != $(this).attr("data-initial")) {
+            update_searchterm($(this).parent().attr('id'));
+        }
 });
