@@ -380,6 +380,8 @@ async function populate_whitelist(){
             $('#whitelist').find('div.loading-overlay').toggle();
             // update number badge
             $('#count_whitelist').removeClass('loading-count').html($('#whitelist_body').find($(`.shown`)).length)
+            // update filter entries
+            retrigger_table_filter('whitelist');
         }
 
     })
@@ -418,6 +420,8 @@ async function populate_blacklist(){
             $('#blacklist').find('div.loading-overlay').toggle();
             // update the number badge
             $('#count_blacklist').removeClass('loading-count').html($('#blacklist_body').find($(`.shown`)).length)
+            // update filter entries
+            retrigger_table_filter('blacklist');    
         }
     })
 }
@@ -459,10 +463,19 @@ async function populate_suggestions(){
             $('#count_suggestions').removeClass('loading-count').html($('#suggestions_body').find($(`.shown`)).length);
             // enable save search term button
             $('.searchterm_mod').prop('disabled', false);
-
+            // update filter entries
+            retrigger_table_filter('suggestions');         
         }
 
     })
+}
+
+function retrigger_table_filter(tableName) {
+    // hack: put something into name des moduls filter, let it load, clear, to retrigger other filters
+    var sug_filter_input = $(`#${tableName}>table thead td[data-column="0"]:not(#${tableName}_title_th) input`).val('...').blur();
+    setTimeout(function(){
+        $(`#${tableName}>table thead td[data-column="0"]:not(#${tableName}_title_th) input`).val('').blur()
+    }, 300);
 }
 
 /**
