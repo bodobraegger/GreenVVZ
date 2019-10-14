@@ -18,6 +18,9 @@ from flask_cors import CORS, cross_origin
 # python-dateutil lib
 from dateutil.relativedelta import relativedelta
 
+# cool template strings
+from ww import f
+
 # this codebase
 import models
 import updateModules
@@ -422,21 +425,29 @@ def search():
             else:
                 modFilter = "substringof('{0}',Seark)".format(searchterm)
 
-            rURI = models.Globals.URI_prefix+"/SmSearchSet?$skip=0&$top=9999&$orderby=SmStext asc&$filter=({0}) and PiqYear eq '{1}' and PiqSession eq '{2}'&$inlinecount=allpages&$format=json".format(
-                modFilter, str(session['year']).zfill(3), str(session['session']).zfill(3))
-            try:
-                r = requests.get(rURI)
+            next_results = 100
+            processed_results = 0
+            total_results = next_results
+            while(processed_results < total_results)
+                total_results = -1
+                rURI = f("{models.Globals.URI_prefix}/SmSearchSet?$skip={processed_results}&$top={next_results}&$orderby=SmStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json")
+                try:
+                    r = requests.get(rURI)
+                    total_results = r.json()['d']['__count']
 
-                for module in r.json()['d']['results']:
-                    modules.append({
-                        'SmObjId':    int(module['Objid']),
-                        'title':          module['SmStext'],
-                        'PiqYear':    int(module['PiqYear']),
-                        'PiqSession': int(module['PiqSession']),
-                        'searchterm': searchterm,
-                    })
-            except Exception as e:
-                print("ERROR: Processing the module request for term '{}' failed: {}".format(searchterm, e), 400)
+                    for module in r.json()['d']['results']:
+                        modules.append({
+                            'SmObjId':    int(module['Objid']),
+                            'title':          module['SmStext'],
+                            'PiqYear':    int(module['PiqYear']),
+                            'PiqSession': int(module['PiqSession']),
+                            'searchterm': searchterm,
+                        })
+                    
+                    processed_results += next_results
+
+                except Exception as e:
+                    print("ERROR: Processing the module request for term '{}' failed: {}".format(searchterm, e), 400)
 
     # also search for modules associated with courses for same search
     modules += json.loads(search_upwards().get_data())
@@ -508,24 +519,32 @@ def search_upwards():
                 searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
                 modFilter = ' or '.join(searchterms)
             else:
-                modFilter = "substringof('{0}',Seark)".format(searchterm)        
-
-            rURI = models.Globals.URI_prefix+"/ESearchSet?$skip=0&$top=9999&$orderby=EStext asc&$filter=({0}) and PiqYear eq '{1}' and PiqSession eq '{2}'&$inlinecount=allpages&$format=json".format(
-                modFilter, str(session['year']).zfill(3), str(session['session']).zfill(3))
-            
-            try:
-                r = requests.get(rURI)
+                modFilter = "substringof('{0}',Seark)".format(searchterm) 
+                   
+            next_results = 100
+            processed_results = 0
+            total_results = next_results
+            while(processed_results < total_results)
+                total_results = -1
+                rURI = f("{models.Globals.URI_prefix}/ESearchSet?$skip={processed_results}&$top={next_results}&$orderby=EStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json")
                 
-                for course in r.json()['d']['results']:
-                    courses.append({
-                        'EObjId':     int(course['Objid']),
-                        'EStext':         course['EStext'],
-                        'PiqYear':    int(course['PiqYear']),
-                        'PiqSession': int(course['PiqSession']),
-                        'searchterm': searchterm,
-                    })
-            except Exception as e:
-                print("ERROR: Processing the course request for term '{}' failed: {}".format(searchterm, e), 400)
+                try:
+                    r = requests.get(rURI)
+                    total_results = r.json()['d']['__count']
+                    
+                    for course in r.json()['d']['results']:
+                        courses.append({
+                            'EObjId':     int(course['Objid']),
+                            'EStext':         course['EStext'],
+                            'PiqYear':    int(course['PiqYear']),
+                            'PiqSession': int(course['PiqSession']),
+                            'searchterm': searchterm,
+                        })
+                                    
+                        processed_results += next_results
+
+                except Exception as e:
+                    print("ERROR: Processing the course request for term '{}' failed: {}".format(searchterm, e), 400)
         
         # parallel execution: takes about 6 seconds for the two dev terms
         with ThreadPoolExecutor(max_workers=len(courses)+5) as executor:
