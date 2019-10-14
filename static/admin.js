@@ -374,13 +374,11 @@ async function populate_whitelist(){
             console.log('Whitelist konnte nicht abgerufen werden: '+err)
         },
         complete : function() {
-            // tell tablesorter to update sorting 
-            $('#whitelist table').trigger('update');
             // hide loading screen
             $('#whitelist').find('div.loading-overlay').toggle();
             // update number badge
             $('#count_whitelist').removeClass('loading-count').html($('#whitelist_body').find($(`.shown`)).length)
-            // update filter entries
+            // update filter entries & resort for tablesorter
             retrigger_table_filter('whitelist');
         }
 
@@ -414,13 +412,11 @@ async function populate_blacklist(){
             console.log('Blacklist konnte nicht abgerufen werden: '+err)
         },
         complete : function() {
-            // tell tablesorter to update sorting 
-            $('#blacklist table').trigger('update');
             // hide loading screen
             $('#blacklist').find('div.loading-overlay').toggle();
             // update the number badge
             $('#count_blacklist').removeClass('loading-count').html($('#blacklist_body').find($(`.shown`)).length)
-            // update filter entries
+            // update filter entries & resort for tablesorte
             retrigger_table_filter('blacklist');    
         }
     })
@@ -455,15 +451,13 @@ async function populate_suggestions(){
             console.log('Suchvorschläge konnten nicht abgerufen werden: '+err)
         },
         complete : function() {
-            // tell tablesorter to update sorting 
-            $('#suggestions table').trigger('update');
             // hide loading screen
             $('#suggestions').find('div.loading-overlay').toggle();
             // update the number badge
             $('#count_suggestions').removeClass('loading-count').html($('#suggestions_body').find($(`.shown`)).length);
             // enable save search term button
             $('.searchterm_mod').prop('disabled', false);
-            // update filter entries
+            // update filter entries & resort for tablesorter
             retrigger_table_filter('suggestions');         
         }
 
@@ -471,6 +465,8 @@ async function populate_suggestions(){
 }
 
 function retrigger_table_filter(tableName) {
+    // tell tablesorter to resort
+    $(`${tableName} table`).trigger('update');
     // hack: put something into name des moduls filter, let it load, clear, to retrigger other filters
     var sug_filter_input = $(`#${tableName}>table thead td[data-column="0"]:not(#${tableName}_title_th) input`).val('...').blur();
     setTimeout(function(){
