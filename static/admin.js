@@ -482,6 +482,13 @@ function retrigger_table_filter(tableName, delay) {
     }, delay);
 }
 
+/* 
+ * Load specific filter parameter
+ */
+function load_filter_parameter(column, data) {
+    var sug_filter_input = $(`table thead td[data-column="${column}"] input,ul`).val(`${data}`).blur();
+}
+
 /**
  * Request studyprograms for selected semester from server, as well as studyprogamid_moduleids list, add them to global JS scope.
  */
@@ -670,8 +677,7 @@ $(document).on( "blur", "#searchterms_body td.searchterm", function() {
 /**
  * Disable the global semester selector when a specific for a table is used
  */
-$(document).one( "input click", `input[data-column="2"]`, function() {
-    console.log(this)
+$(document).one( "input click blur", `input[data-column="2"]`, function() {
     $('#semester_selector').val($('#all_semesters').val());
     ShowSelectedModules();
     $('#semester_selector').prop('disabled', true);
