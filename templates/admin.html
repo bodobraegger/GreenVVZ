@@ -148,7 +148,7 @@
                     widgets: ['staticRow', 'filter', 'stickyHeaders'],
                     widgetOptions : {
                         // Use the $.tablesorter.storage utility to save the most recent filters
-                        filter_saveFilters : true,
+                        // filter_saveFilters : true,
                         // jQuery selector string of an element used to reset the filters
                         filter_reset : 'button.reset',
                         // add custom selector elements to the filter row
@@ -186,7 +186,7 @@
                 });
 
                 // remove leading whitespace, and replace double whitespace with single.
-                $('input[type=text]').on('input', function(ev) {
+                $('input:not(input[type=number])').on('input', function(ev) {
                     $(this).val(
                         $(this).val()
                             .replace(/^\s+/g, '') // remove leading whitespace
