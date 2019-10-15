@@ -464,6 +464,10 @@ async function populate_suggestions(){
     })
 }
 
+
+/**
+ * Retrigger table filter suggestions display, which breaks when new data comes in, and must be retriggered.
+ */
 function retrigger_table_filter(tableName, delay) {
     // TODO: this does nothing?
     if(delay == undefined) {
@@ -660,4 +664,15 @@ $(document).on( "blur", "#searchterms_body td.searchterm", function() {
         if($(this).text() != $(this).attr("data-initial")) {
             update_searchterm($(this).parent().attr('id'));
         }
+});
+
+
+/**
+ * Disable the global semester selector when a specific for a table is used
+ */
+$(document).one( "input click", `input[data-column="2"]`, function() {
+    console.log(this)
+    $('#semester_selector').val($('#all_semesters').val());
+    ShowSelectedModules();
+    $('#semester_selector').prop('disabled', true);
 });
