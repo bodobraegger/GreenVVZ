@@ -34,7 +34,7 @@ async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitel
             // if module_id not supplied, it was added using save_module()
             if(module_id) flag_in_suggestions(module_id, whitelisted);
             populate_whitelist();
-            populate_blacklist();
+            // populate_blacklist();
             populate_studyprograms();
         },
         error : function (err) {
@@ -56,7 +56,7 @@ async function update_whitelist_status(module_id, whitelisted) {
         success : function (data) {
             remove_module(module_id)
             if(whitelisted) populate_whitelist();
-            else populate_blacklist();
+            // else populate_blacklist();
             populate_suggestions();
             populate_studyprograms();
         },
@@ -169,7 +169,7 @@ async function delete_blacklisted_module(module_id){
         method : 'DELETE',
         success : function (data) {
             remove_module(module_id)
-            populate_blacklist();
+            // populate_blacklist();
             populate_suggestions();
             // flag_in_suggestions(module_id, -1); ids won't match!
         },
@@ -597,7 +597,7 @@ async function updateModules() {
         },
         success : function() {
             populate_whitelist();
-            populate_blacklist();
+            // populate_blacklist();
             // hide alert box, set cookie for an hour
             $('#modules-updating').hide();
             setCookie("updated_recently", true, 1);
