@@ -46,7 +46,7 @@ def update_modules() -> bool:
         mod = models.Module(row['SmObjId'], next_session['year'], next_session['session'])
         next_values = mod.find_module_values()
         if next_values is not None:
-            main.save_module(next_values['SmObjId'], next_values['PiqYear'], next_values['PiqSession'], row['whitelisted'],  row['searchterm'])
+            main.save_module(next_values['SmObjId'], next_values['PiqYear'], next_values['PiqSession'], row['whitelisted'],  row['searchterm'], row['searchterm_id'])
 
     cnx.commit()
     cnx.close()
