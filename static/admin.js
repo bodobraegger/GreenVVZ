@@ -223,19 +223,19 @@ function flag_in_suggestions(module_id, whitelisted){
  * @param {String} searchterm   searchterm which found the module in the course catalogue
  * @return {String} String matching an opened tr DOM element, with td elements inside
  */
-function write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm){
+function write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm, searchterm_id){
     // courses.uzh.ch url
     var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId;
     // write id for tr, as well as data-SmObjId and data-semester, descriptive class="shown" by default.
     if(searchterm.charAt(0)=='#') {
-        var searchterm_td = `<td class="searchterm deleted">${searchterm/*.slice(2)*/}</td>`
+        var searchterm_cell = `<td class="searchterm deleted">${searchterm/*.slice(2)*/}</td>`
     }
     else {
-        var searchterm_td = `<td class="searchterm">${searchterm}</td>`
+        var searchterm_cell = `<td class="searchterm">${searchterm}</td>`
     }
     return `<tr id="module_${module_id}" data-SmObjId="${SmObjId}" data-semester="${PiqYear} ${PiqSession}" class="shown">
-        <td><a target="_blank" href="${url}">${title}</a></td>
-        ${searchterm_td}
+        <td data-searchterm_id=${searchterm_id}><a target="_blank" href="${url}">${title}</a></td>
+        ${searchterm_cell}
         <td>${convert_session_to_string(PiqSession, PiqYear)}</td>
         `
 }
@@ -249,8 +249,8 @@ function write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title
  * @param {String} title        module title
  * @param {String} searchterm   searchterm which found the module in the course catalogue
  */
-function add_to_whitelist(module_id, SmObjId, PiqYear, PiqSession, title, searchterm){
-    var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm)}
+function add_to_whitelist(module_id, SmObjId, PiqYear, PiqSession, title, searchterm, searchterm_id){
+    var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm, searchterm_id)}
         <td><button name="Anzeigen" onclick="update_whitelist_status(${module_id}, 0)">Verbergen</button></td>
     </tr>`)
     $('#whitelist_body').append(module);
@@ -265,10 +265,10 @@ function add_to_whitelist(module_id, SmObjId, PiqYear, PiqSession, title, search
  * @param {String} title        module title
  * @param {String} searchterm   searchterm which found the module in the course catalogue
  */
-function add_to_blacklist(module_id, SmObjId, PiqYear, PiqSession, title, searchterm){
+function add_to_blacklist(module_id, SmObjId, PiqYear, PiqSession, title, searchterm, searchterm_id){
     var anzeigen_button = `<button name="Anzeigen" onclick="update_whitelist_status(${module_id}, 1)">Anzeigen</button>`
     var   delete_button = `<button name="Löschen" onclick="delete_blacklisted_module(${module_id})">Löschen</button>`
-    var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm)}
+    var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm, searchterm_id)}
             <td>${anzeigen_button}${delete_button}</td>
         </tr>`)
     $('#blacklist_body').append(module);
@@ -302,7 +302,7 @@ function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whit
     }
     var whitelist_status_td = `<td class="whitelist_status whitelisted_${whitelisted}">${sug_status}</td>`
 
-    var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm)}
+    var module = $(`${write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm, searchterm_id)}
             <td>${anzeigen_button}${verbergen_button}</td>
             ${whitelist_status_td}
         </tr>`);
@@ -365,7 +365,7 @@ async function populate_whitelist(){
             whitelist.empty()
             for (var row in data) {
                 // for each module in data, add a row
-                add_to_whitelist(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].searchterm)
+                add_to_whitelist(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].searchterm, data[row].searchterm_id)
             }
             // hide modules not in current filter scope
             ShowSelectedModules();
@@ -403,7 +403,7 @@ async function populate_blacklist(){
             blacklist.empty()
             for (var row in data) {
                 // for each module in data, add a row
-                add_to_blacklist(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].searchterm)
+                add_to_blacklist(data[row].id, data[row].SmObjId, data[row].PiqYear, data[row].PiqSession, data[row].title, data[row].searchterm, data[row].searchterm_id)
             }
             // hide modules not in current filter scope
             ShowSelectedModules();
