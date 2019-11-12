@@ -160,14 +160,18 @@ def get_whitelist():
 @require_appkey
 def add_module():
     """ Add module to database. required in POST request body: SmObjId, PiqYear, PiqSession, whitelisted, searchterm """
-    req_data = request.get_json()
-    # get data from request body
-    SmObjId = req_data['SmObjId']
-    PiqYear = req_data['PiqYear']
-    PiqSession = req_data['PiqSession']
-    whitelisted = int(req_data['whitelisted'])
-    searchterm = req_data['searchterm']
-    searchterm_id = req_data['searchterm_id']
+    try:
+        req_data = request.get_json()
+        # get data from request body
+        SmObjId = req_data['SmObjId']
+        PiqYear = req_data['PiqYear']
+        PiqSession = req_data['PiqSession']
+        whitelisted = int(req_data['whitelisted'])
+        searchterm = req_data['searchterm']
+        searchterm_id = req_data['searchterm_id']
+    except Exception as err:
+            return "Error: {}\nfor module {}".format(err, SmObjId), 409
+
 
     try_save_module = save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm, searchterm_id)
     # saving succeeded, create new tuple from module values dict and success code
