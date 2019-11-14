@@ -231,10 +231,10 @@ function write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title
         var searchterm_cell = `<td class="searchterm deleted">${searchterm/*.slice(2)*/}</td>`
     }
     else {
-        var searchterm_cell = `<td class="searchterm">${searchterm}</td>`
+        var searchterm_cell = `<td class="searchterm" data-searchterm_id=${searchterm_id}>${searchterm}</td>`
     }
     return `<tr id="module_${module_id}" data-SmObjId="${SmObjId}" data-semester="${PiqYear} ${PiqSession}" class="shown">
-        <td data-searchterm_id=${searchterm_id}><a target="_blank" href="${url}">${title}</a></td>
+        <td><a target="_blank" href="${url}">${title}</a></td>
         ${searchterm_cell}
         <td>${convert_session_to_string(PiqSession, PiqYear)}</td>
         `
