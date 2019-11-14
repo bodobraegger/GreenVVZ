@@ -407,7 +407,7 @@ def search():
     try:
         cnx = mysql.connector.connect(**db_config)
         cursor = cnx.cursor(dictionary=True)
-        cursor.execute("SELECT term FROM searchterm")
+        cursor.execute("SELECT term, id FROM searchterm")
         for row in cursor:
             terms.append(row['term'])
             terms_ids[row['term']] = row['id']
