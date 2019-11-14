@@ -402,6 +402,7 @@ def search():
     start_time = time.perf_counter()
     # get searchterms, and biggest module id
     terms = []
+    terms_ids = []
     id_not_currently_in_use = 999
     try:
         cnx = mysql.connector.connect(**db_config)
@@ -409,6 +410,8 @@ def search():
         cursor.execute("SELECT term FROM searchterm")
         for row in cursor:
             terms.append(row['term'])
+            terms_ids.append(row['id'])
+
         cursor.close()
         cursor = cnx.cursor()
         cursor.execute("SELECT MAX(id) FROM module")
@@ -422,7 +425,7 @@ def search():
     # get results for all searchterms
     modules = []
     for session in helpers.get_current_sessions():
-        for searchterm in terms:
+        for idx, searchterm in enumerate(terms):
             if "&" in searchterm:
                 searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
                 modFilter = ' or '.join(searchterms)
@@ -446,6 +449,7 @@ def search():
                             'PiqYear':    int(module['PiqYear']),
                             'PiqSession': int(module['PiqSession']),
                             'searchterm': searchterm,
+                            'searchterm_id': terms_ids[idx],
                         })
                     
                     processed_results += next_results
