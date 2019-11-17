@@ -613,6 +613,22 @@ def find_studyprograms_for_module(SmObjId: int, PiqYear: int, PiqSession: int) -
             module_values['Partof'].append({
                 'CgHighText':     studyprogram['CgHighText'],
                 'CgHighCategory': studyprogram['CgHighCategory'],
+                # CgCategorySort: "16"
+                # CgHighCategory: "Major 45/75"
+                # CgHighObjid: "50385714"
+                # CgHighText: "German Language and Literature"
+                # CgLowCategory: "Major 45/75"
+                # CgLowObjid: "50385714"
+                # CgLowText: "German Language and Literature"
+                # Corestep: true
+                # OObjid: "50000007"
+                # OText: "00\nFaculty of Arts and Social Sciences"
+                # Oblig: false
+                # PiqSession: "000"
+                # PiqYear: "0000"
+                # ScObjid: "50383586"
+                # ScText: "Master of Arts"
+                # SmObjId: "50932094"
             })
         module_values['Partof'] = list({frozenset(item.items()) : item for item in module_values['Partof']}.values())
     except Exception as e:
