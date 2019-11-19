@@ -56,7 +56,7 @@ async function update_whitelist_status(module_id, whitelisted) {
         success : function (data) {
             var SmObjId = $(`#module_${module_id}`).data('smobjid');
             flag_in_suggestions(SmObjId, whitelisted);
-            remove_module(module_id);
+            remove_saved_module(module_id);
             populate_studyprograms();
         },
         error : function (err) {
@@ -124,8 +124,7 @@ async function delete_searchterm(id){
         url: apiUrl+'/searchterms/'+id+'?key='+secret_key,
         method : 'DELETE',
         success : function (data) {
-            remove_from_searchterms(id)
-            populate_suggestions();
+            remove_from_searchterms(id);
         },
         error : function (err) {
             alert('Der Suchbegriff konnte nicht gelöscht werden')
@@ -137,8 +136,8 @@ async function delete_searchterm(id){
  * @param {Number} id numerical part of CSS selector id for searchterm to delete, matches DB id.
  */
 function remove_from_searchterms(id){
-    var term = $('#searchterms_body').find('#'+id)
-    term.remove()
+    $('#searchterms_body').find('#'+id).remove();
+    remove_suggestions_by_searchterm(id);
 }
 
 /**
@@ -169,7 +168,7 @@ async function delete_blacklisted_module(module_id){
         success : function (data) {
             var SmObjId = $(`#module_${module_id}`).data('smobjid');
             flag_in_suggestions(SmObjId, -1);
-            remove_module(module_id);
+            remove_saved_module(module_id);
         },
         error : function (err) {
             console.log(err);
@@ -182,8 +181,17 @@ async function delete_blacklisted_module(module_id){
  * Remove module from the DOM.
  * @param {Number} module_id the numerical part of the CSS selector, matches DB id.
  */
-function remove_module(module_id){
-    document.getElementById(`module_${module_id}`).remove()
+function remove_saved_module(module_id){
+    $(`#module_${module_id}`).remove();
+}
+
+function remove_suggestions_by_searchterm(searchterm_id) {
+    $("#suggestions").find(`[data-searchterm_id='${searchterm_id}']`).parent().remove();
+    $('#count_suggestions:not(.loading-count)').html($('#suggestions_body').find($(`.shown`)).length);
+}
+
+function remove_suggested_module(SmObjId){
+    $("#suggestions").find(`[data-smobjid='${SmObjId}']`).remove();
 }
 
 /**
