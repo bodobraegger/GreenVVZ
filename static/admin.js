@@ -208,6 +208,7 @@ function flag_in_suggestions(SmObjId, whitelisted){
         tr_module.find('button[name="Anzeigen"]').prop('disabled', false);
         tr_module.find('button[name="Verbergen"]').prop('disabled', false);
         tr_module.find('.whitelist_status').html("Neu");
+    }
 }
 
 /**
