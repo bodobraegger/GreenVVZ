@@ -32,7 +32,7 @@ async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitel
         }),
         success : function (data) {
             // if module_id not supplied, it was added using save_module()
-            if(module_id) flag_in_suggestions(module_id, whitelisted);
+            if(module_id) flag_in_suggestions(SmObjId, whitelisted);
             populate_whitelist();
             // populate_blacklist();
             populate_studyprograms();
@@ -54,10 +54,9 @@ async function update_whitelist_status(module_id, whitelisted) {
         url: `${apiUrl}/modules/${module_id}?whitelisted=${whitelisted}&key=${secret_key}`,
         method : 'PUT',
         success : function (data) {
-            remove_module(module_id)
-            if(whitelisted) populate_whitelist();
-            // else populate_blacklist();
-            populate_suggestions();
+            var SmObjId = $(`#module_${module_id}`).data('smobjid');
+            flag_in_suggestions(SmObjId, whitelisted);
+            remove_module(module_id);
             populate_studyprograms();
         },
         error : function (err) {
@@ -168,10 +167,9 @@ async function delete_blacklisted_module(module_id){
         url: `${apiUrl}/modules/${module_id}?key=${secret_key}`,
         method : 'DELETE',
         success : function (data) {
-            remove_module(module_id)
-            // populate_blacklist();
-            populate_suggestions();
-            // flag_in_suggestions(module_id, -1); ids won't match!
+            var SmObjId = $(`#module_${module_id}`).data('smobjid');
+            flag_in_suggestions(SmObjId, -1);
+            remove_module(module_id);
         },
         error : function (err) {
             console.log(err);
@@ -193,8 +191,8 @@ function remove_module(module_id){
  * @param {Number} module_id the numerical part of the CSS selector
  * @param {Boolean} whitelisted the whitelist status
  */
-function flag_in_suggestions(module_id, whitelisted){
-    var tr_module = document.getElementById(`module_${module_id}`);
+function flag_in_suggestions(SmObjId, whitelisted){
+    var tr_module = $("#suggestions").find(`[data-smobjid='${SmObjId}']`).get();
 
     if(whitelisted==1) {
         tr_module.querySelector('button[name="Anzeigen"]').disabled = true;
