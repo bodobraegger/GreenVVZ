@@ -402,13 +402,16 @@ def search():
     start_time = time.perf_counter()
     # get searchterms, and biggest module id
     terms = []
+    terms_ids = {}
     id_not_currently_in_use = 999
     try:
         cnx = mysql.connector.connect(**db_config)
         cursor = cnx.cursor(dictionary=True)
-        cursor.execute("SELECT term FROM searchterm")
+        cursor.execute("SELECT term, id FROM searchterm")
         for row in cursor:
             terms.append(row['term'])
+            terms_ids[row['term']] = row['id']
+
         cursor.close()
         cursor = cnx.cursor()
         cursor.execute("SELECT MAX(id) FROM module")
@@ -422,10 +425,10 @@ def search():
     # get results for all searchterms
     modules = []
     for session in helpers.get_current_sessions():
-        for searchterm in terms:
+        for idx, searchterm in enumerate(terms):
             if "&" in searchterm:
-                searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
-                modFilter = ' or '.join(searchterms)
+                temp_searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
+                modFilter = ' or '.join(temp_searchterms)
             else:
                 modFilter = "substringof('{0}',Seark)".format(searchterm)
 
@@ -446,6 +449,7 @@ def search():
                             'PiqYear':    int(module['PiqYear']),
                             'PiqSession': int(module['PiqSession']),
                             'searchterm': searchterm,
+                            'searchterm_id': terms_ids[searchterm],
                         })
                     
                     processed_results += next_results
@@ -609,6 +613,22 @@ def find_studyprograms_for_module(SmObjId: int, PiqYear: int, PiqSession: int) -
             module_values['Partof'].append({
                 'CgHighText':     studyprogram['CgHighText'],
                 'CgHighCategory': studyprogram['CgHighCategory'],
+                # CgCategorySort: "16"
+                # CgHighCategory: "Major 45/75"
+                # CgHighObjid: "50385714"
+                # CgHighText: "German Language and Literature"
+                # CgLowCategory: "Major 45/75"
+                # CgLowObjid: "50385714"
+                # CgLowText: "German Language and Literature"
+                # Corestep: true
+                # OObjid: "50000007"
+                # OText: "00\nFaculty of Arts and Social Sciences"
+                # Oblig: false
+                # PiqSession: "000"
+                # PiqYear: "0000"
+                # ScObjid: "50383586"
+                # ScText: "Master of Arts"
+                # SmObjId: "50932094"
             })
         module_values['Partof'] = list({frozenset(item.items()) : item for item in module_values['Partof']}.values())
     except Exception as e:
