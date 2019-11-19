@@ -192,23 +192,22 @@ function remove_module(module_id){
  * @param {Boolean} whitelisted the whitelist status
  */
 function flag_in_suggestions(SmObjId, whitelisted){
-    var tr_module = $("#suggestions").find(`[data-smobjid='${SmObjId}']`).get();
+    var tr_module = $("#suggestions").find(`[data-smobjid='${SmObjId}']`);
 
     if(whitelisted==1) {
-        tr_module.querySelector('button[name="Anzeigen"]').disabled = true;
-        tr_module.querySelector('button[name="Verbergen"]').disabled = false;
-        tr_module.children[4].innerHTML = "Angezeigt"; // status
+        tr_module.find('button[name="Anzeigen"]').prop('disabled', true);
+        tr_module.find('button[name="Verbergen"]').prop('disabled', false);
+        tr_module.find('.whitelist_status').html("Angezeigt");
     }
     else if(whitelisted==0) {
-        tr_module.querySelector('button[name="Anzeigen"]').disabled = false;
-        tr_module.querySelector('button[name="Verbergen"]').disabled = true;
-        tr_module.children[4].innerHTML = "Verborgen"; // status
+        tr_module.find('button[name="Anzeigen"]').prop('disabled', false);
+        tr_module.find('button[name="Verbergen"]').prop('disabled', true);
+        tr_module.find('.whitelist_status').html("Verborgen");
     }
     else {
-        tr_module.querySelector('button[name="Anzeigen"]').disabled = false;
-        tr_module.querySelector('button[name="Verbergen"]').disabled = false;
-        tr_module.children[4].innerHTML = "Neu"; // status
-    }
+        tr_module.find('button[name="Anzeigen"]').prop('disabled', false);
+        tr_module.find('button[name="Verbergen"]').prop('disabled', false);
+        tr_module.find('.whitelist_status').html("Neu");
 }
 
 /**
