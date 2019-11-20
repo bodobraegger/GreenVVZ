@@ -32,7 +32,7 @@ async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitel
         }),
         success : function (data) {
             // if module_id not supplied, it was added using save_module()
-            if(module_id) flag_in_suggestions(SmObjId, whitelisted);
+            if(module_id) flag_in_suggestions(SmObjId, PiqYear, PiqSession, whitelisted);
             populate_whitelist();
             // populate_blacklist();
             populate_studyprograms();
@@ -55,7 +55,8 @@ async function update_whitelist_status(module_id, whitelisted) {
         method : 'PUT',
         success : function (data) {
             var SmObjId = $(`#module_${module_id}`).data('smobjid');
-            flag_in_suggestions(SmObjId, whitelisted);
+            var semester = $(`#module_${module_id}`).data('semester').split(' ');
+            flag_in_suggestions(SmObjId, semester[0], semester[1], whitelisted);
             remove_saved_module(module_id);
             populate_studyprograms();
         },
@@ -199,8 +200,8 @@ function remove_suggested_module(SmObjId){
  * @param {Number} module_id the numerical part of the CSS selector
  * @param {Boolean} whitelisted the whitelist status
  */
-function flag_in_suggestions(SmObjId, whitelisted){
-    var tr_module = $("#suggestions").find(`[data-smobjid='${SmObjId}']`);
+function flag_in_suggestions(SmObjId, PiqYear, PiqSession, whitelisted){
+    var tr_module = $("#suggestions").find(`[data-smobjid='${SmObjId}'][data-semester='${PiqYear} ${PiqSession}']`);
 
     if(whitelisted==1) {
         tr_module.find('button[name="Anzeigen"]').prop('disabled', true);
