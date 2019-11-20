@@ -168,7 +168,8 @@ async function delete_blacklisted_module(module_id){
         method : 'DELETE',
         success : function (data) {
             var SmObjId = $(`#module_${module_id}`).data('smobjid');
-            flag_in_suggestions(SmObjId, -1);
+            var semester = $(`#module_${module_id}`).data('semester').split(' ');
+            flag_in_suggestions(SmObjId, semester[0], semester[1], -1);
             remove_saved_module(module_id);
         },
         error : function (err) {
