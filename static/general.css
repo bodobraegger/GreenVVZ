@@ -10,7 +10,8 @@ thead td.semester {
 }
 span.semester {
     display: inline-block;
-    width: 1.7em;
+    /*width: 1.7em;*/
+    margin-right: .4rem;
 }
 #semester_header {
     white-space: nowrap;
