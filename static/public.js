@@ -11,6 +11,7 @@ $(document).ready(function () {
         fall_sem = 'Fall Semester'
         var langTitle = 'Sustainability-related UZH modules';
         var langName = 'Module name';
+        var langSemester = ''; // dont need explanation here
         monkeyPatchAutocomplete();
     } else {
         spring_sem_abbr = 'FS';
@@ -19,9 +20,9 @@ $(document).ready(function () {
         fall_sem = 'Herbstsemester'
         var langTitle = 'Module der UZH mit Nachhaltigkeitsbezug';
         var langName = 'Name des Moduls';
+        var langSemester = `${spring_sem_abbr}: ${spring_sem}<br>
+                            ${fall_sem_abbr}: ${fall_sem}`
     }
-    var langSemester = `${spring_sem_abbr}: ${spring_sem}<br>
-                        ${fall_sem_abbr}: ${fall_sem}`
     // load the whitelist elements into the page, using the anchor-public div
     $.ajax({
         // apiUrl is defined in admin.js
