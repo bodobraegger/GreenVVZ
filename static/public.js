@@ -4,12 +4,14 @@ $(document).ready(function () {
     // if a data-lang tag exists
     if(lang == 'en'){
         // global abbreviation to make convert_to_session able to access
-        spring_sem_abbr = 'SS';
-        spring_sem = 'Spring Semester'
-        fall_sem_abbr = 'FS'
-        fall_sem = 'Fall Semester'
+        // no abbreviations wanted in english, request by Linde
+        // spring_sem_abbr = 'SS';
+        spring_sem_abbr=spring_sem = 'Spring Semester'
+        // fall_sem_abbr = 'FS'
+        fall_sem_abbr = fall_sem = 'Fall Semester'
         var langTitle = 'Sustainability-related UZH modules';
         var langName = 'Module name';
+        var langSemester = '';
         monkeyPatchAutocomplete();
     } else {
         spring_sem_abbr = 'FS';
@@ -18,9 +20,9 @@ $(document).ready(function () {
         fall_sem = 'Herbstsemester'
         var langTitle = 'Module der UZH mit Nachhaltigkeitsbezug';
         var langName = 'Name des Moduls';
+        var langSemester = `${spring_sem_abbr}: ${spring_sem}<br>
+                            ${fall_sem_abbr}: ${fall_sem}`
     }
-    var langSemester = `${spring_sem_abbr}: ${spring_sem}<br>
-                        ${fall_sem_abbr}: ${fall_sem}`
     // load the whitelist elements into the page, using the anchor-public div
     $.ajax({
         // apiUrl is defined in admin.js
@@ -37,7 +39,8 @@ $(document).ready(function () {
                         $(this).html(`${fall_sem} ${$(this).attr('value').split(' ')[0]}`)
                     }
                     else if($(this).attr('value').split(' ')[1].includes('4')) {
-                        $(this).html(`${spring_sem} ${$(this).attr('value').split(' ')[0]}`)
+                                                    //1+ because the year mismatches.
+                        $(this).html(`${spring_sem} ${parseInt($(this).attr('value').split(' ')[0])+1}`)
                     }
                 })
             }

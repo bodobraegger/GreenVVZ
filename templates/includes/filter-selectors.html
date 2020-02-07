@@ -14,7 +14,7 @@
             {% for sesh in sessions %}
             <option value="{{sesh['year']}} {{sesh['session']}}" id="{{sesh['year']}} {{sesh['session']}}" {% if loop.index == 2 %} class="current_semester" selected {% endif %}>
                 {% if sesh['session'] == 3 %} Herbstsemester {{sesh['year']}} 
-                {% else %} Frühlingssemester {{sesh['year']+1}}{% endif %} 
+                {% else %} Frühjahrssemester {{sesh['year']+1}}{% endif %} 
             </option>
             {% endfor %}       
         </select>
