@@ -5,13 +5,12 @@ $(document).ready(function () {
     if(lang == 'en'){
         // global abbreviation to make convert_to_session able to access
         // no abbreviations wanted in english, request by Linde
-        // spring_sem_abbr = 'SS';
-        spring_sem_abbr=spring_sem = 'Spring Semester'
-        // fall_sem_abbr = 'FS'
-        fall_sem_abbr = fall_sem = 'Fall Semester'
+        spring_sem_abbr = 'Spring';
+        spring_sem = 'Spring Semester'
+        fall_sem_abbr = 'Fall'
+        fall_sem = 'Fall Semester'
         var langTitle = 'Sustainability-related UZH modules';
         var langName = 'Module name';
-        var langSemester = '';
         monkeyPatchAutocomplete();
     } else {
         spring_sem_abbr = 'FS';
@@ -20,9 +19,9 @@ $(document).ready(function () {
         fall_sem = 'Herbstsemester'
         var langTitle = 'Module der UZH mit Nachhaltigkeitsbezug';
         var langName = 'Name des Moduls';
-        var langSemester = `${spring_sem_abbr}: ${spring_sem}<br>
-                            ${fall_sem_abbr}: ${fall_sem}`
     }
+    var langSemester = `${spring_sem_abbr}: ${spring_sem}<br>
+                        ${fall_sem_abbr}: ${fall_sem}`
     // load the whitelist elements into the page, using the anchor-public div
     $.ajax({
         // apiUrl is defined in admin.js
