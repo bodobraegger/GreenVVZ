@@ -64,7 +64,7 @@ def hello_world():
     elif request.method == 'POST':
         return "ECHO: POST\n"
     elif request.method == 'PATCH':
-        return "ECHO: PACTH\n"
+        return "ECHO: PATCH\n"
     elif request.method == 'PUT':
         return "ECHO: PUT\n"
     elif request.method == 'DELETE':
