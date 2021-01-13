@@ -509,12 +509,14 @@ def search_upwards():
     start_time = time.perf_counter()
     # get searchterms
     terms = []
+    terms_ids = {}
     try:
         cnx = mysql.connector.connect(**db_config)
         cursor = cnx.cursor(dictionary=True)
         cursor.execute("SELECT term, id FROM searchterm")
         for row in cursor:
             terms.append(row['term'])
+            terms_ids[row['term']] = row['id']
     except Exception as e:
         print('not possible in dev', e)
         terms+=['Nachhaltigkeit', 'Sustainability']
@@ -548,6 +550,7 @@ def search_upwards():
                             'PiqYear':    int(course['PiqYear']),
                             'PiqSession': int(course['PiqSession']),
                             'searchterm': searchterm,
+                            'searchterm_id': terms_ids[searchterm],
                         })
                                     
                         processed_results += next_results
