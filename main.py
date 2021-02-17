@@ -427,7 +427,7 @@ def search():
 
     # get results for all searchterms
     modules = []
-    for session in helpers.get_current_sessions()[-2:]:
+    for session in helpers.get_current_sessions()[:2]:
         for idx, searchterm in enumerate(terms):
             if "&" in searchterm:
                 temp_searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
@@ -531,7 +531,7 @@ def search_upwards():
     # get results for all searchterms
     courses = []
     modules = []
-    for session in helpers.get_current_sessions()[-2:]:
+    for session in helpers.get_current_sessions()[:2]:
         for searchterm in terms:
             if "&" in searchterm:
                 searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
