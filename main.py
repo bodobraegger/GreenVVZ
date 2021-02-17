@@ -566,7 +566,7 @@ def search_upwards(year: int, session: int):
                     processed_results += next_results
 
             except Exception as e:
-                print("ERROR: Processing the course request for term '{}' failed: {}; {}\n".format(searchterm, type(e), e, rURI), 400)
+                print("ERROR: Processing the course request for term '{}' failed: {}; {}\n{}".format(searchterm, type(e), e, rURI), 400)
             processed_results += next_results
 
     # parallel execution: takes about 6 seconds for the two dev terms
