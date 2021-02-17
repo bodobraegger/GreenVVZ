@@ -43,10 +43,13 @@ def update_modules() -> bool:
         cursor2.close()
 
         # update in next semester
-        next_session = helpers.get_next_session(row['PiqYear'], row['PiqSession'])
-        mod = models.Module(row['SmObjId'], next_session['year'], next_session['session'])
+        # next_session = helpers.get_next_session(row['PiqYear'], row['PiqSession'])
+        # mod = models.Module(row['SmObjId'], next_session['year'], next_session['session'])
+        newest_session = helpers.get_current_sessions()[0]
+        mod = models.Module(row['SmObjId'], newest_session['year'], newest_session['session'])
         next_values = mod.find_module_values()
         if next_values is not None:
+            print("FOUND:", next_values['title'], " --- whitelisted: ". row['whitelisted'])
             main.save_module(next_values['SmObjId'], next_values['PiqYear'], next_values['PiqSession'], row['whitelisted'],  row['searchterm'], row['searchterm_id'])
 
     cnx.commit()
