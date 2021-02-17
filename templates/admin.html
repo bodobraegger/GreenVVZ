@@ -28,7 +28,7 @@
     <body>
         {% include 'includes/filter-selectors.html' %}
         <div class="mod mod-text skin-text-basics"> <!-- add this outer div to match UZH styling -->
-            <div id="anchor-admin" data-api-key="{{secret_key}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
+            <div id="anchor-admin" data-api-key="{{secret_key}}" data-use-local-api="{{use_local_api}}" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
                 <h3>Angezeigte Elemente (Whitelist) <div class="count" id="count_whitelist"></div></h3>
                 <div id="whitelist" style="padding: 0">
                     <div class="loading-overlay"><h3 class="loading-overlay ui-accordion-header ui-corner-top ui-state-default"> Module data is loading... </h3></div>
@@ -115,6 +115,9 @@
             $(document).ready(function () {
                 // update secret_key
                 secret_key = "{{secret_key}}";
+                use_local_api = "{{use_local_api}}";
+                apiUrl = 'https://greenvvz.ifi.uzh.ch';
+                if(use_local_api==true) { apiUrl = 'http://127.0.0.1:5000' };
 
                 // populate searchterms
                 populate_searchterms()

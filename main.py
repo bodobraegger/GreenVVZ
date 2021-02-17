@@ -79,9 +79,11 @@ def admin():
     studyprograms = {0: "Theologie: Vollstudienfach 120"}
     studyprogramid_moduleids = {0: [2]}
     secret_key = app.config['SECRET_KEY']
+    use_local_api = os.environ.get('USE_LOCAL_API', "False")
 
     return render_template('admin.html', **{
         'secret_key': secret_key,
+        'use_local_api': use_local_api,
         # for filter-selectors.html include
         'sessions': helpers.get_current_sessions(),
             # optional, for local testing:
@@ -463,7 +465,7 @@ def search(year: int, session: int):
 
 
     # also search for modules associated with courses for same search
-    modules += json.loads(search_upwards().get_data())
+    modules += json.loads(search_upwards(year, session).get_data())
 
     elapsed_time = time.perf_counter() - start_time
     # print("elapsed: getting modules", elapsed_time)
@@ -505,12 +507,13 @@ def check_which_saved(modules: list):
         print(e)
     return modules
 
-@app.route('/search_upwards', methods=['GET'])
+@app.route('/search_upwards/<int:year>/<int:session>', methods=['GET'])
 @cross_origin()
-def search_upwards():
+def search_upwards(year: int, session: int):
     """
         Find course matches, then find containing modules, # and containing study programs
     """
+    session = {"year": year, "session": session}
     start_time = time.perf_counter()
     # get searchterms
     terms = []
@@ -531,54 +534,54 @@ def search_upwards():
     # get results for all searchterms
     courses = []
     modules = []
-    for session in helpers.get_current_sessions()[:2]:
-        for searchterm in terms:
-            if "&" in searchterm:
-                searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
-                modFilter = ' or '.join(searchterms)
-            else:
-                modFilter = "substringof('{0}',Seark)".format(searchterm) 
-                   
-            next_results = 100
-            processed_results = 0
-            total_results = next_results
-            while(processed_results < total_results):
-                total_results = -1
-                rURI = f("{models.Globals.URI_prefix}/ESearchSet?$skip={processed_results}&$top={next_results}&$orderby=EStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json")
-                
-                try:
-                    r = requests.get(rURI)
-                    total_results = int(r.json()['d']['__count'])
-                    
-                    for course in r.json()['d']['results']:
-                        courses.append({
-                            'EObjId':     int(course['Objid']),
-                            'EStext':         course['EStext'],
-                            'PiqYear':    int(course['PiqYear']),
-                            'PiqSession': int(course['PiqSession']),
-                            'searchterm': searchterm,
-                            'searchterm_id': terms_ids[searchterm],
-                        })
-                                    
-                        processed_results += next_results
-
-                except Exception as e:
-                    print("ERROR: Processing the course request for term '{}' failed: {}; {}".format(searchterm, type(e), e), 400)
-                processed_results += next_results
-
-        # parallel execution: takes about 6 seconds for the two dev terms
-        with ThreadPoolExecutor(max_workers=len(courses)+5) as executor:
-            executor.map(find_modules_for_course, courses)
-            # uncomment this to find studyprograms in one go
-            # executor.map(wrap_execute_for_modules_in_course, courses)
-
-        # sequential execution: takes >20 seconds for the two dev terms.        
-        # for course in courses:
-        #     find_modules_for_course(course)
+    # for session in helpers.get_current_sessions():
+    for searchterm in terms:
+        if "&" in searchterm:
+            searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
+            modFilter = ' or '.join(searchterms)
+        else:
+            modFilter = "substringof('{0}',Seark)".format(searchterm) 
+               
+        next_results = 100
+        processed_results = 0
+        total_results = next_results
+        while(processed_results < total_results):
+            total_results = -1
+            rURI = f("{models.Globals.URI_prefix}/ESearchSet?$skip={processed_results}&$top={next_results}&$orderby=EStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json")
             
-        #     for module in course['Modules']:
-        #         find_studyprograms_for_module(module)
-            # print(course)
+            try:
+                r = requests.get(rURI)
+                total_results = int(r.json()['d']['__count'])
+                
+                for course in r.json()['d']['results']:
+                    courses.append({
+                        'EObjId':     int(course['Objid']),
+                        'EStext':         course['EStext'],
+                        'PiqYear':    int(course['PiqYear']),
+                        'PiqSession': int(course['PiqSession']),
+                        'searchterm': searchterm,
+                        'searchterm_id': terms_ids[searchterm],
+                    })
+                                
+                    processed_results += next_results
+
+            except Exception as e:
+                print("ERROR: Processing the course request for term '{}' failed: {}; {}".format(searchterm, type(e), e), 400)
+            processed_results += next_results
+
+    # parallel execution: takes about 6 seconds for the two dev terms
+    with ThreadPoolExecutor(max_workers=len(courses)+5) as executor:
+        executor.map(find_modules_for_course, courses)
+        # uncomment this to find studyprograms in one go
+        # executor.map(wrap_execute_for_modules_in_course, courses)
+
+    # sequential execution: takes >20 seconds for the two dev terms.        
+    # for course in courses:
+    #     find_modules_for_course(course)
+        
+    #     for module in course['Modules']:
+    #         find_studyprograms_for_module(module)
+        # print(course)
     for course in courses:
         modules += course['Modules']
 
