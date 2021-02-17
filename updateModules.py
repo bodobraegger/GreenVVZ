@@ -22,7 +22,7 @@ def update_modules() -> bool:
     no_longer_relevant_session = helpers.get_current_sessions(len(helpers.get_current_sessions())-1)[-1]
     cursor.execute("DELETE FROM module WHERE PiqYear = %(year)s AND PiqSession = %(session)s", no_longer_relevant_session)
     cnx.commit()
-    last_relevant_session = helpers.get_current_sessions()[1]
+    last_relevant_session = helpers.get_current_sessions()[2]
     cursor.execute("SELECT * FROM module WHERE PiqYear = %(year)s AND PiqSession = %(session)s", last_relevant_session)
     newest_session = helpers.get_current_sessions()[0]
     print("last_relevant_session:", last_relevant_session)
