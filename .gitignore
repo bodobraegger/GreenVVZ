@@ -25,6 +25,7 @@ pip-log.txt
 
 #Mr Developer
 .env
+Pipfile
 venv*
 *.pyc
 build
