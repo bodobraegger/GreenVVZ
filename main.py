@@ -394,9 +394,10 @@ def remove_searchterm(searchterm_id: int):
         return "Error: {}".format(err), 404
 
 
-@app.route('/search', methods=['GET'])
+@app.route('/search/<int:year>/<int:session>', methods=['GET'])
 @cross_origin()
-def search():
+def search(year: int, session: int):
+    session = {"year": year, "session": session}
     """ get modules based on search terms, marking those already on white- and blacklist """
     # record time for this very slow operation
     start_time = time.perf_counter()
@@ -427,39 +428,38 @@ def search():
 
     # get results for all searchterms
     modules = []
-    for session in helpers.get_current_sessions()[:2]:
-        for idx, searchterm in enumerate(terms):
-            if "&" in searchterm:
-                temp_searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
-                modFilter = ' or '.join(temp_searchterms)
-            else:
-                modFilter = "substringof('{0}',Seark)".format(searchterm)
+    for idx, searchterm in enumerate(terms):
+        if "&" in searchterm:
+            temp_searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
+            modFilter = ' or '.join(temp_searchterms)
+        else:
+            modFilter = "substringof('{0}',Seark)".format(searchterm)
 
-            next_results = 100
-            processed_results = 0
-            total_results = next_results
-            while(processed_results < total_results):
-                total_results = -1
-                rURI = f("{models.Globals.URI_prefix}/SmSearchSet?$skip={processed_results}&$top={next_results}&$orderby=SmStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json")
-                try:
-                    r = requests.get(rURI)
-                    total_results = int(r.json()['d']['__count'])
+        next_results = 100
+        processed_results = 0
+        total_results = next_results
+        while(processed_results < total_results):
+            total_results = -1
+            rURI = f("{models.Globals.URI_prefix}/SmSearchSet?$skip={processed_results}&$top={next_results}&$orderby=SmStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json")
+            try:
+                r = requests.get(rURI)
+                total_results = int(r.json()['d']['__count'])
 
-                    for module in r.json()['d']['results']:
-                        modules.append({
-                            'SmObjId':    int(module['Objid']),
-                            'title':          module['SmStext'],
-                            'PiqYear':    int(module['PiqYear']),
-                            'PiqSession': int(module['PiqSession']),
-                            'searchterm': searchterm,
-                            'searchterm_id': terms_ids[searchterm],
-                        })
-                    
-                    processed_results += next_results
-
-                except Exception as e:
-                    print("ERROR: Processing the module request for term '{}' failed: {}; {}".format(searchterm, type(e), e), 400)
+                for module in r.json()['d']['results']:
+                    modules.append({
+                        'SmObjId':    int(module['Objid']),
+                        'title':          module['SmStext'],
+                        'PiqYear':    int(module['PiqYear']),
+                        'PiqSession': int(module['PiqSession']),
+                        'searchterm': searchterm,
+                        'searchterm_id': terms_ids[searchterm],
+                    })
+                
                 processed_results += next_results
+
+            except Exception as e:
+                print("ERROR: Processing the module request for term '{}' failed: {}; {}".format(searchterm, type(e), e), 400)
+            processed_results += next_results
 
 
     # also search for modules associated with courses for same search

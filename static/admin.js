@@ -1,7 +1,7 @@
 // GLOBAL VARIABLES DEFINITIONS: used across public.js and filter.js
 baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
 apiUrl = 'https://greenvvz.ifi.uzh.ch'
-// apiUrl = 'http://127.0.0.1:8080/'
+// apiUrl = 'http://127.0.0.1:5000'
 secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data('api-key')
 // initializatin of global vars for sp_idlist and sp_textlist
 studyprogram_idlist = []
@@ -435,8 +435,10 @@ async function populate_blacklist(){
  */
 async function populate_suggestions(){
     var suggestions = $('#suggestions_body')
+    let year_semester = $("option:selected").val().split(" ");
+    if (year_semester[0] == "all_years") { year_semester = $(".current_semester").val().split(" ") }
     await $.ajax({
-        url: apiUrl+'/search',
+        url: `${apiUrl}/search/${year_semester[0]}/${year_semester[1]}`,
         method : 'GET',
         beforeSend: function () {
             $('#suggestions').find('div.loading-overlay').toggle();
@@ -680,7 +682,9 @@ $(document).on( "blur", "#searchterms_body td.searchterm", function() {
             update_searchterm($(this).parent().attr('id'));
         }
 });
-
+$(document).on( "change", "#semester_selector", function() {
+    populate_suggestions();
+});
 
 /**
  * Disable the global semester selector when a specific for a table is used
