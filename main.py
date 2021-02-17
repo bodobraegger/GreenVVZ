@@ -457,7 +457,7 @@ def search():
                     
 
                 except Exception as e:
-                    print(f"ERROR: Processing the module request for term '{}' failed: {}; {}".format(searchterm, type(e), e), 400)
+                    print("ERROR: Processing the module request for term '{}' failed: {}; {}".format(searchterm, type(e), e), 400)
                 processed_results += next_results
 
     # also search for modules associated with courses for same search
@@ -560,7 +560,7 @@ def search_upwards():
                                     
 
                 except Exception as e:
-                    print(f"ERROR: Processing the course request for term '{}' failed: {}; {}".format(searchterm, type(e), e), 400)
+                    print("ERROR: Processing the course request for term '{}' failed: {}; {}".format(searchterm, type(e), e), 400)
                 processed_results += next_results
         
         # parallel execution: takes about 6 seconds for the two dev terms
