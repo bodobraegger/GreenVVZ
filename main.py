@@ -421,6 +421,9 @@ def search():
     except Exception as e:
         print('/search: not possible in dev', e)
         terms+=['Nachhaltigkeit', 'Sustainability']
+        terms_ids['Nachhaltigkeit'] = 0
+        terms_ids['Sustainability'] = 1
+
 
     # get results for all searchterms
     modules = []
@@ -455,7 +458,7 @@ def search():
                     processed_results += next_results
 
                 except Exception as e:
-                    print("ERROR: Processing the module request for term '{}' failed: {}".format(searchterm, e), 400)
+                    print(f"ERROR: Processing the module request for term '{searchterm}' failed: {type(e)}; {e}", 400)
 
     # also search for modules associated with courses for same search
     modules += json.loads(search_upwards().get_data())
@@ -520,6 +523,8 @@ def search_upwards():
     except Exception as e:
         print('not possible in dev', e)
         terms+=['Nachhaltigkeit', 'Sustainability']
+        terms_ids['Nachhaltigkeit'] = 0
+        terms_ids['Sustainability'] = 1
 
     # get results for all searchterms
     courses = []
@@ -556,7 +561,7 @@ def search_upwards():
                         processed_results += next_results
 
                 except Exception as e:
-                    print("ERROR: Processing the course request for term '{}' failed: {}".format(searchterm, e), 400)
+                    print(f"ERROR: Processing the course request for term '{searchterm}' failed: {type(e)}; {e}", 400)
         
         # parallel execution: takes about 6 seconds for the two dev terms
         with ThreadPoolExecutor(max_workers=len(courses)+5) as executor:
