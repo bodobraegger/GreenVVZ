@@ -49,8 +49,8 @@ class Module:
         except requests.exceptions.HTTPError as err:
             print(err)
             return None
-        except AttributeError as err:
-            print(err)
+        except Exception as err:
+            print(type(err), err)
             return None
 
     def set_module(self, values: dict):
