@@ -23,6 +23,7 @@ def update_modules() -> bool:
     cnx.commit()
     last_relevant_session = helpers.get_current_sessions()[1]
     cursor.execute("SELECT * FROM module WHERE PiqYear = %(year)s AND PiqSession = %(session)s", last_relevant_session)
+    print("last_relevant_session:", last_relevant_session)
     for row in cursor:
         # current semester update
         cursor2 = cnx.cursor()
@@ -47,6 +48,9 @@ def update_modules() -> bool:
         # mod = models.Module(row['SmObjId'], next_session['year'], next_session['session'])
         newest_session = helpers.get_current_sessions()[0]
         mod = models.Module(row['SmObjId'], newest_session['year'], newest_session['session'])
+        print("current module from db:", row)
+        print("newest_session:", newest_session)
+        print("same module from newest_session:", mod)
         next_values = mod.find_module_values()
         if next_values is not None:
             print("FOUND:", next_values['title'], " --- whitelisted: ". row['whitelisted'])
