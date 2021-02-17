@@ -2,6 +2,7 @@
 # coding=utf8
 import os
 import mysql.connector
+from requests.models import HTTPError
 import models
 import helpers
 import main
@@ -50,11 +51,13 @@ def update_modules() -> bool:
         mod = models.Module(row['SmObjId'], newest_session['year'], newest_session['session'])
         print("current module from db:", row)
         print("newest_session:", newest_session)
-        print("same module from newest_session:", mod)
-        next_values = mod.find_module_values()
-        if next_values is not None:
+        try:
+            next_values = mod.find_module_values()
             print("FOUND:", next_values['title'], " --- whitelisted: ". row['whitelisted'])
             main.save_module(next_values['SmObjId'], next_values['PiqYear'], next_values['PiqSession'], row['whitelisted'],  row['searchterm'], row['searchterm_id'])
+        except HTTPError as e:
+            print("This module does not exist in the newest semester!\n", e)
+
 
     cnx.commit()
     cnx.close()
