@@ -42,7 +42,7 @@ def update_modules() -> bool:
         print("current module from db:", row)
         next_values = mod.find_module_values()
         if(next_values != None):
-            print("FOUND:", next_values['title'], " --- whitelisted: ". row['whitelisted'])
+            print("FOUND:", next_values['title'], " --- whitelisted: ", row['whitelisted'])
             # main.save_module(next_values['SmObjId'], next_values['PiqYear'], next_values['PiqSession'], row['whitelisted'],  row['searchterm'], row['searchterm_id'])
             qry = "INSERT INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s, %(searchterm)s, %(searchterm_id)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
             next_values['whitelisted'] = row['whitelisted']
