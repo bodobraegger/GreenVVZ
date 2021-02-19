@@ -26,33 +26,14 @@ def update_modules() -> bool:
     cnx.commit()
     cursor.close()
 
-    cursor2 = cnx.cursor(dictionary=True, buffered=True)
-    last_relevant_session = current_sessions[3]
-    cursor2.execute("SELECT * FROM module WHERE PiqYear = %(year)s AND PiqSession = %(session)s", last_relevant_session)
-    current_session = current_sessions[1]
-    # print("last_relevant_session:", last_relevant_session)
-    # print("current_session:", current_session)
-    for row in cursor2:
-        # if the title were to change of a module of the current semester
-        # update_or_delete(cnx, row)
-        # port modules from a year ago to the currnt semester:
-        # next_session = helpers.get_next_session(row['PiqYear'], row['PiqSession'])
-        # mod = models.Module(row['SmObjId'], next_session['year'], next_session['session'])
-        mod = models.Module(row['SmObjId'], current_session['year'], current_session['session'])
-        print("current module from db:", row)
-        next_values = mod.find_module_values()
-        if(next_values != None):
-            print("FOUND:", next_values['title'], " --- whitelisted: ", row['whitelisted'])
-            # main.save_module(next_values['SmObjId'], next_values['PiqYear'], next_values['PiqSession'], row['whitelisted'],  row['searchterm'], row['searchterm_id'])
-            qry = "INSERT INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s, %(searchterm)s, %(searchterm_id)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
-            next_values['whitelisted'] = row['whitelisted']
-            next_values['searchterm'] = row['searchterm']
-            next_values['searchterm_id'] = row['searchterm_id']
-            cursor = cnx.cursor()
-            cursor.execute(qry, next_values)
-            cnx.commit()
-            cursor.close()
-    cursor2.close()
+    update_modules_from_session(cnx, 
+        session_to_poll_from=current_sessions[3], 
+        session_to_store_in =current_sessions[1])
+    update_modules_from_session(cnx, 
+        session_to_poll_from=current_sessions[2], 
+        session_to_store_in =current_sessions[0])
+
+
     cnx.close()
 
     return True
@@ -71,4 +52,34 @@ def update_or_delete(cnx, row):
         cursor2.execute(qry2, val)
     except mysql.connector.Error as err:
         print("Error: {}".format(err))
+    cursor2.close()
+
+def update_modules_from_session(cnx, session_to_poll_from, session_to_store_in):
+    cursor2 = cnx.cursor(dictionary=True, buffered=True)
+    cursor2.execute("SELECT * FROM module WHERE PiqYear = %(year)s AND PiqSession = %(session)s", session_to_poll_from)
+    # print("session_to_poll_from:", session_to_poll_from)
+    # print("session_to_store_in:", session_to_store_in)
+    for row in cursor2:
+        # if the title were to change of a module of the current semester
+        # update_or_delete(cnx, row)
+        # port modules from a year ago to the currnt semester:
+        # next_session = helpers.get_next_session(row['PiqYear'], row['PiqSession'])
+        # mod = models.Module(row['SmObjId'], next_session['year'], next_session['session'])
+        mod = models.Module(row['SmObjId'], session_to_store_in['year'], session_to_store_in['session'])
+        print("current module from db:", row)
+        next_values = mod.find_module_values()
+        if(next_values != None):
+            print("FOUND:", next_values['title'], " --- whitelisted: ", row['whitelisted'])
+            # main.save_module(next_values['SmObjId'], next_values['PiqYear'], next_values['PiqSession'], row['whitelisted'],  row['searchterm'], row['searchterm_id'])
+            qry = "INSERT INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s, %(searchterm)s, %(searchterm_id)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
+            next_values['whitelisted'] = row['whitelisted']
+            next_values['searchterm'] = row['searchterm']
+            next_values['searchterm_id'] = row['searchterm_id']
+            cursor = cnx.cursor()
+            try:
+                cursor.execute(qry, next_values)
+            except mysql.connector.Error as err:
+                print("Error: {}".format(err))
+            cnx.commit()
+            cursor.close()
     cursor2.close()
