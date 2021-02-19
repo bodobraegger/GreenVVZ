@@ -1,6 +1,7 @@
 # coding=utf8
 # builtin
 import os
+import sys
 import mysql.connector
 from datetime import date
 from functools import wraps
@@ -709,4 +710,5 @@ def get_studyprograms_modules():
     return jsonify(studyprogramid_moduleids)
 
 if __name__ == "__main__":
-    app.run()
+    p = sys.argv[1] if 1 < len(sys.argv) else 5000
+    app.run(port = p)
