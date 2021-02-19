@@ -2,7 +2,7 @@
 # coding=utf8
 import os
 import mysql.connector
-from requests.models import HTTPError
+from requests.models import HTTPError 
 import models
 import helpers
 import main
@@ -18,15 +18,16 @@ def update_modules() -> bool:
     """ For each saved module, check if it still exists and/or changed, match in DB, delete too old ones"""
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor(dictionary=True, buffered=True)
+    current_sessions = helpers.get_current_sessions()
     # delete modules of semester no longer relevant (as defined by the default num_prev_semesters+1, or len(helpers.get_current_sessions())-2 +1
-    no_longer_relevant_session = helpers.get_current_sessions(len(helpers.get_current_sessions())-1)[-1]
+    no_longer_relevant_session = helpers.get_current_sessions(len(current_sessions)-1)[-1]
     cursor.execute("DELETE FROM module WHERE PiqYear = %(year)s AND PiqSession = %(session)s", no_longer_relevant_session)
     cnx.commit()
-    last_relevant_session = helpers.get_current_sessions()[2]
+    last_relevant_session = current_sessions[3]
     cursor.execute("SELECT * FROM module WHERE PiqYear = %(year)s AND PiqSession = %(session)s", last_relevant_session)
-    newest_session = helpers.get_current_sessions()[0]
-    print("last_relevant_session:", last_relevant_session)
-    print("newest_session:", newest_session)
+    current_session = current_sessions[1]
+    # print("last_relevant_session:", last_relevant_session)
+    # print("current_session:", current_session)
     for row in cursor:
         # current semester update
         cursor2 = cnx.cursor()
@@ -49,7 +50,7 @@ def update_modules() -> bool:
         # update in next semester
         # next_session = helpers.get_next_session(row['PiqYear'], row['PiqSession'])
         # mod = models.Module(row['SmObjId'], next_session['year'], next_session['session'])
-        mod = models.Module(row['SmObjId'], newest_session['year'], newest_session['session'])
+        mod = models.Module(row['SmObjId'], current_session['year'], current_session['session'])
         print("current module from db:", row)
         next_values = mod.find_module_values()
         if(next_values != None):
