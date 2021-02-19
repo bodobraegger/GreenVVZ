@@ -67,19 +67,25 @@ def update_modules_from_session(cnx, session_to_poll_from, session_to_store_in):
         # mod = models.Module(row['SmObjId'], next_session['year'], next_session['session'])
         mod = models.Module(row['SmObjId'], session_to_store_in['year'], session_to_store_in['session'])
         print("current module from db:", row)
-        next_values = mod.find_module_values()
-        if(next_values != None):
-            print("FOUND:", next_values['title'], " --- whitelisted: ", row['whitelisted'])
-            # main.save_module(next_values['SmObjId'], next_values['PiqYear'], next_values['PiqSession'], row['whitelisted'],  row['searchterm'], row['searchterm_id'])
-            qry = "INSERT INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s, %(searchterm)s, %(searchterm_id)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
-            next_values['whitelisted'] = row['whitelisted']
-            next_values['searchterm'] = row['searchterm']
-            next_values['searchterm_id'] = row['searchterm_id']
-            cursor = cnx.cursor()
-            try:
-                cursor.execute(qry, next_values)
-            except mysql.connector.Error as err:
-                print("Error: {}".format(err))
-            cnx.commit()
-            cursor.close()
+        # check if already saved in next year, if so, skip adding it!
+        cursor = cnx.cursor(buffered=True)
+        cursor.execute("SELECT 1 FROM module WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s LIMIT 1", mod.get_values())
+        result = cursor.fetchone()
+        cursor.close()
+        if result == None:
+            next_values = mod.find_module_values()
+            if(next_values != None):
+                print("FOUND:", next_values['title'], " --- whitelisted: ", row['whitelisted'])
+                # main.save_module(next_values['SmObjId'], next_values['PiqYear'], next_values['PiqSession'], row['whitelisted'],  row['searchterm'], row['searchterm_id'])
+                qry = "INSERT INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s, %(searchterm)s, %(searchterm_id)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
+                next_values['whitelisted'] = row['whitelisted']
+                next_values['searchterm'] = row['searchterm']
+                next_values['searchterm_id'] = row['searchterm_id']
+                cursor = cnx.cursor()
+                try:
+                    cursor.execute(qry, next_values)
+                except mysql.connector.Error as err:
+                    print("Error: {}".format(err))
+                cnx.commit()
+                cursor.close()
     cursor2.close()
