@@ -44,12 +44,9 @@ class Module:
                 return None
             else:
                 self.set_module(module)
-                print("find_module_values retrieved: {}".format(module))  
+                # print("find_module_values retrieved: {}".format(module))  
                 return module
         except requests.exceptions.HTTPError as err:
-            print(err)
-            return None
-        except Exception as err:
             print(type(err), err)
             return None
 
