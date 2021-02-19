@@ -101,6 +101,7 @@ def public():
     studyprograms = {0: "Theologie: Vollstudienfach 120"}
     studyprogramid_moduleids = {0: [2]}
     secret_key = app.config['SECRET_KEY']
+    use_local_api = os.environ.get('USE_LOCAL_API', "False")
 
     try:
         studyprograms = get_studyprograms().get_data(as_text=True)
@@ -110,6 +111,7 @@ def public():
 
     return render_template('public.html', **{
         'secret_key': secret_key,
+        'use_local_api': use_local_api,
         # for filter-selectors.html
         'sessions': helpers.get_current_sessions(),
             # optional, for local testing:
