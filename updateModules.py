@@ -69,7 +69,7 @@ def update_modules_from_session(cnx, session_to_poll_from, session_to_store_in):
         print("current module from db:", row)
         # check if already saved in next year, if so, skip adding it!
         cursor = cnx.cursor(buffered=True)
-        cursor.execute("SELECT 1 FROM module WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s LIMIT 1", mod.get_values())
+        cursor.execute("SELECT 1 FROM module WHERE SmObjId=%(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession = %(PiqSession)s LIMIT 1", mod.get_module())
         result = cursor.fetchone()
         cursor.close()
         if result == None:
