@@ -16,7 +16,7 @@ db_config = {
 
 def update_modules() -> bool:
     """ For each saved module, check if it still exists and/or changed, match in DB, delete too old ones"""
-    cnx = mysql.connector.connect(**db_config, dictionary=True, buffered=True)
+    cnx = mysql.connector.connect(**db_config)
 
     cursor = cnx.cursor()
     current_sessions = helpers.get_current_sessions()
@@ -26,9 +26,9 @@ def update_modules() -> bool:
     cnx.commit()
     cursor.close()
 
-    cursor2 = cnx.cursor()
+    cursor2 = cnx.cursor(dictionary=True, buffered=True)
     last_relevant_session = current_sessions[3]
-    cursor.execute("SELECT * FROM module WHERE PiqYear = %(year)s AND PiqSession = %(session)s", last_relevant_session)
+    cursor2.execute("SELECT * FROM module WHERE PiqYear = %(year)s AND PiqSession = %(session)s", last_relevant_session)
     current_session = current_sessions[1]
     # print("last_relevant_session:", last_relevant_session)
     # print("current_session:", current_session)
@@ -50,12 +50,6 @@ def update_modules() -> bool:
             next_values['searchterm_id'] = row['searchterm_id']
             cursor = cnx.cursor()
             cursor.execute(qry, next_values)
-            module_id = cursor.lastrowid
-            if module_id == 0:
-                cursor.execute("SELECT id FROM module WHERE SmObjId = %(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession=%(PiqSession)s", next_values)
-                for row in cursor:
-                    print("module_id = cursor.lastrowid did not work", row)
-                    module_id = row[0]
             cnx.commit()
             cursor.close()
     cursor2.close()
@@ -64,7 +58,7 @@ def update_modules() -> bool:
     return True
 
 def update_or_delete(cnx, row):
-    cursor2 = cnx.cursor()
+    cursor2 = cnx.cursor(dictionary=True, buffered=True)
     mod = models.Module(row['SmObjId'], row['PiqYear'], row['PiqSession'])
     current_values = mod.find_module_values()
     if current_values is not None:
