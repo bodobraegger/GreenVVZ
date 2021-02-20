@@ -18,7 +18,6 @@
         <script type="text/javascript" src="{{ url_for('static', filename='additional/iframeResizer.contentWindow.min.js') }}"></script>
         
         <!-- custom functions and styles -->
-        <script type="text/javascript" src="{{ url_for('static', filename='admin.js') }}"></script> 
         <link rel="stylesheet" href="{{ url_for('static', filename='general.css') }}">
 
         <!-- uzh styling -->
@@ -199,6 +198,8 @@
 
             });
         </script>
+        <!-- load custom script in proper order -->
+        <script type="text/javascript" src="{{ url_for('static', filename='admin.js') }}"></script> 
 
     </body>
 </html>

@@ -15,8 +15,6 @@
         
         <!-- custom functions and styles -->
         <link rel="stylesheet" href="{{ url_for('static', filename='general.css') }}">
-        <script type="text/javascript" src="{{ url_for('static', filename='admin.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='public.js') }}"></script>
     </head>
     <body>
         {% include 'includes/filter-selectors.html' %}
@@ -34,5 +32,7 @@
                 populate_studyprograms();
             });
         </script>
+        <script type="text/javascript" src="{{ url_for('static', filename='admin.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='public.js') }}"></script>
     </body>
 </html>

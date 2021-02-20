@@ -1,6 +1,8 @@
 // GLOBAL VARIABLES DEFINITIONS: used across public.js and filter.js
 secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data('api-key')
 use_local_api = $('#anchor-admin').data('use-local-api')
+apiUrl = 'https://greenvvz.ifi.uzh.ch';
+if(use_local_api==true) { apiUrl = 'http://127.0.0.1:5000' };
 // initializatin of global vars for sp_idlist and sp_textlist
 baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
 studyprogram_idlist = []
