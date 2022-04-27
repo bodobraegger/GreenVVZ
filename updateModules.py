@@ -19,9 +19,9 @@ def update_modules() -> bool:
     cnx = mysql.connector.connect(**db_config)
 
     cursor = cnx.cursor()
-    current_sessions = helpers.get_current_sessions()
+    current_sessions = helpers.get_current_sessions(padded=False)
     # delete modules of semester no longer relevant (as defined by the default num_prev_semesters+1, or len(helpers.get_current_sessions())-2 +1
-    no_longer_relevant_session = helpers.get_current_sessions(len(current_sessions)-1)[-1]
+    no_longer_relevant_session = helpers.get_current_sessions(len(current_sessions)-1, padded=False)[-1]
     cursor.execute("DELETE FROM module WHERE PiqYear = %(year)s AND PiqSession = %(session)s", no_longer_relevant_session)
     cnx.commit()
     cursor.close()
