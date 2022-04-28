@@ -27,12 +27,12 @@ def get_session(ref_date = date.today(), target_date = None, padded=True) -> dic
 def get_current_sessions(num_prev_semesters: int = 6, padded=True) -> list:
     """ Get next, current, and last num_prev_semesters sessions: DEFINE DEFAULT HERE, OTHERWISE ADAPT updateModules.py"""
     sessions = [ # next session (6 months from now)
-        get_session(date.today()+relativedelta(months=6), padded), 
-        get_session(date.today(), padded)
+        get_session(date.today()+relativedelta(months=6), padded=padded), 
+        get_session(date.today(), padded=padded)
     ] # current session
     # previous sessions: 6 months back per semester
     for months in range(6, 6*num_prev_semesters+1, 6):
-        sessions.append(get_session(date.today()-relativedelta(months=months), padded))
+        sessions.append(get_session(date.today()-relativedelta(months=months), padded=padded))
     return sessions
 
 def get_next_session(ref_year, ref_sem) -> dict:
