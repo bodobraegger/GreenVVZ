@@ -1,5 +1,5 @@
 /* REQUIRES admin.js TO BE LOADED BEFOREHAND, FOR apiUrl, baseUrlVvzUzh and ShowSelectedModules() */
-// apiUrl = 'https://greenvvz.ifi.uzh.ch';
+// apiUrl = 'https://vvz.ifi.uzh.ch';
 // if(use_local_api==true) { apiUrl = 'http://127.0.0.1:5000' };
 $(document).ready(function () {
     lang=getUrlParam('lang');
