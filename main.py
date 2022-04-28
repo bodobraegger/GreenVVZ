@@ -19,8 +19,6 @@ from flask_cors import CORS, cross_origin
 # python-dateutil lib
 from dateutil.relativedelta import relativedelta
 
-# cool template strings
-# from ww import f
 
 # this codebase
 import models
@@ -445,7 +443,7 @@ def search(year: int, session: int):
         total_results = next_results
         while(processed_results < total_results):
             total_results = -1
-            rURI = f("{models.Globals.URI_prefix}/SmSearchSet?$skip={processed_results}&$top={next_results}&$orderby=SmStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json")
+            rURI = f"{models.Globals.URI_prefix}/SmSearchSet?$skip={processed_results}&$top={next_results}&$orderby=SmStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json"
             try:
                 r = requests.get(rURI)
                 total_results = int(r.json()['d']['__count'])
@@ -550,7 +548,7 @@ def search_upwards(year: int, session: int):
         total_results = next_results
         while(processed_results < total_results):
             total_results = -1
-            rURI = f("{models.Globals.URI_prefix}/ESearchSet?$skip={processed_results}&$top={next_results}&$orderby=EStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json")
+            rURI = "{models.Globals.URI_prefix}/ESearchSet?$skip={processed_results}&$top={next_results}&$orderby=EStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json"
             
             try:
                 r = requests.get(rURI)
