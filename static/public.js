@@ -63,7 +63,7 @@ $(document).ready(function () {
             // append the modules as rows with proper id, data-SmObjId, data-semester, and a link to the vvz
             for (var row in data){
                 // baseUrlVvzUzh is defined in admin.js
-                var url = baseUrlVvzUzh+data[row].PiqYear+'/'+data[row].PiqSession+'/SM/'+data[row].SmObjId
+                var url = baseUrlVvzUzh+data[row].PiqYear+'/'+data[row].PiqSession.toString().padStart(3,0)+'/SM/'+data[row].SmObjId
                 var module = $(`
                 <tr id="module_${data[row].id}" data-SmObjId="${data[row].SmObjId}" data-semester="${data[row].PiqYear} ${data[row].PiqSession}" class="shown">
                     <td><a target="_blank" href="${url}">${data[row].title}</a></td><td>${convert_session_to_string(data[row].PiqSession, data[row].PiqYear)}</td>

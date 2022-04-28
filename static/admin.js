@@ -234,7 +234,7 @@ function flag_in_suggestions(SmObjId, PiqYear, PiqSession, whitelisted){
  */
 function write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title, searchterm, searchterm_id){
     // courses.uzh.ch url
-    var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession+'/SM/'+SmObjId;
+    var url = baseUrlVvzUzh+PiqYear+'/'+PiqSession.toString().padStart(3,0)+'/SM/'+SmObjId;
     // write id for tr, as well as data-SmObjId and data-semester, descriptive class="shown" by default.
     if(searchterm.charAt(0)=='#') {
         var searchterm_cell = `<td class="searchterm deleted">${searchterm/*.slice(2)*/}</td>`
