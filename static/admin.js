@@ -5,8 +5,8 @@ apiUrl = 'https://vvz.ifi.uzh.ch';
 if(use_local_api==true) { apiUrl = 'http://127.0.0.1:5000' };
 // initializatin of global vars for sp_idlist and sp_textlist
 baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
-studyprogram_idlist = []
-studyprogram_textlist = []
+var studyprogram_idlist = []
+var studyprogram_textlist = []
 
 /**
  * Flag tablerows for modules OF THE WHITELIST ONLY contained in the studyprogram input 
@@ -203,7 +203,7 @@ function remove_suggested_module(SmObjId){
  * @param {Boolean} whitelisted the whitelist status
  */
 function flag_in_suggestions(SmObjId, PiqYear, PiqSession, whitelisted){
-    var tr_module = $("#suggestions").find(`[data-smobjid='${SmObjId}'][data-semester='${PiqYear} ${PiqSession}']`);
+    var tr_module = $("#suggestions").find(`[data-smobjid='${SmObjId}'][data-semester='${PiqYear} ${PiqSession.padStart(3, 0)}']`);
 
     if(whitelisted==1) {
         tr_module.find('button[name="Anzeigen"]').prop('disabled', true);
@@ -242,7 +242,7 @@ function write_tr_prefix_for_list(module_id, SmObjId, PiqYear, PiqSession, title
     else {
         var searchterm_cell = `<td class="searchterm" data-searchterm_id=${searchterm_id}>${searchterm}</td>`
     }
-    return `<tr id="module_${module_id}" data-SmObjId="${SmObjId}" data-semester="${PiqYear} ${PiqSession}" class="shown">
+    return `<tr id="module_${module_id}" data-SmObjId="${SmObjId}" data-semester="${PiqYear} ${PiqSession.padStart(3, 0)}" class="shown">
         <td><a target="_blank" href="${url}">${title}</a></td>
         ${searchterm_cell}
         <td>${convert_session_to_string(PiqSession, PiqYear)}</td>
