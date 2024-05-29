@@ -39,6 +39,10 @@ db_config = {
     'host': '127.0.0.1',
     'database': os.environ.get('DB_NAME', 'testdb'),
 }
+if not os.environ.get('DB_NAME'):
+    import sqlite3
+    db_config = {'database': 'db.sqlite'}
+    mysql.connector.connect = sqlite3.connect
 
 
 def require_appkey(view_function):
@@ -138,7 +142,11 @@ def get_modules(whitelisted: bool):
     cnx = mysql.connector.connect(**db_config)
     current_searchterms = [t.get('term') for t in json.loads(get_searchterms().get_data()) if t.get('term') != '#']
 
-    cursor = cnx.cursor(dictionary=True)
+    if 'sqlite' in db_config['database']:
+        cnx.row_factory = sqlite3.Row
+        cursor = cnx.cursor()
+    else:
+        cursor = cnx.cursor(dictionary=True)
     qry = (
         "SELECT * FROM module as m WHERE whitelisted = {whitelisted} ORDER BY title ASC".format(whitelisted=whitelisted))
     cursor.execute(qry)
@@ -262,7 +270,11 @@ def flag_module(module_id: int):
     """ Flag saved module as whitelisted or blacklisted, depending on request.args.get('whitelisted')"""
     whitelisted = int(request.args.get('whitelisted'))
     cnx = mysql.connector.connect(**db_config)
-    cursor = cnx.cursor(dictionary=True, buffered=True)
+    if 'sqlite' in db_config['database']:
+        cnx.row_factory = sqlite3.Row
+        cursor = cnx.cursor()
+    else:
+        cursor = cnx.cursor(dictionary=True, buffered=True)
     # flag module as either black or whitelisted.
     try:
         cursor.execute("UPDATE module SET whitelisted = {} WHERE id = {}".format(whitelisted, module_id))
@@ -291,7 +303,11 @@ def remove_module(module_id: int):
     try:
         cnx = mysql.connector.connect(**db_config)
         val = {'module_id': module_id}
-        cursor = cnx.cursor(dictionary=True, buffered=True)
+        if 'sqlite' in db_config['database']:
+            cnx.row_factory = sqlite3.Row
+            cursor = cnx.cursor()
+        else:
+            cursor = cnx.cursor(dictionary=True, buffered=True)
         qry = "DELETE FROM module WHERE id = %(module_id)s"
         cursor.execute(qry, val)
     except mysql.connector.Error as err:
@@ -308,7 +324,11 @@ def get_searchterms():
     """ get all search terms from DB """
     terms = []
     cnx = mysql.connector.connect(**db_config)
-    cursor = cnx.cursor(dictionary=True)
+    if 'sqlite' in db_config['database']:
+        cnx.row_factory = sqlite3.Row
+        cursor = cnx.cursor()
+    else:
+        cursor = cnx.cursor(dictionary=True)
     qry = (
         "SELECT id, term FROM searchterm ORDER BY term ASC")
     cursor.execute(qry)
@@ -410,7 +430,11 @@ def search(year: int, session: int):
     id_not_currently_in_use = 999
     try:
         cnx = mysql.connector.connect(**db_config)
-        cursor = cnx.cursor(dictionary=True)
+        if 'sqlite' in db_config['database']:
+            cnx.row_factory = sqlite3.Row
+            cursor = cnx.cursor()
+        else:
+            cursor = cnx.cursor(dictionary=True)
         cursor.execute("SELECT term, id FROM searchterm")
         for row in cursor:
             terms.append(row['term'])
@@ -492,7 +516,11 @@ def check_which_saved(modules: list):
         # flag elements that are already in database
         saved_modules = {}
         cnx = mysql.connector.connect(**db_config)
-        cursor = cnx.cursor(dictionary=True)
+        if 'sqlite' in db_config['database']:
+            cnx.row_factory = sqlite3.Row
+            cursor = cnx.cursor()
+        else:
+            cursor = cnx.cursor(dictionary=True)
         cursor.execute("SELECT SmObjId, PiqYear, PiqSession, whitelisted FROM module")
         for row in cursor:
             saved_modules[(row['SmObjId'], row['PiqYear'], row['PiqSession'])]=row['whitelisted']
@@ -521,7 +549,11 @@ def search_upwards(year: int, session: int):
     terms_ids = {}
     try:
         cnx = mysql.connector.connect(**db_config)
-        cursor = cnx.cursor(dictionary=True)
+        if 'sqlite' in db_config['database']:
+            cnx.row_factory = sqlite3.Row
+            cursor = cnx.cursor()
+        else:
+            cursor = cnx.cursor(dictionary=True)
         cursor.execute("SELECT term, id FROM searchterm")
         for row in cursor:
             terms.append(row['term'])
@@ -668,7 +700,11 @@ def get_studyprograms():
     studyprogram_idlist = []
     studyprogram_textlist = []
     cnx = mysql.connector.connect(**db_config)
-    cursor = cnx.cursor(dictionary=True)
+    if 'sqlite' in db_config['database']:
+        cnx.row_factory = sqlite3.Row
+        cursor = cnx.cursor()
+    else:
+        cursor = cnx.cursor(dictionary=True)
     # Select all studyprograms for modules on the whitelist
     qry_p1 = """
     SELECT DISTINCT s.* 
@@ -695,7 +731,11 @@ def get_studyprograms_modules():
     studyprogramid_moduleids = {}
     try: 
         cnx = mysql.connector.connect(**db_config)
-        cursor = cnx.cursor(dictionary=True)
+        if 'sqlite' in db_config['database']:
+            cnx.row_factory = sqlite3.Row
+            cursor = cnx.cursor()
+        else:
+            cursor = cnx.cursor(dictionary=True)
         cursor.execute("SELECT * FROM module_studyprogram AS m_s INNER JOIN module AS m WHERE m_s.module_id = m.id AND whitelisted = 1;")
         for row in cursor:
             for column, value in row.items():

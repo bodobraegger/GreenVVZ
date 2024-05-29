@@ -13,3 +13,4 @@ requests
 six
 urllib3
 Werkzeug
+sqlite3

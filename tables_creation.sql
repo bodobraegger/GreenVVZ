@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS module (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     SmObjId INT(8) NOT NULL, 
     PiqYear INT(4) NOT NULL,
-    PiqSession INT(3) ZEROFILL NOT NULL,
+    PiqSession INT(3) NOT NULL,
     title TEXT,
     whitelisted BOOLEAN,
     searchterm TEXT,
@@ -11,12 +11,12 @@ CREATE TABLE IF NOT EXISTS module (
 );
 
 CREATE TABLE IF NOT EXISTS searchterm (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    term TEXT NOT NULL CHECK (term <> N'') -- Ignored in MariaDB version < 10.2.1, we are on 10.1.37 :(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    term TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS studyprogram (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     CgHighText VARCHAR(255),
     CgHighCategory VARCHAR(255),
     CONSTRAINT key_2 UNIQUE (CgHighText, CgHighCategory)
