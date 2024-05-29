@@ -324,11 +324,8 @@ function add_to_suggestions(module_id, SmObjId, PiqYear, PiqSession, title, whit
  * @param {String} term         searchterm value
  */
 function add_to_searchterms(id, term){
-    if(term.charAt(0) != '#') {
         var searchterm = $('<tr id="'+id+'"><td class="searchterm">'+term+'</td><td><button class="searchterm_mod" onclick="delete_searchterm('+id+')">Entfernen</button></td></tr>')
         $('#searchterms_body').append(searchterm)
-    }
-
 }
 
 
@@ -343,6 +340,7 @@ async function populate_searchterms(){
         method: 'GET',
         success: function (data) {
             searchterms.empty()
+            console.log(data)
             for (var row in data){
                 add_to_searchterms(data[row].id, data[row].term)
             }
