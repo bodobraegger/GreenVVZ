@@ -99,8 +99,8 @@ function convert_session_to_string(session, year){
 }
 
 function getUrlParam(name){
-	var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-	if(results) {
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    if(results) {
         return results[1]
     }
 }

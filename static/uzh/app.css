@@ -123,22 +123,22 @@ legend {
 /* featherlight.uzh.css */
 
 @media all {
-	.featherlight {
-		background: #d8dee4;
-		background: rgba(200, 206, 212, 0.8);
-	}
-	.featherlight .featherlight-close {
-		color: #dc6027;
-		font-weight: bold;
-		background: transparent;
-	}
-	.featherlight .featherlight-content {
-		border: 1px solid #c8ced4;
-		padding: 20px;
+  .featherlight {
+    background: #d8dee4;
+    background: rgba(200, 206, 212, 0.8);
+  }
+  .featherlight .featherlight-close {
+    color: #dc6027;
+    font-weight: bold;
+    background: transparent;
+  }
+  .featherlight .featherlight-content {
+    border: 1px solid #c8ced4;
+    padding: 20px;
 
-		min-width: 50%;
-		width: auto;
-	}
+    min-width: 50%;
+    width: auto;
+  }
 }
 
 /* elements.less */
@@ -194,7 +194,7 @@ svg:not(:root) {
 }
 /*:after,
 :before {
-	.screenreader-mute();
+  .screenreader-mute();
 }*/
 a img {
   border: none;
@@ -297,8 +297,8 @@ var {
     display: none !important;
   }
   /**
-  	 * Richtext styles
-  	 */
+     * Richtext styles
+     */
   span.attention {
     color: #000000;
   }
@@ -312,8 +312,8 @@ var {
 /* grid.less */
 
 /* Ggrid System
-	you can do all variations of 1 to 4 column styles with these classes,
-	no additional classes needed.
+  you can do all variations of 1 to 4 column styles with these classes,
+  no additional classes needed.
 */
 .g-unit {
   overflow: hidden;
@@ -340,7 +340,7 @@ var {
   width: 460px;
 }
 /* the footer uses a separate grid system based on margins,
-	either left or right to position it with the main column (flex)
+  either left or right to position it with the main column (flex)
 */
 .g-col-footer {
   clear: both;
@@ -420,131 +420,131 @@ var {
 /* zora.css */
 
 .mod-zora p {
-	margin: 0.3em 0 0.6em 0;
-	padding: 0;
-	line-height: 1.6em;
+  margin: 0.3em 0 0.6em 0;
+  padding: 0;
+  line-height: 1.6em;
 }
 .mod-zora firstauthor,
 .mod-zora type,
 .mod-zora pubdate {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 .mod-zora .Z3988 {
-	display: none;
+  display: none;
 }
 
 .mod-zora title {
-	display: inline;
+  display: inline;
 }
 
 .mod-zora a,
 .mod-zora a:visited,
 .mod-zora a:hover {
-	color: #dc6027;
+  color: #dc6027;
 }
 
 .mod-zora a.uzh,
 .mod-zora a.internal{
-	display: block;
+  display: block;
 }
 
 .mod-zora a:before {
-	display: inline-block;
-	background: url(http://www.wcmstest.uzh.ch/terrific/76/assets/img/sprite/sprite.png?20150331135517) no-repeat 0 0;
-	content:"";
-	vertical-align: -10%;
-	margin-right: 0.25em;
-	background-position: -99px -41px;
-	width: 10px;
-	height: 13px
+  display: inline-block;
+  background: url(http://www.wcmstest.uzh.ch/terrific/76/assets/img/sprite/sprite.png?20150331135517) no-repeat 0 0;
+  content:"";
+  vertical-align: -10%;
+  margin-right: 0.25em;
+  background-position: -99px -41px;
+  width: 10px;
+  height: 13px
 }
 
 
 .zora-publication-list {
-	margin-bottom: 2em;
+  margin-bottom: 2em;
 }
 
 .zora-publication-list li {
-	margin-bottom: 1em;
+  margin-bottom: 1em;
 }
 
 .zora-publication-list ul {
-	padding-left: 1em;
+  padding-left: 1em;
 }
 
 .zora-publication-list ul > ul {
-	padding-left: 1em;
+  padding-left: 1em;
 }
 
 .zora-publication-list ul b {
-	display: block;
+  display: block;
 }
 
 .zora-sort-headings {
-	overflow: hidden;
-	margin-top: .2em;
-	margin-bottom: 2em;
+  overflow: hidden;
+  margin-top: .2em;
+  margin-bottom: 2em;
 }
 
 .zora-sort-headings li {
-	float: left;
-	border-left: solid 1px black;
-	padding-left: .5em;
-	margin-left: .5em;
-	line-height: 1em;
+  float: left;
+  border-left: solid 1px black;
+  padding-left: .5em;
+  margin-left: .5em;
+  line-height: 1em;
 }
 .zora-sort-headings li:first-child {
-	margin: 0;
-	padding: 0;
-	border: none;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 .zora-publication-head {
-	overflow: hidden;
+  overflow: hidden;
     padding-top: 2px;
 }
 
 .zora-publication-head .zora-sort-headings {
-	float: left;
+  float: left;
 }
 .zora-publication-head .zora-sorting {
-	float: right;
+  float: right;
 }
 
 .paging-full-numbers {
-	margin-bottom: 2em;
+  margin-bottom: 2em;
 }
 
 .paging-full-numbers ul,
 .paging-full-numbers li {
-	display: inline-block;
+  display: inline-block;
 }
 
 .paging-full-numbers a:before {
-	display: none;
+  display: none;
 }
 
 .paging-full-numbers a {
-	color: #000000;
-	display: block;
+  color: #000000;
+  display: block;
 }
 
 
 .paging-full-numbers a.paginate_active {
-	font-weight: bold;
-	color: #dc6027;
+  font-weight: bold;
+  color: #dc6027;
 }
 
 .paging-full-numbers a.paginate_button,
 .paging-full-numbers a.paginate_active {
-	border: 1px solid LightGrey;
-	cursor: pointer;
-	margin: 0 1px;
-	padding: 2px 2px;
+  border: 1px solid LightGrey;
+  cursor: pointer;
+  margin: 0 1px;
+  padding: 2px 2px;
 }
 
 #zora-export-list {
-	margin: 0 1em 0 0;
+  margin: 0 1em 0 0;
 }
 
 
@@ -7302,10 +7302,10 @@ body {
   padding: 5px 5px 5px 11px;
   /* Not used yet, adds 0 padding left for [...] Entry see  https://jira.namics.com/browse/UZH-218 */
   /*
-			&.parent {
-				padding-left: 0;
-			}
-			*/
+      &.parent {
+        padding-left: 0;
+      }
+      */
 
 }
 .mod-subnavigation li a.subscribe,

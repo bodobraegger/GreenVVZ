@@ -36,9 +36,9 @@
             source: studyprogram_textlist,
             minLength: 0,
             select: function (event, ui) {
-				$(this).val(ui.item.label);
-				ShowSelectedModules();
-			},
+                $(this).val(ui.item.label);
+                ShowSelectedModules();
+            },
         }).focus(function() {
             $(this).autocomplete('search', $(this).val())
         });
