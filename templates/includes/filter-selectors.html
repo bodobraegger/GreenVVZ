@@ -24,6 +24,9 @@
     <script type="text/javascript" src="{{ url_for('static', filename='filter.js') }}"></script>
     <!-- <script type="text/javascript" src="{{ url_for('static', filename='additional/autocomplete.js') }}"></script> -->
     <script type="text/javascript">
+        if (typeof studyprogram_textlist === 'undefined') {
+            var studyprogram_textlist = [];
+        }
         $('select#semester_selector').change(function() {
             ClearStudyProgramFilter();
             ShowSelectedModules();

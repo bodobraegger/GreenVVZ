@@ -114,9 +114,12 @@
             $(document).ready(function () {
                 // update secret_key
                 secret_key = "{{secret_key}}";
-                use_local_api = "{{use_local_api}}";
+                use_local_api = {{use_local_api}};
                 apiUrl = 'https://vvz.ifi.uzh.ch';
-                if(use_local_api==true) { apiUrl = 'http://127.0.0.1:5000' };
+                if(use_local_api==true) { 
+                    apiUrl = 'http://127.0.0.1:5000'
+                    console.log('apiUrl: ' + apiUrl, use_local_api, secret_key)
+                };
 
                 // populate searchterms
                 populate_searchterms()
