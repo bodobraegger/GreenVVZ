@@ -151,6 +151,8 @@ def get_modules(whitelisted: bool):
         "SELECT * FROM module as m WHERE whitelisted = {whitelisted} ORDER BY title ASC".format(whitelisted=whitelisted))
     cursor.execute(qry)
     for module in cursor:
+        if 'sqlite' in db_config['database']:
+            module = dict(zip(module.keys(), module))
         for column, value in module.items():
             if type(value) is bytearray:
                 module[column] = value.decode('utf-8')
@@ -204,15 +206,17 @@ def save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm, searchter
         try:
             # try to save into database
             cnx = mysql.connector.connect(**db_config)
-            qry = "INSERT INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id) VALUES (%(SmObjId)s, %(PiqYear)s, %(PiqSession)s, %(title)s, %(whitelisted)s, %(searchterm)s, %(searchterm_id)s) ON DUPLICATE KEY UPDATE whitelisted=%(whitelisted)s"
+            qry = "REPLACE INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id) VALUES (?, ?, ?, ?, ?, ?, ?)"
             module_values['whitelisted'] = whitelisted
             module_values['searchterm'] = searchterm
             module_values['searchterm_id'] = searchterm_id
+            print(tuple(module_values.items()))
+            print(tuple(module_values.values()))
             cursor = cnx.cursor()
-            cursor.execute(qry, module_values)
+            cursor.execute(qry, tuple(module_values.values()))
             module_id = cursor.lastrowid
             if module_id == 0:
-                cursor.execute("SELECT id FROM module WHERE SmObjId = %(SmObjId)s AND PiqYear = %(PiqYear)s AND PiqSession=%(PiqSession)s", module_values)
+                cursor.execute("SELECT id FROM module WHERE SmObjId = ? AND PiqYear = ? AND PiqSession = ?", tuple(module_values.values()))
                 for row in cursor:
                     print("module_id = cursor.lastrowid did not work", row)
                     module_id = row[0]
@@ -232,33 +236,28 @@ def save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm, searchter
 
 def save_studyprograms_for_module(module_id: int, studyprograms: list):
     """ Save studyprogams for module in database, establish relationship"""
-    print('deleting studyprogams', studyprograms, 'for module', module_id)
+    # print('deleting studyprogams', studyprograms, 'for module', module_id)
     cnx = mysql.connector.connect(**db_config)
     studyprogram_id = 0
     for sp in studyprograms:
         cursor = cnx.cursor()
-        qry1 = "INSERT IGNORE INTO studyprogram (CgHighText, CgHighCategory) VALUES (%(CgHighText)s, %(CgHighCategory)s)"
-        val1 = {
-            'CgHighText':  sp['CgHighText'],
-            'CgHighCategory': sp['CgHighCategory'],
-        }
+        qry1 = "INSERT OR IGNORE INTO studyprogram (CgHighText, CgHighCategory) VALUES (?, ?)"
+        val1 = (sp['CgHighText'], sp['CgHighCategory'])
+
         cursor.execute(qry1, val1)
         studyprogram_id = cursor.lastrowid
         # if the study_program == 0, the insert failed (likely, because the studyprogram already exists)
         if studyprogram_id == 0:
             # thus, you can find the studyprogam using the values, and grab the id.
-            cursor.execute("SELECT id FROM studyprogram WHERE CgHighText = %(CgHighText)s AND CgHighCategory = %(CgHighCategory)s", val1)
+            cursor.execute("SELECT id FROM studyprogram WHERE CgHighText = ? AND CgHighCategory = ?", val1)
             for row in cursor:
                 print("studyprogram_id = cursor.lastrowid did not work", row)
                 studyprogram_id = row[0]
         cnx.commit()
 
         # insert entry in designated database, to match Many-To-Many relationship Modules-To-Studyprograms
-        qry2 = "INSERT IGNORE INTO module_studyprogram (module_id, studyprogram_id) VALUES (%(module_id)s, %(studyprogram_id)s)"
-        val2 = {
-            'module_id': module_id,
-            'studyprogram_id': studyprogram_id,
-        }
+        qry2 = "INSERT OR IGNORE INTO module_studyprogram (module_id, studyprogram_id) VALUES (?, ?)"
+        val2 = (module_id, studyprogram_id)
         cursor.execute(qry2, val2)
         cnx.commit()
         cursor.close()
@@ -308,8 +307,8 @@ def remove_module(module_id: int):
             cursor = cnx.cursor()
         else:
             cursor = cnx.cursor(dictionary=True, buffered=True)
-        qry = "DELETE FROM module WHERE id = %(module_id)s"
-        cursor.execute(qry, val)
+        qry = "DELETE FROM module WHERE id = ?"
+        cursor.execute(qry, tuple(val.values()))
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 500
 
@@ -334,6 +333,8 @@ def get_searchterms():
     cursor.execute(qry)
     # decode encoded strings to make them human readable
     for row in cursor.fetchall():
+        if 'sqlite' in db_config['database']:
+            row = dict(zip(row.keys(), row))
         for column, value in row.items():
             if type(value) is bytearray:
                 row[column] = value.decode('utf-8')
@@ -349,6 +350,8 @@ def get_searchterms():
     )
     cursor.execute(qry)
     for row in cursor.fetchall():
+        if 'sqlite' in db_config['database']:
+            row = dict(zip(row.keys(), row))
         for column, value in row.items():
             if type(value) is bytearray:
                 row[column] = value.decode('utf-8')
@@ -368,9 +371,9 @@ def add_searchterm():
     cursor = cnx.cursor()
     data = request.form
     term = data['term']
-    qry = "INSERT INTO searchterm (term) VALUES (%(term)s)"
+    qry = "INSERT OR IGNORE INTO searchterm (term) VALUES ( ? )"
     try:
-        cursor.execute(qry, data)
+        cursor.execute(qry, tuple([term]))
         id = cursor.lastrowid
         cnx.commit()
         cnx.close()
@@ -386,12 +389,10 @@ def update_searchterm(searchterm_id: int):
     """ Update searchterm in DB, term is supplied in form data """
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor()
-    data = request.values.to_dict()
-    data['searchterm_id'] = searchterm_id
-    term = data['term']
-    qry = "UPDATE searchterm SET term = %(term)s WHERE id = %(searchterm_id)s"
+    term = request.values.to_dict()['term']
+    qry = "UPDATE searchterm SET term = ? WHERE id = ?"
     try:
-        cursor.execute(qry, data)
+        cursor.execute(qry, tuple([term, searchterm_id]))
         cnx.commit()
         cnx.close()
         return jsonify({'id': searchterm_id, 'term': term}), 200
@@ -406,9 +407,9 @@ def remove_searchterm(searchterm_id: int):
     """ remove searchterm from DB via id """
     cnx = mysql.connector.connect(**db_config)
     cursor = cnx.cursor()
-    qry = "DELETE FROM searchterm WHERE id = %(searchterm_id)s"
+    qry = "DELETE FROM searchterm WHERE id = ?"
     try:
-        cursor.execute(qry, {'searchterm_id': searchterm_id})
+        cursor.execute(qry, tuple([searchterm_id]))
         cnx.commit()
         cnx.close()
         return 'deleted', 200
@@ -542,7 +543,6 @@ def search_upwards(year: int, session: int):
     """
         Find course matches, then find containing modules, # and containing study programs
     """
-    session = {"year": year, "session": session}
     start_time = time.perf_counter()
     # get searchterms
     terms = []
@@ -716,6 +716,8 @@ def get_studyprograms():
     qry_p2 = " AND m.PiqYear = {} AND m.PiqSession = {}".format(request.args.get('PiqYear'), request.args.get('PiqSession')) if request.args.get('PiqSession', 'all_semesters') != "all_semesters" else ""
     cursor.execute(qry_p1+qry_p2+" ORDER BY s.CgHighText, s.CgHighCategory;")
     for row in cursor:
+        if 'sqlite' in db_config['database']:
+            row = dict(zip(row.keys(), row))
         for column, value in row.items():
             if type(value) is bytearray:
                 row[column] = value.decode('utf-8')
@@ -738,6 +740,8 @@ def get_studyprograms_modules():
             cursor = cnx.cursor(dictionary=True)
         cursor.execute("SELECT * FROM module_studyprogram AS m_s INNER JOIN module AS m WHERE m_s.module_id = m.id AND whitelisted = 1;")
         for row in cursor:
+            if 'sqlite' in db_config['database']:
+                row = dict(zip(row.keys(), row))
             for column, value in row.items():
                 if type(value) is bytearray:
                     row[column] = value.decode('utf-8')

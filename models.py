@@ -34,10 +34,10 @@ class Module:
             r.raise_for_status()
 
             module = {
-                'title':        r.json()['d']['SmText'],
                 'SmObjId':      r.json()['d']['SmObjId'],
-                'PiqSession':   r.json()['d']['PiqSession'],
                 'PiqYear':      r.json()['d']['PiqYear'],
+                'PiqSession':   r.json()['d']['PiqSession'],
+                'title':        r.json()['d']['SmText'],
             }
             # No module found in course catalogue
             if module['SmObjId'] == '00000000':
@@ -62,8 +62,8 @@ class Module:
         if self.PiqSession != 0:
             return {
                 'SmObjId': self.SmObjId,
-                'PiqSession': self.PiqSession,
                 'PiqYear': self.PiqYear,
+                'PiqSession': self.PiqSession,
                 'title': self.title,
                 'whitelisted': self.whitelisted
             }
