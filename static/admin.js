@@ -33,7 +33,8 @@ async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitel
         }),
         success : function (data) {
             // if module_id not supplied, it was added using save_module()
-            if(module_id) flag_in_suggestions(SmObjId, PiqYear, PiqSession, whitelisted);
+            // if(module_id) 
+            flag_in_suggestions(SmObjId, PiqYear, PiqSession, whitelisted);
             populate_whitelist();
             // populate_blacklist();
             populate_studyprograms();
@@ -158,6 +159,7 @@ async function save_module(){
     var PiqSession = $('option:selected').val().split(' ')[1];
     // post to db with module_id=null, and searchterm = "Manuell Hinzugefügt"
     await post_module_to_db(null, SmObjId, PiqYear, PiqSession, whitelisted=1, "Manuell Hinzugefügt", -999);
+    
 }
 /**
  * Delete module from the DB.
