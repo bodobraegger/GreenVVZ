@@ -150,7 +150,7 @@ def get_modules(whitelisted: bool):
     modules = []
     cnx, cursor = get_cnx_and_cursor()
     
-    current_searchterms = [t.get('term') for t in json.loads(get_searchterms().get_data()) if t.get('term') != '#']
+    current_searchterms = [t.get('term') for t in json.loads(get_searchterms(with_deleted=False).get_data())]
 
     qry = (
         "SELECT * FROM module as m WHERE whitelisted = {whitelisted} ORDER BY title ASC".format(whitelisted=whitelisted))
@@ -313,7 +313,7 @@ def remove_module(module_id: int):
 
 @app.route('/searchterms', methods=['GET'])
 @cross_origin()
-def get_searchterms():
+def get_searchterms(with_deleted=False):
     """ get all search terms from DB """
     terms = []
     cnx, cursor = get_cnx_and_cursor()
@@ -328,25 +328,29 @@ def get_searchterms():
             if type(value) is bytearray:
                 row[column] = value.decode('utf-8')
         terms.append(row)
-    qry = ("""
-        SELECT DISTINCT searchterm AS term, searchterm_id AS id 
-        FROM module m 
-        WHERE searchterm NOT IN (
-            SELECT term 
-            FROM searchterm s 
+    if with_deleted:
+        qry = ("""
+            SELECT DISTINCT searchterm AS term, searchterm_id AS id 
+            FROM module m 
+            WHERE searchterm NOT IN (
+                SELECT term 
+                FROM searchterm s 
+            )
+            ORDER BY searchterm ASC;"""
         )
-        ORDER BY searchterm ASC;"""
-    )
-    cursor.execute(qry)
-    for row in cursor.fetchall():
-        if 'sqlite' in db_config['database']:
-            row = dict(zip(row.keys(), row))
-        for column, value in row.items():
-            if type(value) is bytearray:
-                row[column] = value.decode('utf-8')
-            if column == 'term':
-                row[column] = '# ' + value
-        terms.append(row)
+        cursor.execute(qry)
+        for row in cursor.fetchall():
+            if 'sqlite' in db_config['database']:
+                row = dict(zip(row.keys(), row))
+            for column, value in row.items():
+                if type(value) is bytearray:
+                    row[column] = value.decode('utf-8')
+                if column == 'term':
+                    row[column] = '# ' + value
+            terms.append(row)
+    cursor.close()
+    cnx.close()
+
     return jsonify(terms)
 
 
@@ -408,7 +412,6 @@ def remove_searchterm(searchterm_id: int):
 @app.route('/search/<int:year>/<int:session>', methods=['GET'])
 @cross_origin()
 def search(year: int, session: int):
-    session = {"year": year, "session": session}
     """ get modules based on search terms, marking those already on white- and blacklist """
     # record time for this very slow operation
     start_time = time.perf_counter()
@@ -423,8 +426,6 @@ def search(year: int, session: int):
             terms.append(row['term'])
             terms_ids[row['term']] = row['id']
 
-        cursor.close()
-        cursor = cnx.cursor()
         cursor.execute("SELECT MAX(id) FROM module")
         # to make sure that all modules have unique CSS ids, make smallest suggestion_module_id = max(module_id)+999
         id_not_currently_in_use = cursor.fetchone()[0] + 999
@@ -435,22 +436,26 @@ def search(year: int, session: int):
         terms_ids['Nachhaltigkeit'] = 0
         terms_ids['Sustainability'] = 1
 
+    finally:
+        cursor.close()
+        cnx.close()
+
 
     # get results for all searchterms
     modules = []
-    for idx, searchterm in enumerate(terms):
+    for searchterm in terms:
         if "&" in searchterm:
             temp_searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
             modFilter = ' or '.join(temp_searchterms)
         else:
-            modFilter = "substringof('{0}',Seark)".format(searchterm)
+            modFilter = f"substringof('{searchterm}',Seark)"
 
         next_results = 100
         processed_results = 0
         total_results = next_results
         while(processed_results < total_results):
             total_results = -1
-            rURI = f"{models.Globals.URI_prefix}/SmSearchSet?$skip={processed_results}&$top={next_results}&$orderby=SmStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json"
+            rURI = f"{models.Globals.URI_prefix}/SmSearchSet?$skip={processed_results}&$top={next_results}&$orderby=SmStext asc&$filter=({modFilter}) and PiqYear eq '{year}' and PiqSession eq '{str(session).zfill(3)}'&$inlinecount=allpages&$format=json"
             try:
                 r = requests.get(rURI)
                 total_results = int(r.json()['d']['__count'])
@@ -468,7 +473,7 @@ def search(year: int, session: int):
                 processed_results += next_results
 
             except Exception as e:
-                print("ERROR: Processing the module request for term '{}' failed: {}; {}".format(searchterm, type(e), e), 400)
+                print(f"ERROR: Processing the module request for term '{searchterm}' failed: {type(e)}; {e}", 400)
             processed_results += next_results
 
 
@@ -545,14 +550,14 @@ def search_upwards(year: int, session: int):
             searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
             modFilter = ' or '.join(searchterms)
         else:
-            modFilter = "substringof('{0}',Seark)".format(searchterm) 
+            modFilter = f"substringof('{searchterm}',Seark)"
                
         next_results = 100
         processed_results = 0
         total_results = next_results
         while(processed_results < total_results):
             total_results = -1
-            rURI = f"{models.Globals.URI_prefix}/ESearchSet?$skip={processed_results}&$top={next_results}&$orderby=EStext asc&$filter=({modFilter}) and PiqYear eq '{str(session['year']).zfill(3)}' and PiqSession eq '{str(session['session']).zfill(3)}'&$inlinecount=allpages&$format=json"
+            rURI = f"{models.Globals.URI_prefix}/ESearchSet?$skip={processed_results}&$top={next_results}&$orderby=EStext asc&$filter=({modFilter}) and PiqYear eq '{year}' and PiqSession eq '{str(session).zfill(3)}'&$inlinecount=allpages&$format=json"
             
             try:
                 r = requests.get(rURI)
@@ -591,7 +596,7 @@ def search_upwards(year: int, session: int):
         modules += course['Modules']
 
     elapsed_time = time.perf_counter() - start_time
-    # print("elapsed: getting courses->modules->studyprograms", elapsed_time)
+    print("elapsed: getting courses->modules->studyprograms", elapsed_time)
     return jsonify(modules)
 
 def find_modules_for_course(course: dict):
