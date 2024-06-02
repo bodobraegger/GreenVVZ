@@ -215,8 +215,7 @@ def save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm, searchter
             module_values['whitelisted'] = whitelisted
             module_values['searchterm'] = searchterm
             module_values['searchterm_id'] = searchterm_id
-            print(tuple(module_values.items()))
-            print(tuple(module_values.values()))
+            study_programs = module_values.pop('Partof')
             cursor.execute(qry, tuple(module_values.values()))
             module_id = cursor.lastrowid
             if module_id == 0:
@@ -228,8 +227,7 @@ def save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm, searchter
             cursor.close()
 
             # if a module is to be saved, find the corresponding studyprograms and save them too
-            studyprograms = find_studyprograms_for_module(SmObjId, PiqYear, PiqSession)
-            save_studyprograms_for_module(module_id, studyprograms)
+            save_studyprograms_for_module(module_id, study_programs)
             cnx.close()
             return module_values
         except mysql.connector.Error as err:
@@ -588,15 +586,11 @@ def search_upwards(year: int, session: int):
     # sequential execution: takes >20 seconds for the two dev terms.        
     # for course in courses:
     #     find_modules_for_course(course)
-        
-    #     for module in course['Modules']:
-    #         find_studyprograms_for_module(module)
-        # print(course)
     for course in courses:
         modules += course['Modules']
 
     elapsed_time = time.perf_counter() - start_time
-    print("elapsed: getting courses->modules->studyprograms", elapsed_time)
+    print("elapsed: getting courses->modules", elapsed_time)
     return jsonify(modules)
 
 def find_modules_for_course(course: dict):
@@ -624,51 +618,6 @@ def find_modules_for_course(course: dict):
         print("ERROR: Processing the module request for course '{}' failed: {}".format(course['EStext'], e))
     
     return course['Modules']
-
-def find_studyprograms_for_module(SmObjId: int, PiqYear: int, PiqSession: int) -> list:
-    """
-    Request detail page for module object, add Studyprogrm subobjects(dicts) as list to given module obj
-    """
-    rURI = models.Globals.URI_prefix+"/SmDetailsSet(SmObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Partof%2cOrganizations%2cResponsible%2cEvents%2cEvents%2fPersons%2cOfferPeriods&$format=json".format(
-        SmObjId, PiqYear, PiqSession)
-    module_values = {"Partof": []}
-    try: 
-        r = requests.get(rURI)
-
-        for studyprogram in r.json()['d']['Partof']['results']:
-            module_values['Partof'].append({
-                'CgHighText':     studyprogram['CgHighText'],
-                'CgHighCategory': studyprogram['CgHighCategory'],
-                # CgCategorySort: "16"
-                # CgHighCategory: "Major 45/75"
-                # CgHighObjid: "50385714"
-                # CgHighText: "German Language and Literature"
-                # CgLowCategory: "Major 45/75"
-                # CgLowObjid: "50385714"
-                # CgLowText: "German Language and Literature"
-                # Corestep: true
-                # OObjid: "50000007"
-                # OText: "00\nFaculty of Arts and Social Sciences"
-                # Oblig: false
-                # PiqSession: "000"
-                # PiqYear: "0000"
-                # ScObjid: "50383586"
-                # ScText: "Master of Arts"
-                # SmObjId: "50932094"
-            })
-        module_values['Partof'] = list({frozenset(item.items()) : item for item in module_values['Partof']}.values())
-    except Exception as e:
-        print("ERROR: Processing the studyprogram request for module '{}' failed: {}".format(SmObjId, e))
-    
-    return module_values['Partof']
-
-def wrap_execute_for_modules_in_course(course):
-    """
-    Wrapper function to be able to parallelize finding studyprograms for modules
-    """
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        return executor.map(find_studyprograms_for_module, course['Modules'])
-    # return ThreadPool(len(course['Modules'])).imap_unordered(find_studyprograms_for_module, course['Modules'])
 
 @app.route('/studyprograms', methods=['GET'])
 @cross_origin()

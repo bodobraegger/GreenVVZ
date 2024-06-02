@@ -25,7 +25,7 @@ class Module:
         """Check if module with given SmObjId and session data exists in course catalogue, get values if it does"""
         # Details page for module
         rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmDetailsSet(SmObjId='{0}',PiqYear='{1}'," \
-               "PiqSession='{2}')?$format=json".format(
+               "PiqSession='{2}')?$expand=Partof,Organizations,Responsible,Events,Events/Persons,OfferPeriods&$format=json".format(
             self.SmObjId, self.PiqYear, self.PiqSession)
 
         r = requests.get(rURI)
@@ -38,6 +38,7 @@ class Module:
                 'PiqYear':      r.json()['d']['PiqYear'],
                 'PiqSession':   r.json()['d']['PiqSession'],
                 'title':        r.json()['d']['SmText'],
+                'Partof':       r.json()['d']['Partof']['results'],
             }
             # No module found in course catalogue
             if module['SmObjId'] == '00000000':
