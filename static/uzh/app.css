@@ -451,7 +451,6 @@ var {
 
 .mod-zora a:before {
   display: inline-block;
-  background: url(http://www.wcmstest.uzh.ch/terrific/76/assets/img/sprite/sprite.png?20150331135517) no-repeat 0 0;
   content:"";
   vertical-align: -10%;
   margin-right: 0.25em;
@@ -559,7 +558,6 @@ var {
 
 .mod-zora a.uzh:before {
     display: inline-block;
-    background: url(http://www.wcmstest.uzh.ch/terrific/76/assets/img/sprite/sprite.png?20150331135517) no-repeat 0 0;
     background-position: -14px -99px;
     width: 10px;
     height: 13px;
@@ -4348,8 +4346,6 @@ body {
  * -------------------------- */
 @font-face {
   font-family: 'FontAwesome';
-  src: url('assets/fonts/fontawesome-webfont.eot?v=4.7.0');
-  src: url('assets/fonts/fontawesome-webfont.eot?#iefix&v=4.7.0') format('embedded-opentype'), url('assets/fonts/fontawesome-webfont.woff2?v=4.7.0') format('woff2'), url('assets/fonts/fontawesome-webfont.woff?v=4.7.0') format('woff'), url('assets/fonts/fontawesome-webfont.ttf?v=4.7.0') format('truetype'), url('assets/fonts/fontawesome-webfont.svg?v=4.7.0#fontawesomeregular') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -7030,7 +7026,6 @@ body {
   margin-top: 0;
 }
 .comp-slideshow a.uzh {
-  background: transparent url('assets/img/arrow-right.png') 0 0 no-repeat;
   display: block;
   line-height: initial;
 }
@@ -9227,7 +9222,6 @@ body {
 .skin-text-basics a.www {
   padding-left: 13px;
   padding-right: 2px;
-  background: transparent url(assets/img/sprite/icon/arrow-up-right.png) 0 0 no-repeat;
 }
 .skin-text-basics a[href^="/"],
 .skin-text-basics a[href*="uzh.ch"],
@@ -9279,7 +9273,6 @@ body {
   }
   .skin-text-basics a[href^="http"],
   .skin-text-basics a.www {
-    background-image: url(assets/img/sprite/icon/arrow-up-right-print.png);
   }
   .skin-text-basics a[href^="/"],
   .skin-text-basics a[href*="uzh.ch"],
@@ -9288,11 +9281,9 @@ body {
   .skin-text-basics a.uzh,
   .skin-text-basics a.internal,
   .skin-text-basics a[href^="#"] {
-    background-image: url(assets/img/sprite/icon/arrow-right-print.png);
   }
   .skin-text-basics a[href*="/dam/"],
   .skin-text-basics a.download {
-    background-image: url(assets/img/sprite/icon/arrow-down-print.png);
   }
   .skin-text-basics a:visited {
     color: #000000;
