@@ -274,7 +274,7 @@ def save_studyprograms_for_module(module_id: int, studyprograms: list):
             # thus, you can find the studyprogam using the values, and grab the id.
             cursor.execute("SELECT id FROM studyprogram WHERE CgHighText = ? AND CgHighCategory = ?", val1)
             for row in cursor:
-                print("studyprogram_id = cursor.lastrowid did not work", row)
+                print("duplicate studyprogram?: studyprogram_id = cursor.lastrowid did not work, potential match id in db: ", row[0])
                 studyprogram_id = row[0]
         cnx.commit()
 
