@@ -30,7 +30,7 @@ class Module:
         #     self.SmObjId, self.PiqYear, self.PiqSession)
         # use new URI structure:
         # SmDetailsSet(SmObjId='51223451',PiqYear='2024',PiqSession='003')?sap-client=001&$expand=Partof,Organizations,Responsible,Events,Events/Persons,OfferPeriods
-        rURI = f"{Globals.URI_prefix_details}/SmDetailsSet(SmObjId='{self.SmObjId}',PiqYear='{self.PiqYear}',PiqSession='{self.PiqSession}')?sap-client=001&$expand=Partof,Organizations,Responsible,Events,Events/Persons,OfferPeriods$&$format=json"
+        rURI = f"{Globals.URI_prefix_details}/SmDetailsSet(SmObjId='{self.SmObjId}',PiqYear='{self.PiqYear}',PiqSession='{self.PiqSession}')?sap-client=001&$expand=Partof,Organizations,Responsible,Events,Events/Persons,OfferPeriods&$format=json"
         r = requests.get(rURI)
         try:
             # if the module does not exist, raise HTTP error 404
