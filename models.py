@@ -6,7 +6,8 @@ from dateutil.relativedelta import relativedelta
 import helpers
 
 class Globals():
-    URI_prefix = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv"
+    URI_prefix_details = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv"
+    URI_prefix = "https://studentservices.uzh.ch/sap/opu/zodatav4/sap/zcm_vvz_v4_ui/srvd/sap/zsb_vvz/0001"
 
 class Module:
     """ Class to hold Module logic and data. Hardly used to full potential, could rework to use more of this."""
@@ -24,10 +25,12 @@ class Module:
     def find_module_values(self) -> dict:
         """Check if module with given SmObjId and session data exists in course catalogue, get values if it does"""
         # Details page for module
-        rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmDetailsSet(SmObjId='{0}',PiqYear='{1}'," \
-               "PiqSession='{2}')?$expand=Partof,Organizations,Responsible,Events,Events/Persons,OfferPeriods&$format=json".format(
-            self.SmObjId, self.PiqYear, self.PiqSession)
-
+        # rURI = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv/SmDetailsSet(SmObjId='{0}',PiqYear='{1}'," \
+        #        "PiqSession='{2}')?$expand=Partof,Organizations,Responsible,Events,Events/Persons,OfferPeriods&$format=json".format(
+        #     self.SmObjId, self.PiqYear, self.PiqSession)
+        # use new URI structure:
+        # SmDetailsSet(SmObjId='51223451',PiqYear='2024',PiqSession='003')?sap-client=001&$expand=Partof,Organizations,Responsible,Events,Events/Persons,OfferPeriods
+        rURI = f"{Globals.URI_prefix_details}/SmDetailsSet(SmObjId='{self.SmObjId}',PiqYear='{self.PiqYear}',PiqSession='{self.PiqSession}')?sap-client=001&$expand=Partof,Organizations,Responsible,Events,Events/Persons,OfferPeriods$&$format=json"
         r = requests.get(rURI)
         try:
             # if the module does not exist, raise HTTP error 404

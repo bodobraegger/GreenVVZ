@@ -34,6 +34,9 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 # get SECRET_KEY from environment
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'secret')
+# dotenv integration
+from dotenv import load_dotenv
+load_dotenv()
 # Database config from environment.
 db_config = {
     'user': os.environ.get('DB_USER', 'test'),
@@ -442,28 +445,32 @@ def search(year: int, session: int):
     # get results for all searchterms
     modules = []
     for searchterm in terms:
-        if "&" in searchterm:
-            temp_searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
-            modFilter = ' or '.join(temp_searchterms)
-        else:
-            modFilter = f"substringof('{searchterm}',Seark)"
+        # new API has no or search
+        # if "&" in searchterm:
+        #     temp_searchterms = ["substringof('{0}',Seark)".format(t.strip()) for t in searchterm.split("&")]
+        #     modFilter = ' or '.join(temp_searchterms)
+        # else:
+        #     modFilter = f"substringof('{searchterm}',Seark)"
 
         next_results = 100
         processed_results = 0
         total_results = next_results
         while(processed_results < total_results):
             total_results = -1
-            rURI = f"{models.Globals.URI_prefix}/SmSearchSet?$skip={processed_results}&$top={next_results}&$orderby=SmStext asc&$filter=({modFilter}) and PiqYear eq '{year}' and PiqSession eq '{str(session).zfill(3)}'&$inlinecount=allpages&$format=json"
+            # rURI = f"{models.Globals.URI_prefix}/SmSearchSet?$skip={processed_results}&$top={next_results}&$orderby=SmStext asc&$filter=({modFilter}) and PiqYear eq '{year}' and PiqSession eq '{str(session).zfill(3)}'&$inlinecount=allpages&$format=json"
+            # use new URI structure:
+            # SMSearch?$count=true&$search="green"&$select=ObjectAbbreviation,ObjectNameText,OShortText,Points,CategoryText&$orderby=ObjectNameTextSort&$filter=AcademicYear eq '2024' and AcademicPeriod eq '003' and Points ge 0 and Points le 1000&$skip=0&$top=100
+            rURI = f"{models.Globals.URI_prefix}/SMSearch?$count=true&$search={searchterm}&$select=ObjectAbbreviation,ObjectNameText,OShortText,Points,CategoryText&$orderby=ObjectNameTextSort&$filter=AcademicYear eq '{year}' and AcademicPeriod eq '{str(session).zfill(3)}' and Points ge 0 and Points le 1000&$skip={processed_results}&$top={next_results}"
             try:
                 r = requests.get(rURI)
-                total_results = int(r.json()['d']['__count'])
+                total_results = int(r.json()["@odata.count"])
 
-                for module in r.json()['d']['results']:
+                for module in r.json()["value"]:
                     modules.append({
-                        'SmObjId':    int(module['Objid']),
-                        'title':          module['SmStext'],
-                        'PiqYear':    int(module['PiqYear']),
-                        'PiqSession': int(module['PiqSession']),
+                        'SmObjId':    int(module['ObjectId']),
+                        'title':          module['ObjectNameText'],
+                        'PiqYear':    int(module['AcademicYear']),
+                        'PiqSession': int(module['AcademicPeriod']),
                         'searchterm': searchterm,
                         'searchterm_id': terms_ids[searchterm],
                     })
@@ -556,17 +563,19 @@ def search_upwards(year: int, session: int):
         while(processed_results < total_results):
             total_results = -1
             rURI = f"{models.Globals.URI_prefix}/ESearchSet?$skip={processed_results}&$top={next_results}&$orderby=EStext asc&$filter=({modFilter}) and PiqYear eq '{year}' and PiqSession eq '{str(session).zfill(3)}'&$inlinecount=allpages&$format=json"
-            
+            # use new URI structure:
+            # ESearch?$count=true&$search="green"&$select=ETitelText,EObjectAbbreviation,EVNumber,RoomId,RoomText,ScheduleSummaryText,HasSchedule,DCategory,DCategoryText,Language,Lecturer&$orderby=ETitelTextSort&$filter=AcademicYear eq '2024' and AcademicPeriod eq '003'&$skip=0&$top=100 
+            rURI = f"{models.Globals.URI_prefix}/ESearch?$count=true&$search={searchterm}&$select=ETitelText,EObjectAbbreviation,EVNumber,RoomId,RoomText,ScheduleSummaryText,HasSchedule,DCategory,DCategoryText,Language,Lecturer&$orderby=ETitelTextSort&$filter=AcademicYear eq '{year}' and AcademicPeriod eq '{str(session).zfill(3)}'&$skip={processed_results}&$top={next_results}"
             try:
                 r = requests.get(rURI)
-                total_results = int(r.json()['d']['__count'])
+                total_results = int(r.json()["@odata.count"])
                 
-                for course in r.json()['d']['results']:
+                for course in r.json()["value"]:
                     courses.append({
-                        'EObjId':     int(course['Objid']),
-                        'EStext':         course['EStext'],
-                        'PiqYear':    int(course['PiqYear']),
-                        'PiqSession': int(course['PiqSession']),
+                        'EObjId':     int(course['ObjectId']),
+                        'EStext':         course['ETitelText'],
+                        'PiqYear':    int(course['AcademicYear']),
+                        'PiqSession': int(course['AcademicPeriod']),
                         'searchterm': searchterm,
                         'searchterm_id': terms_ids[searchterm],
                     })
@@ -598,11 +607,13 @@ def find_modules_for_course(course: dict):
     Request detail page for course object, add Module subobjects(dicts) as list to given course object 
     """
     course['Modules'] = []
-    rURI = models.Globals.URI_prefix+"/EDetailsSet(EObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links&$format=json".format(
-        course.get('EObjId'), course.get('PiqYear'), course.get('PiqSession')) #named params with **dict
+    # rURI = models.Globals.URI_prefix+"/EDetailsSet(EObjId='{}',PiqYear='{}',PiqSession='{}')?$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links&$format=json".format(
+    #     course.get('EObjId'), course.get('PiqYear'), course.get('PiqSession')) #named params with **dict
+    # use new URI structure:
+    # EDetailsSet(EObjId='51225236',PiqYear='2024',PiqSession='003')?sap-client=001&$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links
+    rURI = f"{models.Globals.URI_prefix_details}/EDetailsSet(EObjId='{course.get('EObjId')}',PiqYear='{course.get('PiqYear')}',PiqSession='{course.get('PiqSession')}')?sap-client=001&$expand=Rooms,Persons,Schedule,Schedule/Rooms,Schedule/Persons,Modules,Links&$format=json"
     try:
         r = requests.get(rURI)
-
         # select each result of the 'Modules' subelement
         for module in r.json()['d']['Modules']['results']:
             course['Modules'].append({
