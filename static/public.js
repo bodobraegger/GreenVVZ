@@ -1,6 +1,4 @@
-/* REQUIRES admin.js TO BE LOADED BEFOREHAND, FOR apiUrl, baseUrlVvzUzh and ShowSelectedModules() */
-// apiUrl = 'https://vvz.ifi.uzh.ch';
-// if(use_local_api==true) { apiUrl = 'http://127.0.0.1:5000' };
+/* REQUIRES admin.js TO BE LOADED BEFOREHAND, FOR api_url, baseUrlVvzUzh and ShowSelectedModules() */
 $(document).ready(function () {
     lang=getUrlParam('lang');
     // if a data-lang tag exists
@@ -27,8 +25,8 @@ $(document).ready(function () {
     }
     // load the whitelist elements into the page, using the anchor-public div
     $.ajax({
-        // apiUrl is defined in admin.js
-        url : apiUrl+"/modules/whitelist",
+        // api_url is defined in admin.js
+        url : api_url+"/modules/whitelist",
         method : 'GET',
         beforeSend : function() {
             // change the semester selector language

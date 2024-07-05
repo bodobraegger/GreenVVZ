@@ -1,8 +1,3 @@
-// GLOBAL VARIABLES DEFINITIONS: used across public.js and filter.js
-secret_key = $('#anchor-admin').data('api-key') || $('#anchor-admin-2').data('api-key')
-use_local_api = $('#anchor-admin').data('use-local-api')
-apiUrl = 'https://vvz.ifi.uzh.ch';
-if(use_local_api==true) { apiUrl = 'http://127.0.0.1:5000' };
 // initializatin of global vars for sp_idlist and sp_textlist
 baseUrlVvzUzh = 'https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/'
 var studyprogram_idlist = []
@@ -21,7 +16,7 @@ var studyprogram_textlist = []
 async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitelisted, searchterm, searchterm_id) {
     await $.ajax({
         contentType: 'application/json',
-        url: `${apiUrl}/modules?key=${secret_key}`,
+        url: `${api_url}/modules?key=${secret_key}`,
         method : 'POST',
         data: JSON.stringify({
             'PiqYear': PiqYear,
@@ -53,7 +48,7 @@ async function post_module_to_db(module_id, SmObjId, PiqYear, PiqSession, whitel
  */
 async function update_whitelist_status(module_id, whitelisted) {
     await $.ajax({
-        url: `${apiUrl}/modules/${module_id}?whitelisted=${whitelisted}&key=${secret_key}`,
+        url: `${api_url}/modules/${module_id}?whitelisted=${whitelisted}&key=${secret_key}`,
         method : 'PUT',
         success : function (data) {
             var SmObjId = $(`#module_${module_id}`).data('smobjid');
@@ -78,7 +73,7 @@ async function save_searchterm(){
         return;
     }
     await $.ajax({
-        url :  apiUrl+'/searchterms?key='+secret_key,
+        url :  api_url+'/searchterms?key='+secret_key,
         method : 'POST',
         dataType : 'json',
         data : {'term':term},
@@ -103,7 +98,7 @@ async function update_searchterm(id){
         return;
     }
     await $.ajax({
-        url :  `${apiUrl}/searchterms/${id}?key=${secret_key}`,
+        url :  `${api_url}/searchterms/${id}?key=${secret_key}`,
         method : 'PUT',
         dataType : 'json',
         data : {'term':term},
@@ -124,7 +119,7 @@ async function update_searchterm(id){
  */
 async function delete_searchterm(id){
     await $.ajax({
-        url: apiUrl+'/searchterms/'+id+'?key='+secret_key,
+        url: api_url+'/searchterms/'+id+'?key='+secret_key,
         method : 'DELETE',
         success : function (data) {
             remove_from_searchterms(id);
@@ -167,7 +162,7 @@ async function save_module(){
  */
 async function delete_blacklisted_module(module_id){
     await $.ajax({
-        url: `${apiUrl}/modules/${module_id}?key=${secret_key}`,
+        url: `${api_url}/modules/${module_id}?key=${secret_key}`,
         method : 'DELETE',
         success : function (data) {
             var SmObjId = $(`#module_${module_id}`).data('smobjid');
@@ -338,7 +333,7 @@ function add_to_searchterms(id, term){
 async function populate_searchterms(){
     var searchterms = $('#searchterms_body')
     await $.ajax({
-        url: apiUrl+'/searchterms',
+        url: api_url+'/searchterms',
         method: 'GET',
         success: function (data) {
             searchterms.empty()
@@ -362,7 +357,7 @@ async function populate_searchterms(){
 async function populate_whitelist(){
     var whitelist = $('#whitelist_body')
     await $.ajax({
-        url: apiUrl+'/modules/whitelist',
+        url: api_url+'/modules/whitelist',
         method : 'GET',
         beforeSend: function () { 
             // show loading indicators
@@ -401,7 +396,7 @@ async function populate_whitelist(){
 async function populate_blacklist(){
     var blacklist = $('#blacklist_body');
     await $.ajax({
-        url: apiUrl+'/modules/blacklist',
+        url: api_url+'/modules/blacklist',
         method : 'GET',             // show loading screen
         beforeSend: function () {
             $('#blacklist').find('div.loading-overlay').toggle(); 
@@ -439,7 +434,7 @@ async function populate_suggestions(){
     let year_semester = $("option:selected").val().split(" ");
     if (year_semester[0] == "all_years") { year_semester = $(".current_semester").val().split(" ") }
     await $.ajax({
-        url: `${apiUrl}/search/${year_semester[0]}/${year_semester[1]}`,
+        url: `${api_url}/search/${year_semester[0]}/${year_semester[1]}`,
         method : 'GET',
         beforeSend: function () {
             $('#suggestions').find('div.loading-overlay').toggle();
@@ -510,7 +505,7 @@ async function populate_studyprograms() {
     var previous_placeholder = $('#studyprogram_input').attr("placeholder")
     // get studyprograms id list and text list 
     await $.ajax({
-        url: apiUrl+'/studyprograms',
+        url: api_url+'/studyprograms',
         method : 'GET',
         data: {
             'PiqYear': PiqYear,
@@ -535,7 +530,7 @@ async function populate_studyprograms() {
 
     // get studyprogram_id : [module_ids] dictionary
     await $.ajax({
-        url: apiUrl+'/studyprograms_modules',
+        url: api_url+'/studyprograms_modules',
         method : 'GET',
         success : function (data) {
             studyprogramid_moduleids = data;
@@ -595,7 +590,7 @@ function convert_session_to_string(session, year){
  */
 async function updateModules() {
     await $.ajax({
-        url: apiUrl+'/update',
+        url: api_url+'/update',
         method : 'GET',
         beforeSend: function () {
             // generate and add alert box to DOM
