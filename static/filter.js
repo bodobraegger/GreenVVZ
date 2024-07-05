@@ -86,6 +86,7 @@ function ClearStudyProgramFilter() {
  * and if necessary, searching only from beginning of result (commented out)
  */
 function monkeyPatchAutocomplete() {
+    if(lang==undefined) var lang = "de";
     if(lang=="en") {
         var more_weitere = "more"
         var further_modules_msg = "study programs for modules in the chosen semester"

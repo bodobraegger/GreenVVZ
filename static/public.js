@@ -101,4 +101,5 @@ function getUrlParam(name){
     if(results) {
         return results[1]
     }
+    return 'de'
 }
