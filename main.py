@@ -25,7 +25,7 @@ import models
 import updateModules
 import helpers
 
-import pyodata
+# import pyodata
 
 # Initialize flask app
 app = Flask(__name__, static_url_path='/static')
@@ -34,6 +34,12 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 # get SECRET_KEY from environment
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'secret')
+app.config['DEBUG'] = os.environ.get('DEBUG', True)
+# custom
+app.config['API_URL'] = os.environ.get('API_URL', 'http://localhost:5000')
+
+print(f"{app.config=}")
+
 # dotenv integration
 from dotenv import load_dotenv
 load_dotenv()
@@ -44,10 +50,9 @@ db_config = {
     'host': '127.0.0.1',
     'database': os.environ.get('DB_NAME', 'testdb'),
 }
-if not os.environ.get('DB_NAME'):
-    import sqlite3
-    db_config = {'database': 'db.sqlite'}
-    mysql.connector.connect = sqlite3.connect
+print(f"{db_config=}")
+
+
 def get_cnx_and_cursor():
     cnx = mysql.connector.connect(**db_config)
     if 'sqlite' in db_config['database']:
@@ -56,6 +61,20 @@ def get_cnx_and_cursor():
     else:
         cursor = cnx.cursor(dictionary=True, buffered=True)
     return cnx, cursor
+
+
+if not os.environ.get('DB_NAME'):
+    import sqlite3
+    db_config = {'database': 'db.sqlite'}
+    mysql.connector.connect = sqlite3.connect
+    if not os.path.isfile('db.sqlite'):
+        print("no db.sqlite file found, creating new one")
+        cnx, cursor = get_cnx_and_cursor()
+        with open('tables_creation.sql', 'r') as f:
+            cursor.executescript(f.read())
+        cnx.commit()
+        cnx.close()
+
 
 def require_appkey(view_function):
     """ decorator for checking the api-key, making unauthorized requests impossible """
@@ -94,11 +113,10 @@ def admin():
     studyprograms = {0: "Theologie: Vollstudienfach 120"}
     studyprogramid_moduleids = {0: [2]}
     secret_key = app.config['SECRET_KEY']
-    use_local_api = os.environ.get('USE_LOCAL_API', "False")
 
     return render_template('admin.html', **{
         'secret_key': secret_key,
-        'use_local_api': use_local_api,
+        'api_url': app.config['API_URL'],
         # for filter-selectors.html include
         'sessions': helpers.get_current_sessions(),
             # optional, for local testing:
@@ -114,8 +132,6 @@ def public():
     # for local testing
     studyprograms = {0: "Theologie: Vollstudienfach 120"}
     studyprogramid_moduleids = {0: [2]}
-    secret_key = app.config['SECRET_KEY']
-    use_local_api = os.environ.get('USE_LOCAL_API', "False")
 
     try:
         studyprograms = get_studyprograms().get_data(as_text=True)
@@ -124,8 +140,8 @@ def public():
         print("not possible in dev", e)
 
     return render_template('public.html', **{
-        'secret_key': secret_key,
-        'use_local_api': use_local_api,
+        'secret_key': app.config['SECRET_KEY'],
+        'api_url': app.config['API_URL'],
         # for filter-selectors.html
         'sessions': helpers.get_current_sessions(),
             # optional, for local testing:
