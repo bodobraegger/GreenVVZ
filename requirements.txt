@@ -13,4 +13,5 @@ requests
 six
 urllib3
 Werkzeug
-sqlite3
+# pyodata
+python-dotenv
