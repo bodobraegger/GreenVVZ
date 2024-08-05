@@ -1,7 +1,8 @@
-import collections
 from datetime import date
 from dateutil.relativedelta import relativedelta
-import re
+import os
+import mysql.connector
+import sqlite3
 
 def get_session(ref_date = date.today(), target_date = None, padded=True) -> dict:
     """
@@ -40,7 +41,38 @@ def get_next_session(ref_year, ref_sem) -> dict:
     year = ref_year if ref_sem == 3 else ref_year+1
     return {'year': year, 'session': semester}
 
-
 def current_year() -> int:
     """ returns current year as int """
     return date.today().year
+
+
+### DB helpers
+# Database config from environment.
+db_config = {
+    'user': os.environ.get('DB_USER', 'test'),
+    'password': os.environ.get('DB_PASSWORD', 'testpw'),
+    'host': '127.0.0.1',
+    'database': os.environ.get('DB_NAME', 'testdb'),
+}
+if not os.environ.get('DB_NAME'):
+    import sqlite3
+    db_config = {'database': 'db.sqlite'}
+    mysql.connector.connect = sqlite3.connect
+    if not os.path.isfile('db.sqlite'):
+        print("no db.sqlite file found, creating new one")
+        cnx, cursor = get_cnx_and_cursor()
+        with open('tables_creation.sql', 'r') as f:
+            cursor.executescript(f.read())
+        cnx.commit()
+        cnx.close()
+print(f"{db_config=}")
+
+def get_cnx_and_cursor():
+    cnx = mysql.connector.connect(**db_config)
+    if 'sqlite' in db_config['database']:
+        cnx.row_factory = sqlite3.Row
+        cursor = cnx.cursor()
+    else:
+        cursor = cnx.cursor(dictionary=True, buffered=True)
+    return cnx, cursor
+

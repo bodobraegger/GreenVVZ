@@ -1,33 +1,12 @@
 #!/usr/bin/python
 # coding=utf8
-import os
 import mysql.connector
-from requests.models import HTTPError 
 import models
 import helpers
-import main
-
-db_config = {
-    'user': os.environ.get('DB_USER', 'test'),
-    'password': os.environ.get('DB_PASSWORD', 'testpw'),
-    'host': '127.0.0.1',
-    'database': os.environ.get('DB_NAME', 'testdb'),
-}
-if not os.environ.get('DB_NAME'):
-    import sqlite3
-    db_config = {'database': 'db.sqlite'}
-    mysql.connector.connect = sqlite3.connect
-
 
 def update_modules() -> bool:
     """ For each saved module, check if it still exists and/or changed, match in DB, delete too old ones"""
-    cnx = mysql.connector.connect(**db_config)
-    if 'sqlite' in db_config['database']:
-        cnx.row_factory = sqlite3.Row
-        cursor = cnx.cursor()
-    else:
-        cursor = cnx.cursor(dictionary=True)
-    cursor = cnx.cursor()
+    cnx, cursor = helpers.get_cnx_and_cursor()
     current_sessions = helpers.get_current_sessions(padded=False)
     # delete modules of semester no longer relevant (as defined by the default num_prev_semesters+1, or len(helpers.get_current_sessions())-2 +1
     no_longer_relevant_session = helpers.get_current_sessions(len(current_sessions)-1, padded=False)[-1]

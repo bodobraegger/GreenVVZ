@@ -3,7 +3,6 @@
 import os
 import sys
 import mysql.connector
-from datetime import date
 from functools import wraps
 import requests
 import time
@@ -16,16 +15,10 @@ from flask import Flask, json, jsonify, request, abort, render_template
 # flask_cors extension for handling CORS, making corss-origin AJAX possible.
 from flask_cors import CORS, cross_origin
 
-# python-dateutil lib
-from dateutil.relativedelta import relativedelta
-
-
 # this codebase
 import models
 import updateModules
 import helpers
-
-# import pyodata
 
 # Initialize flask app
 app = Flask(__name__, static_url_path='/static')
@@ -45,37 +38,7 @@ print(f"{app.config=}")
 # dotenv integration
 from dotenv import load_dotenv
 load_dotenv()
-# Database config from environment.
-db_config = {
-    'user': os.environ.get('DB_USER', 'test'),
-    'password': os.environ.get('DB_PASSWORD', 'testpw'),
-    'host': '127.0.0.1',
-    'database': os.environ.get('DB_NAME', 'testdb'),
-}
-print(f"{db_config=}")
 
-
-def get_cnx_and_cursor():
-    cnx = mysql.connector.connect(**db_config)
-    if 'sqlite' in db_config['database']:
-        cnx.row_factory = sqlite3.Row
-        cursor = cnx.cursor()
-    else:
-        cursor = cnx.cursor(dictionary=True, buffered=True)
-    return cnx, cursor
-
-
-if not os.environ.get('DB_NAME'):
-    import sqlite3
-    db_config = {'database': 'db.sqlite'}
-    mysql.connector.connect = sqlite3.connect
-    if not os.path.isfile('db.sqlite'):
-        print("no db.sqlite file found, creating new one")
-        cnx, cursor = get_cnx_and_cursor()
-        with open('tables_creation.sql', 'r') as f:
-            cursor.executescript(f.read())
-        cnx.commit()
-        cnx.close()
 
 
 def require_appkey(view_function):
@@ -169,7 +132,7 @@ def update():
 def get_modules(whitelisted: bool):
     """ Get modules saved in the database, either blacklisted or whitelisted, as JSON response """
     modules = []
-    cnx, cursor = get_cnx_and_cursor()
+    cnx, cursor = helpers.get_cnx_and_cursor()
     
     current_searchterms = [t.get('term') for t in json.loads(get_searchterms(with_deleted=False).get_data())]
 
@@ -177,7 +140,7 @@ def get_modules(whitelisted: bool):
         "SELECT * FROM module as m WHERE whitelisted = {whitelisted} ORDER BY title ASC".format(whitelisted=whitelisted))
     cursor.execute(qry)
     for module in cursor:
-        if 'sqlite' in db_config['database']:
+        if 'sqlite' in helpers.db_config['database']:
             module = dict(zip(module.keys(), module))
         for column, value in module.items():
             if type(value) is bytearray:
@@ -231,7 +194,7 @@ def save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm, searchter
         module_id = 0
         try:
             # try to save into database
-            cnx, cursor = get_cnx_and_cursor()
+            cnx, cursor = helpers.get_cnx_and_cursor()
             qry = "REPLACE INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id) VALUES (?, ?, ?, ?, ?, ?, ?)"
             module_values['whitelisted'] = whitelisted
             module_values['searchterm'] = searchterm
@@ -260,7 +223,7 @@ def save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm, searchter
 def save_studyprograms_for_module(module_id: int, studyprograms: list):
     """ Save studyprogams for module in database, establish relationship"""
     # print('deleting studyprogams', studyprograms, 'for module', module_id)
-    cnx, cursor = get_cnx_and_cursor()
+    cnx, cursor = helpers.get_cnx_and_cursor()
     studyprogram_id = 0
     for sp in studyprograms:
         cursor = cnx.cursor()
@@ -291,7 +254,7 @@ def save_studyprograms_for_module(module_id: int, studyprograms: list):
 def flag_module(module_id: int):
     """ Flag saved module as whitelisted or blacklisted, depending on request.args.get('whitelisted')"""
     whitelisted = int(request.args.get('whitelisted'))
-    cnx, cursor = get_cnx_and_cursor()
+    cnx, cursor = helpers.get_cnx_and_cursor()
     # flag module as either black or whitelisted.
     try:
         cursor.execute("UPDATE module SET whitelisted = {} WHERE id = {}".format(whitelisted, module_id))
@@ -319,7 +282,7 @@ def remove_module(module_id: int):
     """ remove module from database by id """
     try:
         val = {'module_id': module_id}
-        cnx, cursor = get_cnx_and_cursor()
+        cnx, cursor = helpers.get_cnx_and_cursor()
         qry = "DELETE FROM module WHERE id = ?"
         cursor.execute(qry, tuple(val.values()))
     except mysql.connector.Error as err:
@@ -335,13 +298,13 @@ def remove_module(module_id: int):
 def get_searchterms(with_deleted=False):
     """ get all search terms from DB """
     terms = []
-    cnx, cursor = get_cnx_and_cursor()
+    cnx, cursor = helpers.get_cnx_and_cursor()
     qry = (
         "SELECT id, term FROM searchterm ORDER BY term ASC")
     cursor.execute(qry)
     # decode encoded strings to make them human readable
     for row in cursor.fetchall():
-        if 'sqlite' in db_config['database']:
+        if 'sqlite' in helpers.db_config['database']:
             row = dict(zip(row.keys(), row))
         for column, value in row.items():
             if type(value) is bytearray:
@@ -359,7 +322,7 @@ def get_searchterms(with_deleted=False):
         )
         cursor.execute(qry)
         for row in cursor.fetchall():
-            if 'sqlite' in db_config['database']:
+            if 'sqlite' in helpers.db_config['database']:
                 row = dict(zip(row.keys(), row))
             for column, value in row.items():
                 if type(value) is bytearray:
@@ -379,7 +342,7 @@ def get_searchterms(with_deleted=False):
 @require_appkey
 def add_searchterm():
     """ Add searchterm to DB, term is supplied in form data """
-    cnx, cursor = get_cnx_and_cursor()
+    cnx, cursor = helpers.get_cnx_and_cursor()
     data = request.form
     term = data['term']
     qry = "INSERT OR IGNORE INTO searchterm (term) VALUES ( ? )"
@@ -398,7 +361,7 @@ def add_searchterm():
 @require_appkey
 def update_searchterm(searchterm_id: int):
     """ Update searchterm in DB, term is supplied in form data """
-    cnx, cursor = get_cnx_and_cursor()
+    cnx, cursor = helpers.get_cnx_and_cursor()
     term = request.values.to_dict()['term']
     qry = "UPDATE searchterm SET term = ? WHERE id = ?"
     try:
@@ -415,7 +378,7 @@ def update_searchterm(searchterm_id: int):
 @require_appkey
 def remove_searchterm(searchterm_id: int):
     """ remove searchterm from DB via id """
-    cnx, cursor = get_cnx_and_cursor()
+    cnx, cursor = helpers.get_cnx_and_cursor()
     cursor = cnx.cursor()
     qry = "DELETE FROM searchterm WHERE id = ?"
     try:
@@ -439,7 +402,7 @@ def search(year: int, session: int):
     terms_ids = {}
     id_not_currently_in_use = 999
     try:
-        cnx, cursor = get_cnx_and_cursor()
+        cnx, cursor = helpers.get_cnx_and_cursor()
         cursor.execute("SELECT term, id FROM searchterm")
         for row in cursor:
             terms.append(row['term'])
@@ -526,7 +489,7 @@ def check_which_saved(modules: list):
     try:
         # flag elements that are already in database
         saved_modules = {}
-        cnx, cursor = get_cnx_and_cursor()
+        cnx, cursor = helpers.get_cnx_and_cursor()
         cursor.execute("SELECT SmObjId, PiqYear, PiqSession, whitelisted FROM module")
         for row in cursor:
             saved_modules[(row['SmObjId'], row['PiqYear'], row['PiqSession'])]=row['whitelisted']
@@ -553,7 +516,7 @@ def search_upwards(year: int, session: int):
     terms = []
     terms_ids = {}
     try:
-        cnx, cursor = get_cnx_and_cursor()
+        cnx, cursor = helpers.get_cnx_and_cursor()
         cursor.execute("SELECT term, id FROM searchterm")
         for row in cursor:
             terms.append(row['term'])
@@ -654,7 +617,7 @@ def get_studyprograms():
     """ Get distinct studyprograms associated with modules in the whitelist """
     studyprogram_idlist = []
     studyprogram_textlist = []
-    cnx, cursor = get_cnx_and_cursor()
+    cnx, cursor = helpers.get_cnx_and_cursor()
     # Select all studyprograms for modules on the whitelist
     qry_p1 = """
     SELECT DISTINCT s.* 
@@ -666,7 +629,7 @@ def get_studyprograms():
     qry_p2 = " AND m.PiqYear = {} AND m.PiqSession = {}".format(request.args.get('PiqYear'), request.args.get('PiqSession')) if request.args.get('PiqSession', 'all_semesters') != "all_semesters" else ""
     cursor.execute(qry_p1+qry_p2+" ORDER BY s.CgHighText, s.CgHighCategory;")
     for row in cursor:
-        if 'sqlite' in db_config['database']:
+        if 'sqlite' in helpers.db_config['database']:
             row = dict(zip(row.keys(), row))
         for column, value in row.items():
             if type(value) is bytearray:
@@ -682,10 +645,10 @@ def get_studyprograms_modules():
     """ Get Module-Studyprogramids assocations as a dictionary """
     studyprogramid_moduleids = {}
     try: 
-        cnx, cursor = get_cnx_and_cursor()
+        cnx, cursor = helpers.get_cnx_and_cursor()
         cursor.execute("SELECT * FROM module_studyprogram AS m_s INNER JOIN module AS m WHERE m_s.module_id = m.id AND whitelisted = 1;")
         for row in cursor:
-            if 'sqlite' in db_config['database']:
+            if 'sqlite' in helpers.db_config['database']:
                 row = dict(zip(row.keys(), row))
             for column, value in row.items():
                 if type(value) is bytearray:
