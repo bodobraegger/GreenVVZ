@@ -27,8 +27,6 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 # get SECRET_KEY from environment
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'secret')
-app.config['DEBUG'] = os.environ.get('DEBUG', True)
-app.config['ENV'] = os.environ.get('ENV', 'development')
 
 # custom
 app.config['API_URL'] = os.environ.get('API_URL', 'http://localhost:5000')
