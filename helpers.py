@@ -79,3 +79,58 @@ if not os.environ.get('DB_NAME'):
         cnx.commit()
         cnx.close()
 print(f"{db_config=}")
+
+def save_module_to_db(module_values: dict):
+    # safety
+    module_id = 0
+    try:
+        # try to save into database
+        cnx, cursor = get_cnx_and_cursor()
+        qry = "REPLACE INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+
+        study_programs = module_values.pop('Partof')
+        cursor.execute(qry, tuple(module_values.values()))
+        module_id = cursor.lastrowid
+        if module_id == 0:
+            cursor.execute("SELECT id FROM module WHERE SmObjId = %s AND PiqYear = %s AND PiqSession = %s", tuple(module_values.values()))
+            for row in cursor:
+                print("module_id = cursor.lastrowid did not work", row)
+                module_id = row[0]
+        cnx.commit()
+        cursor.close()
+
+        # if a module is to be saved, find the corresponding studyprograms and save them too
+        save_studyprograms_for_module(module_id, study_programs)
+        cnx.close()
+        return module_values
+    except mysql.connector.Error as err:
+        return "Error: {}\nfor module {}".format(err, module_id), 409
+
+
+def save_studyprograms_for_module(module_id: int, studyprograms: list):
+    """ Save studyprogams for module in database, establish relationship"""
+    # print('deleting studyprogams', studyprograms, 'for module', module_id)
+    cnx, cursor = get_cnx_and_cursor()
+    studyprogram_id = 0
+    for sp in studyprograms:
+        cursor = cnx.cursor()
+        qry1 = "REPLACE INTO studyprogram (CgHighText, CgHighCategory) VALUES (%s, %s)"
+        val1 = (sp['CgHighText'], sp['CgHighCategory'])
+
+        cursor.execute(qry1, val1)
+        studyprogram_id = cursor.lastrowid
+        # if the study_program == 0, the insert failed (likely, because the studyprogram already exists)
+        if studyprogram_id == 0:
+            # thus, you can find the studyprogam using the values, and grab the id.
+            cursor.execute("SELECT id FROM studyprogram WHERE CgHighText = %s AND CgHighCategory = %s", val1)
+            for row in cursor:
+                print("duplicate studyprogram?: studyprogram_id = cursor.lastrowid did not work, potential match id in db: ", row[0])
+                studyprogram_id = row[0]
+        cnx.commit()
+
+        # insert entry in designated database, to match Many-To-Many relationship Modules-To-Studyprograms
+        qry2 = "REPLACE INTO module_studyprogram (module_id, studyprogram_id) VALUES (%s, %s)"
+        val2 = (module_id, studyprogram_id)
+        cursor.execute(qry2, val2)
+        cnx.commit()
+        cursor.close()

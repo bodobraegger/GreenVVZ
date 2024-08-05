@@ -62,19 +62,11 @@ def update_modules_from_session(cnx, session_to_poll_from, session_to_store_in):
         cursor.close()
         if result == None:
             next_values = mod.find_module_values()
-            print("next_values:", next_values)
             if(next_values != None):
                 print("FOUND:", next_values['title'], " --- whitelisted: ", row['whitelisted'])
                 # main.save_module(next_values['SmObjId'], next_values['PiqYear'], next_values['PiqSession'], row['whitelisted'],  row['searchterm'], row['searchterm_id'])
-                qry = "REPLACE INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id) VALUES (%s, %s, %s, %s, %s, %s, %s)"
                 next_values['whitelisted'] = row['whitelisted']
                 next_values['searchterm'] = row['searchterm']
                 next_values['searchterm_id'] = row['searchterm_id']
-                cursor = cnx.cursor(dictionary=True)
-                try:
-                    cursor.execute(qry, tuple(next_values.values()))
-                except mysql.connector.Error as err:
-                    print("Error: {}".format(err))
-                cnx.commit()
-                cursor.close()
+                helpers.save_module_to_db(next_values)
     cursor2.close()
