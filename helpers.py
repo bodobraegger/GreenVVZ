@@ -3,6 +3,10 @@ from dateutil.relativedelta import relativedelta
 import os
 import mysql.connector
 import sqlite3
+from dotenv import load_dotenv
+load_dotenv()
+print(os.environ.get('DB_USER'))
+
 
 def get_session(ref_date = date.today(), target_date = None, padded=True) -> dict:
     """
@@ -45,27 +49,14 @@ def current_year() -> int:
     """ returns current year as int """
     return date.today().year
 
-
 ### DB helpers
 # Database config from environment.
 db_config = {
     'user': os.environ.get('DB_USER', 'test'),
     'password': os.environ.get('DB_PASSWORD', 'testpw'),
-    'host': '127.0.0.1',
+    'host': os.environ.get('DB_HOST', 'localhost'),
     'database': os.environ.get('DB_NAME', 'testdb'),
 }
-if not os.environ.get('DB_NAME'):
-    import sqlite3
-    db_config = {'database': 'db.sqlite'}
-    mysql.connector.connect = sqlite3.connect
-    if not os.path.isfile('db.sqlite'):
-        print("no db.sqlite file found, creating new one")
-        cnx, cursor = get_cnx_and_cursor()
-        with open('tables_creation.sql', 'r') as f:
-            cursor.executescript(f.read())
-        cnx.commit()
-        cnx.close()
-print(f"{db_config=}")
 
 def get_cnx_and_cursor():
     cnx = mysql.connector.connect(**db_config)
@@ -76,3 +67,15 @@ def get_cnx_and_cursor():
         cursor = cnx.cursor(dictionary=True, buffered=True)
     return cnx, cursor
 
+if not os.environ.get('DB_NAME'):
+    import sqlite3
+    db_config = {'database': 'db.sqlite'}
+    mysql.connector.connect = sqlite3.connect
+    if not os.path.isfile('db.sqlite'):
+        print("no db.sqlite file found, creating new one")
+        cnx, cursor = get_cnx_and_cursor()
+        with open('tables_creation_sqlite.sql', 'r') as f:
+            cursor.executescript(f.read())
+        cnx.commit()
+        cnx.close()
+print(f"{db_config=}")

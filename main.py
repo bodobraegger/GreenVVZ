@@ -35,12 +35,6 @@ app.config['API_URL'] = os.environ.get('API_URL', 'http://localhost:5000')
 
 print(f"{app.config=}")
 
-# dotenv integration
-from dotenv import load_dotenv
-load_dotenv()
-
-
-
 def require_appkey(view_function):
     """ decorator for checking the api-key, making unauthorized requests impossible """
     @wraps(view_function)

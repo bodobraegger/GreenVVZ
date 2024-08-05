@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS module (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     SmObjId INT(8) NOT NULL, 
     PiqYear INT(4) NOT NULL,
     PiqSession INT(3) NOT NULL,
@@ -7,24 +7,24 @@ CREATE TABLE IF NOT EXISTS module (
     whitelisted BOOLEAN,
     searchterm TEXT,
     searchterm_id INT,
-    UNIQUE (SmObjId, PiqYear, PiqSession)
+    CONSTRAINT key_2 UNIQUE (SmObjId, PiqYear, PiqSession)
 );
 
 CREATE TABLE IF NOT EXISTS searchterm (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     term TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS studyprogram (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     CgHighText VARCHAR(255),
     CgHighCategory VARCHAR(255),
-    UNIQUE (CgHighText, CgHighCategory)
+    CONSTRAINT key_2 UNIQUE (CgHighText, CgHighCategory)
 );
 
 CREATE TABLE IF NOT EXISTS module_studyprogram (
-    module_id INT NOT NULL,
-    studyprogram_id INT NOT NULL,
+    module_id INT(8) NOT NULL,
+    studyprogram_id INT(8) NOT NULL,
     FOREIGN KEY (module_id) REFERENCES module (id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (studyprogram_id) REFERENCES studyprogram (id) ON DELETE CASCADE ON UPDATE CASCADE,
     PRIMARY KEY (module_id, studyprogram_id)
