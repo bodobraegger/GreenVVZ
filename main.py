@@ -189,7 +189,7 @@ def save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm, searchter
         try:
             # try to save into database
             cnx, cursor = helpers.get_cnx_and_cursor()
-            qry = "REPLACE INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id) VALUES (?, ?, ?, ?, ?, ?, ?)"
+            qry = "REPLACE INTO module (SmObjId, PiqYear, PiqSession, title, whitelisted, searchterm, searchterm_id) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             module_values['whitelisted'] = whitelisted
             module_values['searchterm'] = searchterm
             module_values['searchterm_id'] = searchterm_id
@@ -197,7 +197,7 @@ def save_module(SmObjId, PiqYear, PiqSession, whitelisted, searchterm, searchter
             cursor.execute(qry, tuple(module_values.values()))
             module_id = cursor.lastrowid
             if module_id == 0:
-                cursor.execute("SELECT id FROM module WHERE SmObjId = ? AND PiqYear = ? AND PiqSession = ?", tuple(module_values.values()))
+                cursor.execute("SELECT id FROM module WHERE SmObjId = %s AND PiqYear = %s AND PiqSession = %s", tuple(module_values.values()))
                 for row in cursor:
                     print("module_id = cursor.lastrowid did not work", row)
                     module_id = row[0]
@@ -221,7 +221,7 @@ def save_studyprograms_for_module(module_id: int, studyprograms: list):
     studyprogram_id = 0
     for sp in studyprograms:
         cursor = cnx.cursor()
-        qry1 = "INSERT OR IGNORE INTO studyprogram (CgHighText, CgHighCategory) VALUES (?, ?)"
+        qry1 = "REPLACE INTO studyprogram (CgHighText, CgHighCategory) VALUES (%s, %s)"
         val1 = (sp['CgHighText'], sp['CgHighCategory'])
 
         cursor.execute(qry1, val1)
@@ -229,14 +229,14 @@ def save_studyprograms_for_module(module_id: int, studyprograms: list):
         # if the study_program == 0, the insert failed (likely, because the studyprogram already exists)
         if studyprogram_id == 0:
             # thus, you can find the studyprogam using the values, and grab the id.
-            cursor.execute("SELECT id FROM studyprogram WHERE CgHighText = ? AND CgHighCategory = ?", val1)
+            cursor.execute("SELECT id FROM studyprogram WHERE CgHighText = %s AND CgHighCategory = %s", val1)
             for row in cursor:
                 print("duplicate studyprogram?: studyprogram_id = cursor.lastrowid did not work, potential match id in db: ", row[0])
                 studyprogram_id = row[0]
         cnx.commit()
 
         # insert entry in designated database, to match Many-To-Many relationship Modules-To-Studyprograms
-        qry2 = "INSERT OR IGNORE INTO module_studyprogram (module_id, studyprogram_id) VALUES (?, ?)"
+        qry2 = "REPLACE INTO module_studyprogram (module_id, studyprogram_id) VALUES (%s, %s)"
         val2 = (module_id, studyprogram_id)
         cursor.execute(qry2, val2)
         cnx.commit()
@@ -277,7 +277,7 @@ def remove_module(module_id: int):
     try:
         val = {'module_id': module_id}
         cnx, cursor = helpers.get_cnx_and_cursor()
-        qry = "DELETE FROM module WHERE id = ?"
+        qry = "DELETE FROM module WHERE id = %s"
         cursor.execute(qry, tuple(val.values()))
     except mysql.connector.Error as err:
         return "Error: {}".format(err), 500
@@ -339,7 +339,7 @@ def add_searchterm():
     cnx, cursor = helpers.get_cnx_and_cursor()
     data = request.form
     term = data['term']
-    qry = "INSERT OR IGNORE INTO searchterm (term) VALUES ( ? )"
+    qry = "REPLACE INTO searchterm (term) VALUES ( %s )"
     try:
         cursor.execute(qry, tuple([term]))
         id = cursor.lastrowid
@@ -357,7 +357,7 @@ def update_searchterm(searchterm_id: int):
     """ Update searchterm in DB, term is supplied in form data """
     cnx, cursor = helpers.get_cnx_and_cursor()
     term = request.values.to_dict()['term']
-    qry = "UPDATE searchterm SET term = ? WHERE id = ?"
+    qry = "UPDATE searchterm SET term = %s WHERE id = %s"
     try:
         cursor.execute(qry, tuple([term, searchterm_id]))
         cnx.commit()
@@ -374,7 +374,7 @@ def remove_searchterm(searchterm_id: int):
     """ remove searchterm from DB via id """
     cnx, cursor = helpers.get_cnx_and_cursor()
     cursor = cnx.cursor()
-    qry = "DELETE FROM searchterm WHERE id = ?"
+    qry = "DELETE FROM searchterm WHERE id = %s"
     try:
         cursor.execute(qry, tuple([searchterm_id]))
         cnx.commit()
