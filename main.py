@@ -353,17 +353,12 @@ def search(year: int, session: int):
 
         cursor.execute("SELECT MAX(id) FROM module")
         # to make sure that all modules have unique CSS ids, make smallest suggestion_module_id = max(module_id)+999
-        id_not_currently_in_use = cursor.fetchone()[0] + 999
+        id_not_currently_in_use = cursor.fetchone()['MAX(id)'] + 999
 
         cursor.close()
         cnx.close()
-
     except Exception as e:
-        print('/search: not possible in dev', e)
-        terms+=['Nachhaltigkeit', 'Sustainability']
-        terms_ids['Nachhaltigkeit'] = 0
-        terms_ids['Sustainability'] = 1
-
+        print(type(e), e)
 
     # get results for all searchterms
     modules = []
