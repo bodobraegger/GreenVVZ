@@ -1,17 +1,6 @@
-certifi
-chardet
-Click
-Flask
-Flask-Cors
-idna
-itsdangerous
-Jinja2
-MarkupSafe
-mysql-connector
-python-dateutil
-requests
-six
-urllib3
-Werkzeug
-# pyodata
-python-dotenv
+Flask==3.0.3
+Flask-Cors==4.0.1
+mysql-connector==2.2.9
+python-dateutil==2.9.0.post0
+requests==2.32.2
+python-dotenv==1.0.1
