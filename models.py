@@ -1,9 +1,5 @@
 # coding=utf8
 import requests
-from datetime import date
-from dateutil.relativedelta import relativedelta
-
-import helpers
 
 class Globals():
     URI_prefix_details = "https://studentservices.uzh.ch/sap/opu/odata/uzh/vvz_data_srv"
