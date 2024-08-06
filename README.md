@@ -126,3 +126,25 @@ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mar
 # restart after shutdown
 docker start mariadbtest
 ```
+
+### resaving all studyprograms
+
+```js
+all = document.querySelectorAll('#whitelist_body tr');
+processed = []
+all.forEach(e=>{processed.push(
+    [
+        e.id.replace('module_',''), // moduleid
+        e.dataset['smobjid'], // smobjid
+        e.dataset['semester'].split(' ')[0], // year
+        e.dataset['semester'].split(' ')[1], // semester
+        1, // whitelisted
+        e.children[1].innerText, // search term
+        e.children[1].dataset['searchterm_id'] // search term id
+    ]
+)})
+
+processed.forEach(e=>{
+    post_module_to_db(e[0],e[1],e[2],e[3],whitelisted=e[4],e[5],e[6])
+})
+```
