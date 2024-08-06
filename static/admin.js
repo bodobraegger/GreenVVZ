@@ -337,7 +337,6 @@ async function populate_searchterms(){
         method: 'GET',
         success: function (data) {
             searchterms.empty()
-            console.log(data)
             for (var row in data){
                 add_to_searchterms(data[row].id, data[row].term)
             }
