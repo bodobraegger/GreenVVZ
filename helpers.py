@@ -4,8 +4,7 @@ import os
 import mysql.connector
 import sqlite3
 from dotenv import load_dotenv
-load_dotenv()
-print(os.environ.get('DB_USER'))
+load_dotenv(override=True)
 
 
 def get_session(ref_date = date.today(), target_date = None, padded=True) -> dict:
