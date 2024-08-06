@@ -107,3 +107,22 @@ To set up a server hosting this tool, which will be required to implement and te
             ```
 
     
+
+
+
+## Notes: 
+
+### Using a local MariaDB 
+
+```bash
+# Initial setup
+docker run --name mariadbtest -e MYSQL_ROOT_PASSWORD=mypass -p 3306:3306 -d docker.io/library/mariadb:10.6.17
+# to init database
+docker cp tables_creation.sql mariadbtest:/tables.sql
+docker exec -it mariadbtest chmod 777 tables.sql
+docker exec -it mysql -u root -p db_name < tables.sql
+# get IP
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mariadbtest
+# restart after shutdown
+docker start mariadbtest
+```
