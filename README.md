@@ -130,7 +130,7 @@ docker start mariadbtest
 ### resaving all studyprograms
 
 ```js
-all = document.querySelectorAll('#whitelist_body tr');
+all = document.querySelectorAll('#whitelist_body tr:not(.hidden)');
 processed = []
 all.forEach(e=>{processed.push(
     [
