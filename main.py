@@ -21,7 +21,9 @@ import updateModules
 import helpers
 
 # Initialize flask app
-app = Flask(__name__, static_url_path='/static')
+# TODO: This is a hack, in production, a real WSGI server should be used, and the app should be served from root,
+# with the SCRIPT_NAME and APPLICATION_ROOT env vars to handle routing.
+app = Flask(__name__, static_url_path=f"{os.getenv('BASENAME', '/greenvvz')}/static")
 # for handling CORS, making corss-origin AJAX possible.
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -45,7 +47,7 @@ def require_appkey(view_function):
     return decorated_function
 
 
-@app.route('/echo', methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'])
+@app.route('/greenvvz/echo', methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'])
 @cross_origin()
 @require_appkey
 def hello_world():
