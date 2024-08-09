@@ -29,8 +29,9 @@ api_url = os.environ.get('API_URL', '/')
 if api_url[-1] == '/':
     api_url = api_url[:-1]
     os.environ['API_URL'] = api_url[:-1]
-    if 'http' in api_url:
-        prefix = '/' + api_url.split('/')[2:][-1]
+
+if 'http' in api_url:
+    prefix = '/' + api_url.split('/')[2:][-1]
 
 app = Flask(__name__, static_url_path=f"{prefix}/static")
 # SUB URL HANDLING DONE
