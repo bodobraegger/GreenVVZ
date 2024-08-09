@@ -23,7 +23,7 @@ import helpers
 # Initialize flask app
 # TODO: This is a hack, in production, a real WSGI server should be used, and the app should be served from root,
 # with the SCRIPT_NAME and APPLICATION_ROOT env vars to handle routing.
-app = Flask(__name__, static_url_path=f"{os.getenv('BASENAME', '/greenvvz')}/static")
+app = Flask(__name__, static_url_path=f"/{os.getenv('API_URL', '/greenvvz').split('/')[-1]}/static")
 # for handling CORS, making corss-origin AJAX possible.
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
