@@ -51,10 +51,10 @@ def current_year() -> int:
 ### DB helpers
 # Database config from environment.
 db_config = {
-    'user': os.environ.get('DB_USER', 'test'),
-    'password': os.environ.get('DB_PASSWORD', 'testpw'),
-    'host': os.environ.get('DB_HOST', 'localhost'),
-    'database': os.environ.get('DB_NAME', 'testdb'),
+    'user': os.environ.get('DB_USER', 'root'),
+    'password': os.environ.get('DB_PASSWORD', 'mypass'),
+    'host': os.environ.get('DB_HOST', '172.17.0.2'),
+    'database': os.environ.get('DB_NAME', 'db_name'),
 }
 
 def get_cnx_and_cursor():
