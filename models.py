@@ -31,6 +31,9 @@ class Module:
         try:
             # if the module does not exist, raise HTTP error 404
             r.raise_for_status()
+            # if the module exists with 'no content' (204), return None
+            if r.status_code == 204:
+                return None
 
             module = {
                 'SmObjId':      r.json()['d']['SmObjId'],
