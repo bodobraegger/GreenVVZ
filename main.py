@@ -548,8 +548,8 @@ def find_modules_for_course(course: dict):
             })
         course['Modules'] = list({frozenset(item.items()) : item for item in course['Modules']}.values())
     except Exception as e:
-        print("ERROR: Processing the module request for course '{}' failed: {}".format(course['EStext'], e))
-    
+        print(f"ERROR: Processing the module request for course '{course['EStext']}' failed. \n=> {type(e)}: {e}")
+
     return course['Modules']
 
 @app.route('/studyprograms', methods=['GET'])

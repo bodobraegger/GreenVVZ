@@ -49,8 +49,8 @@ class Module:
                 self.set_module(module)
                 # print("find_module_values retrieved: {}".format(module))  
                 return module
-        except requests.exceptions.HTTPError as err:
-            print(type(err), err)
+        except Exception as err:
+            print(f"find_module_values failed for {self.SmObjId}\n", type(err), err)
             return None
 
     def set_module(self, values: dict):
