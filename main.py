@@ -35,7 +35,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'secret')
 
 # custom
-app.config['API_URL'] = os.environ.get('API_URL', 'http://localhost:5000')
+app.config['API_URL'] = os.environ.get('API_URL', '')
 
 print(f"{app.config=}")
 
