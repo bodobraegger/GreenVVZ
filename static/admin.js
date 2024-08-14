@@ -374,7 +374,7 @@ async function populate_whitelist(){
             ShowSelectedModules();
         },
         error : function (err) {
-            console.log('Whitelist konnte nicht abgerufen werden: '+err.Message)
+            console.log('Whitelist konnte nicht abgerufen werden: '+err)
         },
         complete : function() {
             // hide loading screen
@@ -412,7 +412,7 @@ async function populate_blacklist(){
             ShowSelectedModules();
         },
         error : function (err) {
-            console.log('Blacklist konnte nicht abgerufen werden: '+err.Message)
+            console.log('Blacklist konnte nicht abgerufen werden: '+err)
         },
         complete : function() {
             // hide loading screen
@@ -453,7 +453,7 @@ async function populate_suggestions(){
             ShowSelectedModules();
         },
         error : function (err) {
-            console.log('Suchvorschläge konnten nicht abgerufen werden: '+err.Message)
+            console.log('Suchvorschläge konnten nicht abgerufen werden: '+err)
         },
         complete : function() {
             // hide loading screen
@@ -519,7 +519,7 @@ async function populate_studyprograms() {
             studyprogram_textlist = data[1]
         },
         error : function (err) {
-            console.log('/studyprograms konnten nicht abgerufen werden: '+err.Message)
+            console.log('/studyprograms konnten nicht abgerufen werden: '+err)
         },
         complete : function() {
             // overwrite loading designator, enable button
@@ -535,7 +535,7 @@ async function populate_studyprograms() {
             studyprogramid_moduleids = data;
         },
         error : function (err) {
-            console.log('/studyprograms_modules konnte nicht abgerufen werden: '+err.Message)
+            console.log('/studyprograms_modules konnte nicht abgerufen werden: '+err)
         },
     })
     // update the autocomplete list
